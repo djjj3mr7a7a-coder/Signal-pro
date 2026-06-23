@@ -452,15 +452,16 @@ function analyze(O,H,L,C){
     reasons.push("Price near Pivot ("+sr.pivot.toFixed(5)+") — await breakout for entry");
   }
 
-  // Calculate best duration based on ATR and timeframe volatility
+  // Smart duration based on ATR volatility
   var volatility=atr(H,L,C,14);
-  var avgPrice=last;
-  var atrPct=(volatility/avgPrice)*100;
+  var atrPct=(volatility/last)*100;
   var duration;
-  if(direction==="WAIT"){duration="No Trade";}
-  else if(atrPct>0.15){duration="1-2 min";}
-  else if(atrPct>0.08){duration="3-5 min";}
-  else{duration="5-15 min";}
+  if(direction==="WAIT"){duration="No Entry";}
+  else if(atrPct>0.2){duration="1 min";}
+  else if(atrPct>0.12){duration="2 min";}
+  else if(atrPct>0.07){duration="3 min";}
+  else if(atrPct>0.04){duration="5 min";}
+  else{duration="15 min";}
 
   return{direction:direction,dcls:dcls,accuracy:Math.round(accuracy),strength:Math.round(strength),
     reasons:reasons,sr:sr,last:last.toFixed(5),duration:duration,
@@ -470,31 +471,111 @@ function analyze(O,H,L,C){
     emaScore:emaScore,totalScore:totalScore};
 }
 
+async function fetchTF(symbol,interval){
+  var url="https://api.twelvedata.com/time_series?symbol="+symbol+"&interval="+interval+"&outputsize=100&apikey=fbaf04b411c7458f923c05ef24bcc878";
+  var res=await fetch(url);
+  if(!res.ok)throw new Error("Network error");
+  var text=await res.text();
+  var data=JSON.parse(text);
+  if(data.status==="error"||!data.values)throw new Error(data.message||"No data");
+  var vals=data.values.reverse();
+  return{
+    O:vals.map(function(v){return parseFloat(v.open);}),
+    H:vals.map(function(v){return parseFloat(v.high);}),
+    L:vals.map(function(v){return parseFloat(v.low);}),
+    C:vals.map(function(v){return parseFloat(v.close);})
+  };
+}
+
+function quickBias(O,H,L,C){
+  var last=C[C.length-1];
+  var e20=ema(C.slice(-20),20);
+  var e50=ema(C.slice(-50),50);
+  var r=rsi(C);
+  var m=macd(C);
+  var score=0;
+  if(last>e20)score++;else score--;
+  if(last>e50)score++;else score--;
+  if(r<45)score++;else if(r>55)score--;
+  if(m>0)score++;else score--;
+  if(score>=2)return"UP";
+  if(score<=-2)return"DOWN";
+  return"NEUTRAL";
+}
+
 async function getSignal(){
   if(isLoading)return;
   isLoading=true;
   var btn=document.getElementById("getBtn");
   btn.className="get-btn loading";btn.innerHTML="Analyzing...";
   dd.style.display="none";
-  setCard('<div style="text-align:center;width:100%;padding:20px 0"><div class="spinner"></div><div class="analyzing">Multi-layer market analysis...</div></div>');
+  setCard('<div style="text-align:center;width:100%;padding:20px 0"><div class="spinner"></div><div class="analyzing">Scanning 5 timeframes...</div><div style="color:#333;font-size:11px;margin-top:6px">Please wait ~5 seconds</div></div>');
   var tf=document.getElementById("tfSelect").value;
   try{
-    var url="https://api.twelvedata.com/time_series?symbol="+currentPair.symbol+"&interval="+tf+"&outputsize=100&apikey=fbaf04b411c7458f923c05ef24bcc878";
-    var res=await fetch(url);
-    if(!res.ok)throw new Error("Network error: "+res.status);
-    var text=await res.text();
-    var data;
-    try{data=JSON.parse(text);}catch(e){throw new Error("Invalid response from server");}
-    if(data.status==="error"||!data.values)throw new Error(data.message||"No data received");
-    var vals=data.values.reverse();
-    var O=vals.map(function(v){return parseFloat(v.open);});
-    var H=vals.map(function(v){return parseFloat(v.high);});
-    var L=vals.map(function(v){return parseFloat(v.low);});
-    var C=vals.map(function(v){return parseFloat(v.close);});
+    // Fetch main TF first, then others sequentially
+    var TFS=["1min","5min","15min","1h","4h"];
+    var TF_LABELS={"1min":"1M","5min":"5M","15min":"15M","1h":"1H","4h":"4H"};
+    var mainIdx=TFS.indexOf(tf);
+    var main=await fetchTF(currentPair.symbol,tf);
+    if(!main)throw new Error("Failed to fetch main timeframe");
+    var O=main.O,H=main.H,L=main.L,C=main.C;
+    // Fetch other TFs with small delays to avoid rate limit
+    var results=[];
+    for(var ti=0;ti<TFS.length;ti++){
+      if(ti===mainIdx){results.push(main);}
+      else{
+        try{
+          await new Promise(function(r){setTimeout(r,300);});
+          var r2=await fetchTF(currentPair.symbol,TFS[ti]);
+          results.push(r2);
+        }catch(e){results.push(null);}
+      }
+    }
     var sig=analyze(O,H,L,C);
+
+    // MTF alignment
+    var mtfData=[];
+    var alignedUP=0,alignedDOWN=0;
+    TFS.forEach(function(t,i){
+      if(results[i]){
+        var bias=quickBias(results[i].O,results[i].H,results[i].L,results[i].C);
+        mtfData.push({tf:TF_LABELS[t],bias:bias,active:t===tf});
+        if(bias==="UP")alignedUP++;
+        else if(bias==="DOWN")alignedDOWN++;
+      }
+    });
+    var mtfAlignment=Math.max(alignedUP,alignedDOWN);
+    var mtfDir=alignedUP>alignedDOWN?"UP":alignedDOWN>alignedUP?"DOWN":"NEUTRAL";
+
+    // Override with WAIT if MTF disagrees with signal
+    if(mtfDir!=="NEUTRAL"&&mtfDir!==sig.direction&&sig.direction!=="WAIT"){
+      sig.direction="WAIT";sig.dcls="wait";
+    }
+    // Boost confidence if MTF agrees
+    if(mtfDir===sig.direction&&sig.direction!=="WAIT"){
+      sig.accuracy=Math.min(96,sig.accuracy+Math.round(mtfAlignment*2));
+      sig.strength=Math.min(98,sig.strength+Math.round(mtfAlignment*2));
+    }
+    // Add MTF reason
+    if(mtfAlignment>=4&&sig.direction!=="WAIT"){
+      sig.reasons[2]=mtfAlignment+" out of 5 timeframes confirm "+sig.direction+" — strong multi-timeframe alignment";
+    }
+
     var isUP=sig.direction==="UP";
     var darr=isUP?"&#8593;":sig.direction==="DOWN"?"&#8595;":"&#8213;";
     var tfLabel=tf.replace("min"," min").replace("1h","1H").replace("4h","4H");
+
+    // MTF rows HTML
+    var mtfHTML=mtfData.map(function(d){
+      var cls=d.bias==="UP"?"bull":d.bias==="DOWN"?"bear":"neut";
+      var w=d.bias==="UP"?75:d.bias==="DOWN"?75:35;
+      var fillCol=d.bias==="UP"?"#00e096":d.bias==="DOWN"?"#ff4d6d":"#f0c040";
+      return'<div class="mtf-row">'+
+        '<div class="mtf-tf"'+(d.active?' style="color:#7c83ff;font-weight:700"':'')+'>'+d.tf+'</div>'+
+        '<div class="mtf-bar"><div class="mtf-fill" style="width:'+w+'%;background:'+fillCol+'"></div></div>'+
+        '<div class="mtf-sig '+cls+'">'+d.bias+'</div>'+
+      '</div>';
+    }).join("");
     var patsHTML=sig.patterns.length>0?sig.patterns.map(function(p){return'<span class="wave-tag">'+p+'</span>';}).join(""):"<span style=\'color:#333;font-size:11px\'>No pattern detected</span>";
     var reasonsHTML=sig.reasons.map(function(r,i){
       return'<div class="reason-item"><div class="reason-num '+sig.dcls+'">'+( i+1)+'</div><div class="reason-txt">'+r+'</div></div>';
@@ -502,9 +583,13 @@ async function getSignal(){
     setCard(
       '<div class="card-inner">'+
       '<div class="sec-lbl">Live Market Analysis</div>'+
-      '<div class="g2">'+
-        '<div class="ibox" style="margin-bottom:0"><div class="ilbl">Pair</div><div class="ival" style="font-size:13px">'+currentPair.label+'</div></div>'+
-        '<div class="ibox" style="margin-bottom:0"><div class="ilbl">Confidence</div><div class="ival acc">'+( sig.direction==="WAIT"?"---":sig.accuracy+"%")+'</div></div>'+
+      '<div class="ibox" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">'+
+        '<div><div class="ilbl">Confidence</div><div class="ival acc" style="font-size:22px">'+( sig.direction==="WAIT"?"---":sig.accuracy+"%")+'</div></div>'+
+        '<div style="text-align:right"><div class="ilbl">Market Bias</div><div class="ival" style="font-size:13px;color:#a0a8c8">'+sig.ms.trend+'</div></div>'+
+      '</div>'+
+      '<div class="mtf-box" style="margin-bottom:8px">'+
+        '<div class="ilbl" style="margin-bottom:8px">Multi-Timeframe Alignment</div>'+
+        mtfHTML+
       '</div>'+
       '<div class="g3" style="margin-top:8px">'+
         '<div class="ibox" style="margin-bottom:0"><div class="ilbl">RSI</div><div class="ival '+( sig.rsi<40?"bull":sig.rsi>60?"bear":"neut")+'">'+sig.rsi+'</div></div>'+
@@ -528,7 +613,7 @@ async function getSignal(){
       '<div class="dir-box '+sig.dcls+'" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'+
         '<div><div class="ilbl" style="margin-bottom:4px">Signal</div>'+
           '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:24px">'+darr+'</span><span class="dir-lbl '+sig.dcls+'">'+sig.direction+'</span></div></div>'+
-        '<div style="text-align:right"><div class="ilbl" style="margin-bottom:4px">Timeframe</div><div style="font-size:16px;font-weight:700;color:#7c83ff">'+tfLabel+'</div></div>'+
+        '<div style="text-align:right"><div class="ilbl" style="margin-bottom:4px">Duration</div><div style="font-size:16px;font-weight:700;color:#7c83ff">'+sig.duration+'</div></div>'+
       '</div>'+
       '<div class="reasons-box">'+
         '<div class="ilbl" style="margin-bottom:8px">&#10024; Top 3 Reasons</div>'+
