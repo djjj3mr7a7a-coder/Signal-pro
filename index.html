@@ -82,7 +82,7 @@
   </div>
 
   <div class="card" id="card">
-    <div class="idle">اضغط للبدء بفحص داتا الـ Multi-Timeframe الشمل من الدقيقة للأربع ساعات</div>
+    <div class="idle">اضغط للبدء بفحص داتا الـ Multi-Timeframe الشامل من الدقيقة للأربع ساعات</div>
   </div>
 
   <button class="get-btn" id="getBtn" onclick="getMultiSignal()">
@@ -91,7 +91,10 @@
 </div>
 
 <script>
-const API_KEY = "fbaf04b411c7458f923c05ef24bcc878";
+// دمج مفتاحين لتبديل الحمل أوتوماتيكياً عند حدوث ضغط
+const API_KEYS = ["fbaf04b411c7458f923c05ef24bcc878", "ad7397b987b7445cbfd0092f39293144"];
+let currentKeyIndex = 0;
+
 const PAIRS = [
   {label:"EUR/USD", symbol:"EUR/USD"},
   {label:"GBP/USD", symbol:"GBP/USD"},
@@ -102,8 +105,6 @@ const PAIRS = [
 ];
 let currentPair = PAIRS[0];
 let isLoading = false;
-
-// كاش لتخزين البيانات منعاً لتجميد الـ API
 let apiCache = {};
 
 const dd = document.getElementById("pairDropdown");
@@ -159,28 +160,46 @@ function processSingleTF(values) {
   if (lastClose > pivot && trendUp) side = "UP";
   if (lastClose < pivot && !trendUp) side = "DOWN";
 
-  return { side, lastClose, r1, s1, lastOpen, lastHigh, lastLow, prevClose: close[len - 2] };
+  return { side, lastClose, r1, s1, lastOpen, lastHigh, lastLow };
 }
 
-async function fetchWithCache(symbol, tf) {
+async function fetchWithFallback(symbol, tf) {
   const cacheKey = `${symbol}_${tf}`;
   const now = Date.now();
   
-  if (apiCache[cacheKey] && (now - apiCache[cacheKey].timestamp < 45000)) {
+  if (apiCache[cacheKey] && (now - apiCache[cacheKey].timestamp < 30000)) {
     return apiCache[cacheKey].data;
   }
   
-  const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${tf}&outputsize=30&apikey=${API_KEY}`;
-  const res = await fetch(url);
-  const data = await res.json();
+  // محاولة جلب البيانات بالمفتاح الحالي
+  let key = API_KEYS[currentKeyIndex];
+  let url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${tf}&outputsize=30&apikey=${key}`;
   
-  if (data.status === "error" || !data.values) {
+  try {
+    let res = await fetch(url);
+    let data = await res.json();
+    
+    if (data.status === "error" || !data.values) {
+      // الكي الأول مضغوط، ننقل على الكي التاني فوراً ونعيد الطلب
+      currentKeyIndex = (currentKeyIndex + 1) % API_KEYS.length;
+      key = API_KEYS[currentKeyIndex];
+      url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${tf}&outputsize=30&apikey=${key}`;
+      
+      res = await fetch(url);
+      data = await res.json();
+      
+      if (data.status === "error" || !data.values) {
+        if (apiCache[cacheKey]) return apiCache[cacheKey].data;
+        throw new Error("تجاوزت الحد؛ انتظر 15 ثانية فقط.");
+      }
+    }
+    
+    apiCache[cacheKey] = { timestamp: now, data: data };
+    return data;
+  } catch(e) {
     if (apiCache[cacheKey]) return apiCache[cacheKey].data;
-    throw new Error(data.message || "تجاوزت الحد المسموح، انتظر ثواني.");
+    throw e;
   }
-  
-  apiCache[cacheKey] = { timestamp: now, data: data };
-  return data;
 }
 
 async function getMultiSignal(){
@@ -188,17 +207,17 @@ async function getMultiSignal(){
   isLoading = true;
   const btn = document.getElementById("getBtn");
   btn.className = "get-btn loading";
-  btn.innerHTML = "جاري تجميع فريمات الـ MTF...";
+  btn.innerHTML = "جاري الفحص المتقدم...";
 
   setCard(`<div style="text-align:center;width:100%;">
     <div class="spinner"></div>
-    <div class="analyzing">تجميع شارت (1m, 5m, 15m, 4h)<br>يتم الفحص وحماية الـ API من التجميد...</div>
+    <div class="analyzing">تجميع شارت الفريمات (1m, 5m, 15m, 4h)<br>يتم فحص السوق بالمفاتيح الاحتياطية الموازية...</div>
   </div>`);
 
   const timeframes = ["1min", "5min", "15min", "4h"];
   
   try {
-    const promises = timeframes.map(tf => fetchWithCache(currentPair.symbol, tf));
+    const promises = timeframes.map(tf => fetchWithFallback(currentPair.symbol, tf));
     const results = await promises;
 
     const tf1m = processSingleTF(results[0].values);
@@ -286,7 +305,7 @@ async function getMultiSignal(){
     }
 
   } catch(e) {
-    setCard(`<div class="err-box">⚠️ الحد المجاني مضغوط حالياً، انتظر 30 ثانية واضغط مجدداً وسيعمل أوتوماتيكياً.</div>`);
+    setCard(`<div class="err-box">⚠️ السيرفرات مضغوطة جداً، انتظر ثواني واضغط مجدداً وسيعمل بمفتاح الطوارئ.</div>`);
     btn.className = "get-btn";
     btn.innerHTML = "🚀 فحص وإغلاق جميع الفريمات تزامناً";
   }
