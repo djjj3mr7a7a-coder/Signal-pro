@@ -113,7 +113,7 @@
   <div class="selectors">
     <div style="flex:1;position:relative;">
       <button class="pair-btn" id="pairBtn">
-        <span id="pairLabel">&#127466;&#127482; EUR/USD</span>
+        <span id="pairLabel">EUR/USD</span>
         <span style="color:#444;font-size:10px;">&#9660;</span>
       </button>
       <div class="pair-dropdown" id="pairDropdown" style="display:none;"></div>
@@ -164,10 +164,10 @@ const dd=document.getElementById("pairDropdown");
 PAIRS.forEach(function(p){
   const d=document.createElement("div");
   d.className="pair-item"+(p.symbol===currentPair.symbol?" active":"");
-  d.innerHTML=p.flag+" "+p.label;
+  d.innerHTML=p.label;
   d.onclick=function(){
     currentPair=p;
-    document.getElementById("pairLabel").innerHTML=p.flag+" "+p.label;
+    document.getElementById("pairLabel").innerHTML=p.label;
     document.querySelectorAll(".pair-item").forEach(function(x){x.classList.remove("active");});
     d.classList.add("active");dd.style.display="none";resetCard();
   };
@@ -290,22 +290,48 @@ function candlePatterns(O,H,L,C){
   return{patterns:patterns,score:score};
 }
 
-// ======= WAVE ANALYSIS (Elliott simplified) =======
+// ======= WAVE ANALYSIS (Elliott - Impulsive vs Corrective) =======
 function waveAnalysis(C){
   var n=C.length;
-  var w=[];
-  var dir=C[10]>C[0]?1:-1;
-  var waveCount=1;
-  for(var i=10;i<n-5;i+=8){
-    w.push({wave:waveCount,dir:dir,high:Math.max.apply(null,C.slice(i,i+8)),low:Math.min.apply(null,C.slice(i,i+8))});
-    waveCount++;dir=-dir;
-    if(waveCount>5)break;
+  // Detect swing points
+  var swings=[];
+  for(var i=2;i<n-2;i++){
+    if(C[i]>C[i-1]&&C[i]>C[i-2]&&C[i]>C[i+1]&&C[i]>C[i+2])swings.push({i:i,v:C[i],type:"H"});
+    if(C[i]<C[i-1]&&C[i]<C[i-2]&&C[i]<C[i+1]&&C[i]<C[i+2])swings.push({i:i,v:C[i],type:"L"});
   }
-  var lastWave=w[w.length-1];
-  var currentTrend=C[n-1]>C[n-10]?"UP":"DOWN";
-  var waveLabel="Wave "+waveCount;
-  var waveBias=lastWave&&lastWave.dir>0?"Impulsive UP":"Corrective DOWN";
-  return{waveLabel:waveLabel,waveBias:waveBias,currentTrend:currentTrend,waves:w.length};
+  // Determine wave type from last 3 swings
+  var waveType="Unknown";
+  var waveBias="Analyzing...";
+  var waveNum="";
+  var score=0;
+  if(swings.length>=3){
+    var s1=swings[swings.length-3];
+    var s2=swings[swings.length-2];
+    var s3=swings[swings.length-1];
+    // Impulsive UP: L -> H -> higher L -> higher H
+    if(s1.type==="L"&&s2.type==="H"&&s3.type==="L"&&s3.v>s1.v){
+      waveType="Impulsive";waveBias="Wave 3 UP (Strongest)";waveNum="&#9651; W3";score=3;
+    }
+    // Corrective DOWN after up move
+    else if(s1.type==="H"&&s2.type==="L"&&s3.type==="H"&&s3.v<s1.v){
+      waveType="Corrective";waveBias="Wave ABC DOWN";waveNum="&#9661; ABC";score=-2;
+    }
+    // Impulsive DOWN
+    else if(s1.type==="H"&&s2.type==="L"&&s3.type==="H"&&s3.v<s1.v&&C[n-1]<s2.v){
+      waveType="Impulsive";waveBias="Wave 3 DOWN (Bearish)";waveNum="&#9661; W3";score=-3;
+    }
+    // Corrective UP (retracement)
+    else if(s1.type==="L"&&s2.type==="H"&&s3.type==="L"&&s3.v<s1.v){
+      waveType="Corrective";waveBias="Wave ABC UP";waveNum="&#9651; ABC";score=1;
+    }
+    else{
+      waveType=C[n-1]>C[n-10]?"Impulsive":"Corrective";
+      waveBias=waveType==="Impulsive"?"Trending UP":"Trending DOWN";
+      waveNum=waveType==="Impulsive"?"&#9651; W5":"&#9661; W4";
+      score=waveType==="Impulsive"?1:-1;
+    }
+  }
+  return{waveType:waveType,waveBias:waveBias,waveNum:waveNum,waveScore:score,swings:swings.length};
 }
 
 // ======= MOMENTUM =======
@@ -359,6 +385,7 @@ function analyze(O,H,L,C){
 
   // Market structure
   totalScore+=ms.score;
+  totalScore+=wa.waveScore||0;
 
   // Breakout/Retest
   totalScore+=br.score;
@@ -373,8 +400,24 @@ function analyze(O,H,L,C){
   if(tl.trendDir==="UP_CHANNEL")totalScore+=1;
   else if(tl.trendDir==="DOWN_CHANNEL")totalScore-=1;
 
+  // Conflict detection - if major indicators disagree, force WAIT
+  var emaUp=last>e20&&e20>e50;
+  var emaDown=last<e20&&e20<e50;
+  var rsiUp=r<50;
+  var rsiDown=r>50;
+  var msUp=ms.score>0;
+  var msDown=ms.score<0;
+  var macdUp=m>0;
+  var macdDown=m<0;
+  var conflicts=0;
+  if(emaUp&&msDown)conflicts++;
+  if(emaDown&&msUp)conflicts++;
+  if(emaUp&&rsiDown&&r>65)conflicts++;
+  if(emaDown&&rsiUp&&r<35)conflicts++;
+  if(macdUp&&emaDown)conflicts++;
+  if(macdDown&&emaUp)conflicts++;
   var direction,dcls;
-  if(Math.abs(totalScore)<3){direction="WAIT";dcls="wait";}
+  if(conflicts>=2||Math.abs(totalScore)<3){direction="WAIT";dcls="wait";}
   else if(totalScore>0){direction="UP";dcls="up";}
   else{direction="DOWN";dcls="down";}
 
@@ -397,7 +440,7 @@ function analyze(O,H,L,C){
     if(tl.trendDir!=="NEUTRAL"&&tl.trendDir!=="CONVERGING")reasons.push("Trend channel is "+tl.trendDir+" — price following channel direction");
     if(k<25&&isUP)reasons.push("Stochastic at "+k.toFixed(0)+" — oversold, momentum reversal forming");
     if(k>75&&!isUP)reasons.push("Stochastic at "+k.toFixed(0)+" — overbought, momentum fading");
-    if(wa.waveBias)reasons.push("Elliott Wave analysis: "+wa.waveLabel+" — "+wa.waveBias);
+    if(wa.waveBias)reasons.push("Elliott Wave: "+wa.waveBias+" — "+wa.waveType+" move in progress");
     reasons=reasons.slice(0,3);
     while(reasons.length<3){
       if(isUP)reasons.push("Price holding above Pivot ("+sr.pivot.toFixed(5)+") — bullish bias maintained");
@@ -423,7 +466,7 @@ function analyze(O,H,L,C){
     reasons:reasons,sr:sr,last:last.toFixed(5),duration:duration,
     rsi:r.toFixed(1),macd:m.toFixed(5),stoch:k.toFixed(0),
     e20:e20.toFixed(5),e50:e50.toFixed(5),
-    patterns:cp.patterns,ms:ms,wa:wa,tl:tl,
+    patterns:cp.patterns,ms:ms,wa:wa,tl:tl,waveBias:wa.waveBias,waveNum:wa.waveNum,waveType:wa.waveType,
     emaScore:emaScore,totalScore:totalScore};
 }
 
@@ -460,7 +503,7 @@ async function getSignal(){
       '<div class="card-inner">'+
       '<div class="sec-lbl">Live Market Analysis</div>'+
       '<div class="g2">'+
-        '<div class="ibox" style="margin-bottom:0"><div class="ilbl">Pair</div><div class="ival" style="font-size:13px">'+currentPair.flag+' '+currentPair.label+'</div></div>'+
+        '<div class="ibox" style="margin-bottom:0"><div class="ilbl">Pair</div><div class="ival" style="font-size:13px">'+currentPair.label+'</div></div>'+
         '<div class="ibox" style="margin-bottom:0"><div class="ilbl">Confidence</div><div class="ival acc">'+( sig.direction==="WAIT"?"---":sig.accuracy+"%")+'</div></div>'+
       '</div>'+
       '<div class="g3" style="margin-top:8px">'+
@@ -479,13 +522,13 @@ async function getSignal(){
         '<div class="sr-item"><div class="sr-lbl">Resist R1</div><div class="sr-val bear">'+sig.sr.r1.toFixed(5)+'</div></div>'+
       '</div>'+
       '<div class="wave-box">'+
-        '<div class="wave-lbl">Structure + Patterns | '+sig.ms.trend+' | '+sig.wa.waveLabel+' '+sig.wa.waveBias+'</div>'+
+        '<div class="wave-lbl">'+sig.ms.trend+' | '+sig.waveType+': '+sig.waveBias+'</div>'+
         '<div>'+patsHTML+'</div>'+
       '</div>'+
       '<div class="dir-box '+sig.dcls+'" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'+
         '<div><div class="ilbl" style="margin-bottom:4px">Signal</div>'+
           '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:24px">'+darr+'</span><span class="dir-lbl '+sig.dcls+'">'+sig.direction+'</span></div></div>'+
-        '<div style="text-align:right"><div class="ilbl" style="margin-bottom:4px">Best Duration</div><div style="font-size:16px;font-weight:700;color:#7c83ff">'+sig.duration+'</div></div>'+
+        '<div style="text-align:right"><div class="ilbl" style="margin-bottom:4px">Timeframe</div><div style="font-size:16px;font-weight:700;color:#7c83ff">'+tfLabel+'</div></div>'+
       '</div>'+
       '<div class="reasons-box">'+
         '<div class="ilbl" style="margin-bottom:8px">&#10024; Top 3 Reasons</div>'+
