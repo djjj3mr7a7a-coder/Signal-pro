@@ -5,100 +5,110 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="Signal PRO"/>
+  <meta name="apple-mobile-web-app-title" content="Signal AI"/>
   <meta name="theme-color" content="#08090f"/>
-  <title>Signal PRO</title>
+  <title>Signal AI</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-    body{background:#08090f;color:#e0e0f0;font-family:-apple-system,sans-serif;min-height:100vh;display:flex;justify-content:center;}
+    body{background:#08090f;color:#e0e0f0;font-family:-apple-system,'SF Pro Display',sans-serif;min-height:100vh;display:flex;justify-content:center;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);}
     ::-webkit-scrollbar{width:0;}
     @keyframes spin{to{transform:rotate(360deg)}}
     @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,224,150,0.35)}50%{box-shadow:0 0 0 8px rgba(0,224,150,0)}}
     @keyframes pulseRed{0%,100%{box-shadow:0 0 0 0 rgba(255,77,109,0.35)}50%{box-shadow:0 0 0 8px rgba(255,77,109,0)}}
-    .wrap{width:100%;max-width:390px;padding:0 16px 40px;}
-    .header{display:flex;align-items:center;justify-content:space-between;padding:52px 0 20px;}
+    .wrap{width:100%;max-width:390px;padding:0 16px 32px;}
+    .header{display:flex;align-items:center;justify-content:space-between;padding:52px 0 24px;}
+    .logo{display:flex;align-items:center;gap:6px;}
     .logo-signal{font-size:22px;font-weight:800;background:linear-gradient(135deg,#4fc3f7,#7c83ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-    .logo-pro{font-size:12px;font-weight:700;color:#f0c040;background:rgba(240,192,64,0.15);padding:2px 8px;border-radius:6px;margin-left:4px;}
-    .selectors{display:flex;gap:8px;margin-bottom:16px;position:relative;}
+    .logo-ai{font-size:22px;font-weight:800;color:#fff;}
+    .logo-star{font-size:14px;color:#7c83ff;}
+    .header-icons{display:flex;gap:10px;}
+    .icon-btn{width:32px;height:32px;border-radius:50%;border:1px solid #1e2235;display:flex;align-items:center;justify-content:center;color:#8fa0c0;font-size:15px;cursor:pointer;background:none;}
+    .selectors{display:flex;gap:8px;margin-bottom:20px;position:relative;}
     .pair-btn{flex:1;display:flex;align-items:center;justify-content:space-between;background:#10121e;border:1px solid #1e2235;border-radius:10px;padding:10px 12px;color:#e0e0f0;font-size:13px;font-weight:600;cursor:pointer;}
+    .pair-btn:active{background:#1a1c2e;}
+    .pair-arrow{color:#666;font-size:10px;}
     .pair-dropdown{position:absolute;top:46px;left:0;right:60px;z-index:100;background:#10121e;border:1px solid #1e2235;border-radius:10px;max-height:220px;overflow-y:auto;box-shadow:0 8px 32px #000;}
-    .pair-item{padding:11px 12px;font-size:13px;cursor:pointer;color:#b0b8d8;border-bottom:1px solid #0d0f1a;}
+    .pair-item{padding:11px 12px;font-size:13px;cursor:pointer;color:#b0b8d8;border-bottom:1px solid #0d0f1a;display:flex;align-items:center;gap:8px;}
     .pair-item.active{color:#7c83ff;background:#1a1c2e;}
     .tf-wrap{position:relative;}
     .tf-select{background:#10121e;border:1px solid #1e2235;border-radius:10px;padding:10px 28px 10px 12px;color:#e0e0f0;font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;}
-    .card{background:#10121e;border:1px solid #1a1c2e;border-radius:16px;padding:18px;margin-bottom:12px;min-height:120px;display:flex;align-items:center;justify-content:center;}
+    .tf-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#666;font-size:11px;pointer-events:none;}
+    .card{background:#10121e;border:1px solid #1a1c2e;border-radius:16px;padding:20px;margin-bottom:12px;min-height:320px;display:flex;align-items:center;justify-content:center;}
     .card-inner{width:100%;animation:fadeUp 0.4s ease;}
-    .idle{text-align:center;color:#2a2d45;font-size:14px;}
+    .idle{text-align:center;color:#4a4f73;font-size:14px;}
     .spinner{width:40px;height:40px;border:3px solid #1e2235;border-top:3px solid #7c83ff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;}
-    .analyzing{color:#444;font-size:13px;text-align:center;}
-    .sec-label{font-size:10px;color:#444;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;}
-    .info-box{background:#0d0f1a;border-radius:10px;padding:11px 13px;margin-bottom:8px;}
-    .info-label{font-size:10px;color:#444;margin-bottom:3px;}
-    .info-value{font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
-    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
+    .analyzing{color:#8fa0c0;font-size:13px;text-align:center;}
+    .section-label{font-size:11px;color:#444;font-weight:600;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;}
+    .info-box{background:#0d0f1a;border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+    .info-label{font-size:11px;color:#444;margin-bottom:4px;}
+    .info-value{font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+    .grid2 .info-value{font-size:15px;}
     .acc-value{color:#7c83ff !important;}
-    .bar-row{display:flex;justify-content:space-between;margin-bottom:6px;}
+    .bar-row{display:flex;justify-content:space-between;margin-bottom:8px;}
     .bar-track{background:#1a1c2e;border-radius:100px;height:6px;overflow:hidden;}
-    .bar-fill{height:100%;border-radius:100px;transition:width 0.8s ease;}
-    .bar-fill.green{background:linear-gradient(90deg,#4fc3f7,#00e096);}
-    .bar-fill.red{background:linear-gradient(90deg,#ff4d6d,#ff8c00);}
-    .bar-labels{display:flex;justify-content:space-between;margin-top:3px;}
-    .bar-labels span{font-size:9px;color:#333;}
-    .direction-box{border-radius:10px;padding:13px 15px;margin-bottom:12px;display:flex;align-items:center;}
+    .bar-fill{height:100%;background:linear-gradient(90deg,#4fc3f7,#00e096);border-radius:100px;transition:width 0.8s ease;}
+    .bar-labels{display:flex;justify-content:space-between;margin-top:4px;}
+    .bar-labels span{font-size:10px;color:#333;}
+    .bar-labels .mid{color:#8fa0c0;}
+    .direction-box{border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;}
     .direction-box.up{background:rgba(0,224,150,0.07);border:1px solid rgba(0,224,150,0.18);}
     .direction-box.down{background:rgba(255,77,109,0.07);border:1px solid rgba(255,77,109,0.18);}
     .dir-left{flex:1;}
-    .dir-label{font-size:24px;font-weight:800;}
+    .dir-arrow{font-size:20px;margin-right:6px;}
+    .dir-label{font-size:22px;font-weight:800;}
     .dir-label.up{color:#00e096;}
     .dir-label.down{color:#ff4d6d;}
     .dir-right{text-align:right;}
-    .until-time{font-size:17px;font-weight:700;color:#666;}
-    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
+    .until-label{font-size:11px;color:#444;margin-bottom:4px;}
+    .until-time{font-size:18px;font-weight:700;color:#8fa0c0;}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
     .btn-take{padding:13px;border:none;border-radius:10px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;}
     .btn-take.up{background:#00e096;animation:pulse 2s infinite;}
     .btn-take.down{background:#ff4d6d;animation:pulseRed 2s infinite;}
     .btn-skip{padding:13px;background:transparent;border:1px solid #1e2235;border-radius:10px;color:#666;font-weight:700;font-size:14px;cursor:pointer;}
-    .success-box{text-align:center;padding:14px;background:rgba(0,224,150,0.06);border-radius:10px;border:1px solid rgba(0,224,150,0.18);grid-column:1/-1;}
+    .success-box{text-align:center;padding:14px;background:rgba(0,224,150,0.06);border-radius:10px;border:1px solid rgba(0,224,150,0.18);}
     .success-text{font-size:13px;color:#00e096;font-weight:600;}
-    .new-signal-btn{margin-top:8px;background:none;border:none;color:#444;font-size:12px;cursor:pointer;}
+    .new-signal-btn{margin-top:10px;background:none;border:none;color:#7c83ff;font-size:12px;cursor:pointer;}
     .get-btn{width:100%;padding:15px;background:linear-gradient(135deg,#4fc3f7,#7c83ff);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 24px rgba(124,131,255,0.28);}
     .get-btn.loading{background:#1e2035;cursor:not-allowed;box-shadow:none;}
-    .ind-box{background:#0d0f1a;border-radius:8px;padding:9px 10px;}
-    .ind-label{font-size:9px;color:#444;margin-bottom:2px;}
+    .indicators-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+    .ind-box{background:#0d0f1a;border-radius:10px;padding:10px 12px;}
+    .ind-label{font-size:10px;color:#444;margin-bottom:3px;}
     .ind-value{font-size:13px;font-weight:700;}
-    .bull{color:#00e096;} .bear{color:#ff4d6d;} .neut{color:#f0c040;}
-    .signals-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
-    .sig-item{background:#0d0f1a;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:6px;}
-    .sig-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-    .sig-dot.bull{background:#00e096;} .sig-dot.bear{background:#ff4d6d;} .sig-dot.neut{background:#f0c040;}
-    .sig-text{font-size:10px;color:#888;line-height:1.3;}
-    .patterns-box{background:#0d0f1a;border-radius:10px;padding:11px 13px;margin-bottom:8px;}
-    .pattern-tag{display:inline-block;background:#1a1c2e;border-radius:6px;padding:3px 8px;font-size:10px;color:#7c83ff;margin:2px;}
-    .score-circle{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;border:2px solid;}
-    .nav{display:flex;justify-content:space-around;margin-top:24px;border-top:1px solid #10121e;padding-top:14px;}
-    .nav-item{text-align:center;}
-    .nav-icon{font-size:17px;margin-bottom:2px;}
-    .nav-label{font-size:9px;color:#333;}
+    .ind-value.bull{color:#00e096;}
+    .ind-value.bear{color:#ff4d6d;}
+    .ind-value.neut{color:#f0c040;}
+    .nav{display:flex;justify-content:space-around;margin-top:28px;border-top:1px solid #10121e;padding-top:16px;}
+    .nav-item{text-align:center;cursor:pointer;}
+    .nav-icon{font-size:18px;margin-bottom:3px;}
+    .nav-label{font-size:9px;color:#555;}
+    .nav-item.active .nav-icon{opacity:1;}
     .nav-item.active .nav-label{color:#7c83ff;font-weight:700;}
     .nav-item:not(.active) .nav-icon{opacity:0.25;}
-    .err-box{text-align:center;padding:20px;color:#ff4d6d;font-size:13px;line-height:1.8;}
+    .err-box{text-align:center;padding:20px;color:#ff4d6d;font-size:13px;line-height:1.6;}
   </style>
 </head>
 <body>
 <div class="wrap">
   <div class="header">
-    <div style="display:flex;align-items:center;">
-      <span class="logo-signal">SIGNAL AI</span>
-      <span class="logo-pro">PRO</span>
+    <div class="logo">
+      <span class="logo-signal">SIGNAL</span>
+      <span class="logo-ai">AI</span>
+      <span class="logo-star">+</span>
+    </div>
+    <div class="header-icons">
+      <div class="icon-btn">#</div>
     </div>
   </div>
+
   <div class="selectors">
     <div style="flex:1;position:relative;">
       <button class="pair-btn" id="pairBtn">
-        <span id="pairLabel">&#127466;&#127482; EUR/USD</span>
-        <span style="color:#444;font-size:10px;">&#9660;</span>
+        <span id="pairLabel">FX: EUR/USD</span>
+        <span class="pair-arrow">v</span>
       </button>
       <div class="pair-dropdown" id="pairDropdown" style="display:none;"></div>
     </div>
@@ -109,358 +119,254 @@
         <option value="15min">15 min</option>
         <option value="1h">1 hour</option>
       </select>
+      <span class="tf-icon">T</span>
     </div>
   </div>
+
   <div class="card" id="card">
-    <div class="idle">Press Get Signal to start</div>
+    <div class="idle">Press Get Signal to Start</div>
   </div>
-  <button class="get-btn" id="getBtn" onclick="getSignal()">&#9889; Get Signal</button>
+
+  <button class="get-btn" id="getBtn" onclick="getSignal()">
+    <span>$</span> Get Signal
+  </button>
+
   <div class="nav">
-    <div class="nav-item"><div class="nav-icon">&#128100;</div><div class="nav-label">Profile</div></div>
-    <div class="nav-item"><div class="nav-icon">&#128336;</div><div class="nav-label">History</div></div>
-    <div class="nav-item active"><div class="nav-icon">&#128200;</div><div class="nav-label">Signals</div></div>
-    <div class="nav-item"><div class="nav-icon">&#129302;</div><div class="nav-label">AI</div></div>
-    <div class="nav-item"><div class="nav-icon">&#127911;</div><div class="nav-label">Support</div></div>
+    <div class="nav-item"><div class="nav-icon">P</div><div class="nav-label">Profile</div></div>
+    <div class="nav-item"><div class="nav-icon">H</div><div class="nav-label">History</div></div>
+    <div class="nav-item active"><div class="nav-icon">S</div><div class="nav-label">Signals</div></div>
+    <div class="nav-item"><div class="nav-icon">A</div><div class="nav-label">AI Bot</div></div>
+    <div class="nav-item"><div class="nav-icon">C</div><div class="nav-label">Support</div></div>
   </div>
 </div>
+
 <script>
-const PAIRS=[
-  {label:"EUR/USD",symbol:"EUR/USD",flag:"&#127466;&#127482;"},
-  {label:"GBP/USD",symbol:"GBP/USD",flag:"&#127468;&#127463;"},
-  {label:"USD/JPY",symbol:"USD/JPY",flag:"&#127471;&#127477;"},
-  {label:"AUD/USD",symbol:"AUD/USD",flag:"&#127462;&#127482;"},
-  {label:"USD/CAD",symbol:"USD/CAD",flag:"&#127464;&#127462;"},
-  {label:"EUR/GBP",symbol:"EUR/GBP",flag:"&#127466;&#127482;"},
-  {label:"EUR/JPY",symbol:"EUR/JPY",flag:"&#127466;&#127482;"},
-  {label:"GBP/JPY",symbol:"GBP/JPY",flag:"&#127468;&#127463;"},
-  {label:"USD/CHF",symbol:"USD/CHF",flag:"&#127464;&#127469;"},
-  {label:"NZD/USD",symbol:"NZD/USD",flag:"&#127475;&#127487;"},
-  {label:"AUD/JPY",symbol:"AUD/JPY",flag:"&#127462;&#127482;"},
-  {label:"EUR/CHF",symbol:"EUR/CHF",flag:"&#127466;&#127482;"},
+const API_KEY = "fbaf04b411c7458f923c05ef24bcc878";
+
+const PAIRS = [
+  {label:"EUR/USD", symbol:"EUR/USD"},
+  {label:"GBP/USD", symbol:"GBP/USD"},
+  {label:"USD/JPY", symbol:"USD/JPY"},
+  {label:"AUD/USD", symbol:"AUD/USD"},
+  {label:"USD/CAD", symbol:"USD/CAD"},
+  {label:"EUR/GBP", symbol:"EUR/GBP"},
+  {label:"EUR/JPY", symbol:"EUR/JPY"},
+  {label:"GBP/JPY", symbol:"GBP/JPY"}
 ];
-let currentPair=PAIRS[0],isLoading=false;
-const dd=document.getElementById("pairDropdown");
-PAIRS.forEach(function(p){
-  const d=document.createElement("div");
-  d.className="pair-item"+(p.symbol===currentPair.symbol?" active":"");
-  d.innerHTML=p.flag+" "+p.label;
-  d.onclick=function(){
-    currentPair=p;
-    document.getElementById("pairLabel").innerHTML=p.flag+" "+p.label;
-    document.querySelectorAll(".pair-item").forEach(function(x){x.classList.remove("active");});
-    d.classList.add("active");dd.style.display="none";resetCard();
+let currentPair = PAIRS[0];
+let isLoading = false;
+
+const dd = document.getElementById("pairDropdown");
+PAIRS.forEach(p => {
+  const d = document.createElement("div");
+  d.className = "pair-item" + (p.symbol===currentPair.symbol?" active":"");
+  d.innerHTML = p.label;
+  d.onclick = () => {
+    currentPair = p;
+    document.getElementById("pairLabel").textContent = "FX: " + p.label;
+    document.querySelectorAll(".pair-item").forEach(x=>x.classList.remove("active"));
+    d.classList.add("active");
+    dd.style.display = "none";
+    resetCard();
   };
   dd.appendChild(d);
 });
-document.getElementById("pairBtn").onclick=function(e){e.stopPropagation();dd.style.display=dd.style.display==="none"?"block":"none";};
-document.addEventListener("click",function(){dd.style.display="none";});
-function setCard(h){document.getElementById("card").innerHTML=h;}
+
+document.getElementById("pairBtn").onclick = (e) => {
+  e.stopPropagation();
+  dd.style.display = dd.style.display==="none" ? "block" : "none";
+};
+document.addEventListener("click", () => { dd.style.display="none"; });
+
+function setCard(html){ document.getElementById("card").innerHTML = html; }
+
 function getExpiry(tf){
-  const now=new Date(),map={"1min":1,"5min":5,"15min":15,"1h":60};
-  now.setMinutes(now.getMinutes()+(map[tf]||5));
+  const now = new Date();
+  const map = {"1min":1,"5min":5,"15min":15,"1h":60};
+  now.setMinutes(now.getMinutes() + (map[tf]||5));
   return now.toTimeString().slice(0,5);
 }
 
-// ===== INDICATORS =====
-function calcEMA(data,period){
-  const k=2/(period+1);let ema=data[0];
-  for(let i=1;i<data.length;i++)ema=data[i]*k+ema*(1-k);
-  return ema;
-}
-function calcRSI(data,period){
-  period=period||14;
-  if(data.length<period+1)return 50;
-  let g=0,l=0;
-  for(let i=data.length-period;i<data.length;i++){
-    const d=data[i]-data[i-1];
-    if(d>0)g+=d;else l+=Math.abs(d);
+function analyzeMarket(candles) {
+  const openPrices = candles.map(c => parseFloat(c.open)).reverse();
+  const highPrices = candles.map(c => parseFloat(c.high)).reverse();
+  const lowPrices = candles.map(c => parseFloat(c.low)).reverse();
+  const closePrices = candles.map(c => parseFloat(c.close)).reverse();
+
+  const length = closePrices.length;
+  const lastClose = closePrices[length - 1];
+  const prevClose = closePrices[length - 2];
+  const lastHigh = highPrices[length - 1];
+  const lastLow = lowPrices[length - 1];
+  const lastOpen = openPrices[length - 1];
+
+  const pHigh = highPrices[length - 2];
+  const pLow = lowPrices[length - 2];
+  const pClose = closePrices[length - 2];
+  
+  const pivot = (pHigh + pLow + pClose) / 3;
+  const r1 = (2 * pivot) - pLow;
+  const s1 = (2 * pivot) - pHigh;
+
+  let score = 0;
+  let reason = "Price Action Analysis";
+
+  const bodySize = Math.abs(lastClose - lastOpen);
+  const upperShadow = lastHigh - Math.max(lastClose, lastOpen);
+  const lowerShadow = Math.min(lastClose, lastOpen) - lastLow;
+
+  if (lowerShadow > (bodySize * 2) && lastClose > s1) {
+    score += 3;
+    reason = "Bullish Pin Bar near Support";
   }
-  return 100-(100/(1+(g/period)/((l/period)||0.0001)));
-}
-function calcMACD(data){
-  const ema12=calcEMA(data.slice(-26),12);
-  const ema26=calcEMA(data.slice(-26),26);
-  return ema12-ema26;
-}
-function calcATR(highs,lows,closes,period){
-  period=period||14;
-  let trs=[];
-  for(let i=1;i<closes.length;i++){
-    trs.push(Math.max(highs[i]-lows[i],Math.abs(highs[i]-closes[i-1]),Math.abs(lows[i]-closes[i-1])));
+  if (upperShadow > (bodySize * 2) && lastClose < r1) {
+    score -= 3;
+    reason = "Bearish Pin Bar near Resistance";
   }
-  return trs.slice(-period).reduce(function(a,b){return a+b;},0)/period;
-}
 
-// ===== PRICE ACTION =====
-function detectMarketStructure(closes){
-  const n=closes.length;
-  let hh=0,hl=0,lh=0,ll=0;
-  for(let i=2;i<Math.min(n,20);i++){
-    if(closes[i]>closes[i-1]&&closes[i-1]>closes[i-2])hh++;
-    if(closes[i]>closes[i-2]&&closes[i]<closes[i-1])hl++;
-    if(closes[i]<closes[i-1]&&closes[i-1]<closes[i-2])ll++;
-    if(closes[i]<closes[i-2]&&closes[i]>closes[i-1])lh++;
+  if (prevClose > r1 && lastLow <= r1 && lastClose > r1) {
+    score += 4;
+    reason = "Resistance Broken and Retested (UP)";
   }
-  if(hh+hl>lh+ll+2)return{trend:"UPTREND",label:"HH/HL - Uptrend",score:1};
-  if(ll+lh>hh+hl+2)return{trend:"DOWNTREND",label:"LH/LL - Downtrend",score:-1};
-  return{trend:"SIDEWAYS",label:"Sideways",score:0};
-}
-
-function detectSupportResistance(closes,highs,lows){
-  const last=closes[closes.length-1];
-  const recentHighs=highs.slice(-30);
-  const recentLows=lows.slice(-30);
-  const resistance=Math.max.apply(null,recentHighs);
-  const support=Math.min.apply(null,recentLows);
-  const range=resistance-support;
-  const pos=(last-support)/range;
-  let score=0,zones=[];
-  if(pos<0.25){score+=1;zones.push("Near Support");}
-  else if(pos>0.75){score-=1;zones.push("Near Resistance");}
-  else zones.push("Mid Range");
-  return{support:support.toFixed(5),resistance:resistance.toFixed(5),pos:Math.round(pos*100),score,zones};
-}
-
-function detectBreakoutRetest(closes,highs,lows){
-  const last=closes[closes.length-1];
-  const prev20High=Math.max.apply(null,highs.slice(-22,-2));
-  const prev20Low=Math.min.apply(null,lows.slice(-22,-2));
-  const signals=[];
-  let score=0;
-  if(last>prev20High){signals.push("Bullish Breakout");score+=2;}
-  else if(last<prev20Low){signals.push("Bearish Breakout");score-=2;}
-  const retestHigh=Math.abs(last-prev20High)/prev20High<0.001;
-  const retestLow=Math.abs(last-prev20Low)/prev20Low<0.001;
-  if(retestHigh){signals.push("Retest Resistance");score-=1;}
-  if(retestLow){signals.push("Retest Support");score+=1;}
-  return{signals,score};
-}
-
-// ===== CANDLESTICK PATTERNS =====
-function detectCandlePatterns(opens,highs,lows,closes){
-  const patterns=[];
-  let score=0;
-  const n=closes.length-1;
-  const o=opens[n],h=highs[n],l=lows[n],c=closes[n];
-  const body=Math.abs(c-o);
-  const totalRange=h-l;
-  const upperWick=h-Math.max(o,c);
-  const lowerWick=Math.min(o,c)-l;
-  const bullish=c>o;
-
-  // Doji
-  if(body<totalRange*0.1){patterns.push("Doji");score+=0;}
-  // Hammer
-  if(lowerWick>body*2&&upperWick<body*0.5&&!bullish){patterns.push("Hammer");score+=1;}
-  // Shooting Star
-  if(upperWick>body*2&&lowerWick<body*0.5&&bullish){patterns.push("Shooting Star");score-=1;}
-  // Pin Bar Bull
-  if(lowerWick>body*2.5&&upperWick<body){patterns.push("Bull Pin Bar");score+=2;}
-  // Pin Bar Bear
-  if(upperWick>body*2.5&&lowerWick<body){patterns.push("Bear Pin Bar");score-=2;}
-
-  // Engulfing (2 candles)
-  if(n>0){
-    const po=opens[n-1],pc=closes[n-1];
-    // Bullish Engulfing
-    if(pc<po&&c>o&&c>po&&o<pc){patterns.push("Bullish Engulfing");score+=2;}
-    // Bearish Engulfing
-    if(pc>po&&c<o&&c<po&&o>pc){patterns.push("Bearish Engulfing");score-=2;}
-    // Morning Star
-    if(n>1){
-      const ppo=opens[n-2],ppc=closes[n-2];
-      if(ppc<ppo&&Math.abs(pc-po)<Math.abs(ppc-ppo)*0.3&&c>o&&c>(ppo+ppc)/2){
-        patterns.push("Morning Star");score+=3;
-      }
-      // Evening Star
-      if(ppc>ppo&&Math.abs(pc-po)<Math.abs(ppc-ppo)*0.3&&c<o&&c<(ppo+ppc)/2){
-        patterns.push("Evening Star");score-=3;
-      }
-    }
+  if (prevClose < s1 && lastHigh >= s1 && lastClose < s1) {
+    score -= 4;
+    reason = "Support Broken and Retested (DOWN)";
   }
-  // Strong candle
-  if(body>totalRange*0.7&&bullish){patterns.push("Strong Bull Candle");score+=1;}
-  if(body>totalRange*0.7&&!bullish){patterns.push("Strong Bear Candle");score-=1;}
 
-  return{patterns,score};
-}
+  if (lastClose > r1) { score += 1; }
+  else if (lastClose < s1) { score -= 1; }
 
-// ===== MOMENTUM =====
-function detectMomentum(closes){
-  const n=closes.length;
-  const mom5=closes[n-1]-closes[n-6];
-  const mom10=closes[n-1]-closes[n-11];
-  let score=0,label="";
-  if(mom5>0&&mom10>0){score+=1;label="Strong Bull Momentum";}
-  else if(mom5<0&&mom10<0){score-=1;label="Strong Bear Momentum";}
-  else if(mom5>0){score+=0.5;label="Weak Bull Momentum";}
-  else{score-=0.5;label="Weak Bear Momentum";}
-  return{score,label};
-}
+  const direction = score >= 0 ? "UP" : "DOWN";
+  const absScore = Math.abs(score);
+  
+  const accuracy = Math.min(96, 65 + (absScore * 7));
+  const trend_strength = Math.min(100, 55 + (absScore * 10));
+  const trend_label = trend_strength > 80 ? "Strong" : trend_strength > 65 ? "Moderate" : "Weak";
 
-// ===== MAIN ANALYSIS =====
-function analyze(opens,highs,lows,closes){
-  const c=closes;
-  const ema20=calcEMA(c.slice(-20),20);
-  const ema50=calcEMA(c.slice(-50),50);
-  const ema200=calcEMA(c,200);
-  const rsi=calcRSI(c);
-  const macd=calcMACD(c);
-  const atr=calcATR(highs,lows,closes,14);
-  const last=c[c.length-1];
-
-  let totalScore=0;
-  const signals=[];
-
-  // 1. EMA Trend
-  let emaSig={label:"",cls:"neut",score:0};
-  if(last>ema20&&ema20>ema50){emaSig={label:"Price > EMA20 > EMA50",cls:"bull",score:2};}
-  else if(last<ema20&&ema20<ema50){emaSig={label:"Price < EMA20 < EMA50",cls:"bear",score:-2};}
-  else{emaSig={label:"Mixed EMA",cls:"neut",score:0};}
-  totalScore+=emaSig.score;
-  signals.push({label:emaSig.label,cls:emaSig.cls});
-
-  // 2. RSI
-  let rsiSig={label:"",cls:"neut",score:0};
-  if(rsi<30){rsiSig={label:"RSI Oversold ("+rsi.toFixed(0)+")",cls:"bull",score:2};}
-  else if(rsi>70){rsiSig={label:"RSI Overbought ("+rsi.toFixed(0)+")",cls:"bear",score:-2};}
-  else if(rsi>50){rsiSig={label:"RSI Bullish ("+rsi.toFixed(0)+")",cls:"bull",score:1};}
-  else{rsiSig={label:"RSI Bearish ("+rsi.toFixed(0)+")",cls:"bear",score:-1};}
-  totalScore+=rsiSig.score;
-  signals.push({label:rsiSig.label,cls:rsiSig.cls});
-
-  // 3. MACD
-  let macdSig={label:"",cls:"neut",score:0};
-  if(macd>0){macdSig={label:"MACD Bullish",cls:"bull",score:1};}
-  else{macdSig={label:"MACD Bearish",cls:"bear",score:-1};}
-  totalScore+=macdSig.score;
-  signals.push({label:macdSig.label,cls:macdSig.cls});
-
-  // 4. Market Structure
-  const ms=detectMarketStructure(c);
-  totalScore+=ms.score;
-  signals.push({label:ms.label,cls:ms.score>0?"bull":ms.score<0?"bear":"neut"});
-
-  // 5. Support/Resistance
-  const sr=detectSupportResistance(c,highs,lows);
-  totalScore+=sr.score;
-  sr.zones.forEach(function(z){signals.push({label:z,cls:sr.score>0?"bull":sr.score<0?"bear":"neut"});});
-
-  // 6. Breakout/Retest
-  const br=detectBreakoutRetest(c,highs,lows);
-  totalScore+=br.score;
-  br.signals.forEach(function(s){signals.push({label:s,cls:br.score>0?"bull":br.score<0?"bear":"neut"});});
-
-  // 7. Candle Patterns
-  const cp=detectCandlePatterns(opens,highs,lows,c);
-  totalScore+=cp.score;
-
-  // 8. Momentum
-  const mom=detectMomentum(c);
-  totalScore+=mom.score;
-  signals.push({label:mom.label,cls:mom.score>0?"bull":mom.score<0?"bear":"neut"});
-
-  // Final
-  const direction=totalScore>=1?"UP":"DOWN";
-  const absScore=Math.abs(totalScore);
-  const accuracy=Math.min(92,Math.round(55+absScore*4));
-  const strength=Math.min(98,Math.round(50+absScore*6));
-  const trend_label=strength<65?"Weak":strength<80?"Moderate":"Strong";
-
-  return{
-    direction,accuracy,strength,trend_label,totalScore,
-    ema20:ema20.toFixed(5),ema50:ema50.toFixed(5),
-    rsi:rsi.toFixed(1),macd:macd.toFixed(5),
-    atr:atr.toFixed(5),last:last.toFixed(5),
-    signals:signals.slice(0,8),
-    patterns:cp.patterns,
-    sr
+  return {
+    direction,
+    accuracy: Math.round(accuracy),
+    trend_strength: Math.round(trend_strength),
+    trend_label,
+    reason,
+    lastPrice: lastClose.toFixed(5),
+    pivot: pivot.toFixed(5),
+    r1: r1.toFixed(5),
+    s1: s1.toFixed(5)
   };
 }
 
 async function getSignal(){
-  if(isLoading)return;
-  isLoading=true;
-  const btn=document.getElementById("getBtn");
-  btn.className="get-btn loading";btn.innerHTML="Analyzing...";
-  dd.style.display="none";
-  setCard('<div style="text-align:center;width:100%;"><div class="spinner"></div><div class="analyzing">Fetching & Analyzing...</div></div>');
-  const tf=document.getElementById("tfSelect").value;
-  try{
-    const url="/api/data?symbol="+currentPair.symbol+"&interval="+tf;
-    const res=await fetch(url);
-    const data=await res.json();
-    if(data.status==="error"||!data.values)throw new Error(data.message||"No data");
-    const vals=data.values.reverse();
-    const opens=vals.map(function(v){return parseFloat(v.open);});
-    const highs=vals.map(function(v){return parseFloat(v.high);});
-    const lows=vals.map(function(v){return parseFloat(v.low);});
-    const closes=vals.map(function(v){return parseFloat(v.close);});
-    const sig=analyze(opens,highs,lows,closes);
-    const isUP=sig.direction==="UP";
-    const dcls=isUP?"up":"down";
-    const darr=isUP?"&#8593;":"&#8595;";
-    const tfLabel=tf.replace("min"," min").replace("1h","1 hour");
-    const signalsHTML=sig.signals.map(function(s){
-      return '<div class="sig-item"><div class="sig-dot '+s.cls+'"></div><div class="sig-text">'+s.label+'</div></div>';
-    }).join("");
-    const patternsHTML=sig.patterns.length>0
-      ? '<div class="patterns-box"><div class="info-label" style="margin-bottom:6px">Candle Patterns</div>'+sig.patterns.map(function(p){return '<span class="pattern-tag">'+p+'</span>';}).join("")+'</div>'
-      : '';
-    setCard(
-      '<div class="card-inner">'+
-      '<div class="sec-label">Signal &mdash; Live Analysis</div>'+
-      '<div class="grid2">'+
-        '<div class="info-box" style="margin-bottom:0"><div class="info-label">Pair</div><div class="info-value" style="font-size:13px">'+currentPair.flag+' '+currentPair.label+'</div></div>'+
-        '<div class="info-box" style="margin-bottom:0"><div class="info-label">Accuracy</div><div class="info-value acc-value">'+sig.accuracy+'%</div></div>'+
-      '</div>'+
-      '<div class="grid3" style="margin-top:8px">'+
-        '<div class="ind-box"><div class="ind-label">RSI</div><div class="ind-value '+( sig.rsi<40?"bull":sig.rsi>60?"bear":"neut")+'">'+sig.rsi+'</div></div>'+
-        '<div class="ind-box"><div class="ind-label">EMA20</div><div class="ind-value '+( sig.last>sig.ema20?"bull":"bear")+'" style="font-size:10px">'+sig.ema20+'</div></div>'+
-        '<div class="ind-box"><div class="ind-label">MACD</div><div class="ind-value '+( parseFloat(sig.macd)>0?"bull":"bear")+'">'+( parseFloat(sig.macd)>0?"+":"")+parseFloat(sig.macd).toFixed(4)+'</div></div>'+
-      '</div>'+
-      '<div class="info-box">'+
-        '<div class="bar-row"><span class="info-label">Signal Strength</span><span style="font-size:10px;color:#666">'+sig.trend_label+'</span></div>'+
-        '<div class="bar-track"><div class="bar-fill '+dcls+'" style="width:'+sig.strength+'%"></div></div>'+
-        '<div class="bar-labels"><span>Weak</span><span style="color:#555">'+sig.strength+'%</span><span>Strong</span></div>'+
-      '</div>'+
-      '<div class="signals-grid">'+signalsHTML+'</div>'+
-      patternsHTML+
-      '<div class="info-box" style="margin-bottom:12px">'+
-        '<div class="info-label" style="margin-bottom:4px">Support / Resistance</div>'+
-        '<div style="display:flex;justify-content:space-between">'+
-          '<div><div style="font-size:9px;color:#00e096">Support</div><div style="font-size:12px;font-weight:700;color:#e0e0f0">'+sig.sr.support+'</div></div>'+
-          '<div style="text-align:right"><div style="font-size:9px;color:#ff4d6d">Resistance</div><div style="font-size:12px;font-weight:700;color:#e0e0f0">'+sig.sr.resistance+'</div></div>'+
-        '</div>'+
-      '</div>'+
-      '<div class="direction-box '+dcls+'" style="display:flex">'+
-        '<div class="dir-left"><div class="info-label">Direction</div>'+
-          '<div style="display:flex;align-items:center;gap:6px"><span style="font-size:22px">'+darr+'</span><span class="dir-label '+dcls+'">'+sig.direction+'</span></div></div>'+
-        '<div class="dir-right"><div class="info-label">until</div><div class="until-time">'+getExpiry(tf)+'</div></div>'+
-      '</div>'+
-      '<div class="actions">'+
-        '<button class="btn-take '+dcls+'" onclick="takeTrade()">&#10003; Take</button>'+
-        '<button class="btn-skip" onclick="skipTrade()">&#10005; Skip</button>'+
-      '</div>'+
-      '</div>'
-    );
-    btn.style.display="none";
-  }catch(e){
-    setCard('<div class="err-box">&#10060; '+e.message+'</div>');
-    btn.className="get-btn";btn.innerHTML="&#9889; Get Signal";
+  if(isLoading) return;
+  isLoading = true;
+  const btn = document.getElementById("getBtn");
+  btn.className = "get-btn loading";
+  btn.innerHTML = "Analyzing...";
+  dd.style.display = "none";
+
+  setCard(`<div style="text-align:center;width:100%;">
+    <div class="spinner"></div>
+    <div class="analyzing">Scanning Price Action and Key Levels...</div>
+  </div>`);
+
+  const tf = document.getElementById("tfSelect").value;
+
+  try {
+    const url = `https://api.twelvedata.com/time_series?symbol=${currentPair.symbol}&interval=${tf}&outputsize=60&apikey=${API_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if(data.status === "error" || !data.values){
+      throw new Error(data.message || "API Error");
+    }
+
+    const sig = analyzeMarket(data.values);
+    const isUP = sig.direction === "UP";
+    const dcls = isUP ? "up" : "down";
+    const darr = isUP ? "[UP]" : "[DOWN]";
+
+    setCard(`<div class="card-inner">
+      <div class="section-label">Price Action Live Signal</div>
+      <div class="info-box">
+        <div class="info-label">Currency Pair</div>
+        <div class="info-value">FX: ${currentPair.label}</div>
+      </div>
+      <div class="grid2">
+        <div class="info-box" style="margin-bottom:0">
+          <div class="info-label">Timeframe</div>
+          <div class="info-value">${tf.replace("min"," min").replace("1h","1 hour")}</div>
+        </div>
+        <div class="info-box" style="margin-bottom:0">
+          <div class="info-label">Signal Accuracy</div>
+          <div class="info-value acc-value">${sig.accuracy}%</div>
+        </div>
+      </div>
+      <div class="indicators-row" style="margin-top:10px">
+        <div class="ind-box">
+          <div class="ind-label">Resistance (R1)</div>
+          <div class="ind-value bear" style="font-size:11px">${sig.r1}</div>
+        </div>
+        <div class="ind-box">
+          <div class="ind-label">Current Price</div>
+          <div class="ind-value neut" style="font-size:11px">${sig.lastPrice}</div>
+        </div>
+        <div class="ind-box">
+          <div class="ind-label">Support (S1)</div>
+          <div class="ind-value bull" style="font-size:11px">${sig.s1}</div>
+        </div>
+      </div>
+      <div class="info-box">
+        <div class="bar-row">
+          <span class="info-label">Pattern: <span style="color:#fff">${sig.reason}</span></span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" style="width:${sig.trend_strength}%"></div></div>
+        <div class="bar-labels"><span>Weak</span><span class="mid">${sig.trend_strength}%</span><span>Strong Trend</span></div>
+      </div>
+      <div class="direction-box ${dcls}" style="display:flex">
+        <div class="dir-left">
+          <div class="info-label">Action</div>
+          <div style="display:flex;align-items:center">
+            <span class="dir-arrow">${darr}</span>
+            <span class="dir-label ${dcls}">${sig.direction}</span>
+          </div>
+        </div>
+        <div class="dir-right">
+          <div class="until-label">Expiration</div>
+          <div class="until-time">${getExpiry(tf)}</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-take ${dcls}" onclick="takeTrade()">Take</button>
+        <button class="btn-skip" onclick="skipTrade()">Skip</button>
+      </div>
+    </div>`);
+
+    btn.style.display = "none";
+  } catch(e) {
+    setCard(`<div class="err-box">Error fetching live data<br><span style="color:#666;font-size:11px">${e.message}</span></div>`);
+    btn.className = "get-btn";
+    btn.innerHTML = '<span>$</span> Get Signal';
   }
-  isLoading=false;
+  isLoading = false;
 }
+
 function takeTrade(){
-  const a=document.querySelector(".actions");
-  if(a)a.outerHTML='<div class="success-box"><div class="success-text">&#10003; Trade Taken &mdash; Good luck!</div><button class="new-signal-btn" onclick="resetCard()">Get new signal</button></div>';
+  const actDiv = document.querySelector(".actions");
+  if(actDiv) actDiv.outerHTML = `<div class="success-box">
+    <div class="success-text">Trade Position Sent to Dashboard!</div>
+    <button class="new-signal-btn" onclick="resetCard()">Get next signal</button>
+  </div>`;
 }
-function skipTrade(){resetCard();}
+
+function skipTrade(){ resetCard(); }
+
 function resetCard(){
-  setCard('<div class="idle">Press Get Signal to start</div>');
-  const btn=document.getElementById("getBtn");
-  btn.style.display="flex";btn.className="get-btn";btn.innerHTML="&#9889; Get Signal";
-  isLoading=false;
+  setCard('<div class="idle">Press Get Signal to Start</div>');
+  const btn = document.getElementById("getBtn");
+  btn.style.display = "flex";
+  btn.className = "get-btn";
+  btn.innerHTML = '<span>$</span> Get Signal';
+  isLoading = false;
 }
 </script>
 </body>
