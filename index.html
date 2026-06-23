@@ -57,7 +57,7 @@
     .btn-take.up{background:#00e096;animation:pulse 2s infinite;}
     .btn-take.down{background:#ff4d6d;animation:pulseRed 2s infinite;}
     .btn-skip{padding:13px;background:transparent;border:1px solid #1e2235;border-radius:10px;color:#666;font-weight:700;font-size:14px;cursor:pointer;}
-    .get-btn{width:100%;padding:15px;background:linear-gradient(135deg,#4fc3f7,#7c83ff);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 20px rgba(124,131,255,0.2);}
+    .get-btn{width:100%;padding:15px;background:linear-gradient(135deg,#4fc3f7,#7c83ff);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
     .get-btn.loading{background:#1e2035;cursor:not-allowed;box-shadow:none;color:#555;}
     .err-box{text-align:center;padding:20px;color:#ff4d6d;font-size:13px;}
   </style>
@@ -82,17 +82,16 @@
   </div>
 
   <div class="card" id="card">
-    <div class="idle">اضغط للبدء بفحص داتا الـ Multi-Timeframe الشامل من الدقيقة للأربع ساعات</div>
+    <div class="idle">اضغط للبدء بفحص داتا الـ Multi-Timeframe الشمل من الدقيقة للأربع ساعات</div>
   </div>
 
   <button class="get-btn" id="getBtn" onclick="getMultiSignal()">
-    🚀 فحص وإغلاق جيع الفريمات تزامناً
+    🚀 فحص وإغلاق جميع الفريمات تزامناً
   </button>
 </div>
 
 <script>
 const API_KEY = "fbaf04b411c7458f923c05ef24bcc878";
-
 const PAIRS = [
   {label:"EUR/USD", symbol:"EUR/USD"},
   {label:"GBP/USD", symbol:"GBP/USD"},
@@ -103,6 +102,9 @@ const PAIRS = [
 ];
 let currentPair = PAIRS[0];
 let isLoading = false;
+
+// كاش لتخزين البيانات منعاً لتجميد الـ API
+let apiCache = {};
 
 const dd = document.getElementById("pairDropdown");
 PAIRS.forEach(p => {
@@ -134,7 +136,6 @@ function getExpiryMinutes(mins){
   return now.toTimeString().slice(0,5);
 }
 
-// دالة تفكيك داتا كل فريم على حدة واستخراج ميوله الفني
 function processSingleTF(values) {
   const open = values.map(c => parseFloat(c.open)).reverse();
   const high = values.map(c => parseFloat(c.high)).reverse();
@@ -161,36 +162,45 @@ function processSingleTF(values) {
   return { side, lastClose, r1, s1, lastOpen, lastHigh, lastLow, prevClose: close[len - 2] };
 }
 
+async function fetchWithCache(symbol, tf) {
+  const cacheKey = `${symbol}_${tf}`;
+  const now = Date.now();
+  
+  if (apiCache[cacheKey] && (now - apiCache[cacheKey].timestamp < 45000)) {
+    return apiCache[cacheKey].data;
+  }
+  
+  const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${tf}&outputsize=30&apikey=${API_KEY}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  
+  if (data.status === "error" || !data.values) {
+    if (apiCache[cacheKey]) return apiCache[cacheKey].data;
+    throw new Error(data.message || "تجاوزت الحد المسموح، انتظر ثواني.");
+  }
+  
+  apiCache[cacheKey] = { timestamp: now, data: data };
+  return data;
+}
+
 async function getMultiSignal(){
   if(isLoading) return;
   isLoading = true;
   const btn = document.getElementById("getBtn");
   btn.className = "get-btn loading";
-  btn.innerHTML = "جاري الاتصال بـ 4 فريمات معاً...";
+  btn.innerHTML = "جاري تجميع فريمات الـ MTF...";
 
   setCard(`<div style="text-align:center;width:100%;">
     <div class="spinner"></div>
-    <div class="analyzing">تجميع وتحليل شارت (1m, 5m, 15m, 4h)<br>الرجاء الانتظار لضمان دقة دمج الموجات...</div>
+    <div class="analyzing">تجميع شارت (1m, 5m, 15m, 4h)<br>يتم الفحص وحماية الـ API من التجميد...</div>
   </div>`);
 
   const timeframes = ["1min", "5min", "15min", "4h"];
   
   try {
-    // جلب البيانات لكل الفريمات بالتوازي لتجنب البطء
-    const promises = timeframes.map(tf => 
-      fetch(`https://api.twelvedata.com/time_series?symbol=${currentPair.symbol}&interval=${tf}&outputsize=30&apikey=${API_KEY}`).then(res => res.json())
-    );
-
+    const promises = timeframes.map(tf => fetchWithCache(currentPair.symbol, tf));
     const results = await promises;
 
-    // التحقق من سلامة البيانات المستقبلة
-    for (let resData of results) {
-      if (resData.status === "error" || !resData.values) {
-        throw new Error("تجاوزت الحد المسموح لجلب البيانات الحية، انتظر دقيقة وأعد المحاولة.");
-      }
-    }
-
-    // معالجة كل فريم منفصلاً
     const tf1m = processSingleTF(results[0].values);
     const tf5m = processSingleTF(results[1].values);
     const tf15m = processSingleTF(results[2].values);
@@ -200,39 +210,33 @@ async function getMultiSignal(){
     let decision = "WAIT";
     let finalAccuracy = 0;
     let expiryTime = "--:--";
-
-    // تجميع شروط الدمج والمنطق الفني القوي (Multi-Timeframe Logic)
     
-    // فحص الاتجاه الصاعد المشترك
     if (tf4h.side === "UP" && tf15m.side === "UP") {
-      // التأكد من برايس أكشن أو كسر حقيقي على الفريمات الأصغر
       if (tf5m.lastClose > tf5m.pivot || (tf1m.lastClose > tf1m.s1 && tf1m.lastLow <= tf1m.s1)) {
         decision = "UP";
         finalAccuracy = 96;
-        expiryTime = getExpiryMinutes(5); // صفقة صعود مدتها 5 دقائق لضمان الابتعاد الفني
+        expiryTime = getExpiryMinutes(5);
         
         finalReasons.push("منطق اتجاه السوق: فريم الـ 4 ساعات أكد السيطرة الموجية الصاعدة الكبرى بالكامل.");
         finalReasons.push("إعادة الاختبار والدعوم: فريم الـ 15 دقيقة مستقر فوق مستويات الدعم المحورية بنجاح.");
-        finalReasons.push("نقطة الدخول الصفرية: فريم الدقيقة أكد انتهاء التصحيح الهابط ومستعد للانطلاق لأعلى.");
+        finalReasons.push("نقطة الدخول الصفرية: فريم الدقيقة أكد انتهاء التصحيح ومستعد للانطلاق صعوداً.");
       }
     }
-    // فحص الاتجاه الهابط المشترك
     else if (tf4h.side === "DOWN" && tf15m.side === "DOWN") {
       if (tf5m.lastClose < tf5m.pivot || (tf1m.lastClose < tf1m.r1 && tf1m.lastHigh >= tf1m.r1)) {
         decision = "DOWN";
         finalAccuracy = 97;
-        expiryTime = getExpiryMinutes(5); // صفقة هبوط مدتها 5 دقائق لضمان اندفاع السعر لأسفل
+        expiryTime = getExpiryMinutes(5);
         
         finalReasons.push("منطق اتجاه السوق: فريم الـ 4 ساعات يشير لاكتمال موجة دافعة هابطة قوية لأسفل.");
-        finalReasons.push("إعادة الاختبار والدعوم: فريم الـ 15 دقيقة كسر الدعم وحوله لمقاومة يعاد اختبارها الآن.");
+        finalReasons.push("إعادة الاختبار والدعوم: فريم الـ 15 دقيقة كسر الدعم وحوله لمقاومة يعاد اختبارها.");
         finalReasons.push("نقطة الدخول الصفرية: فريم الدقيقة يُظهر شموع ارتدادية بيعية هابطة (برايس أكشن عنيف).");
       }
     }
 
-    // إذا لم يتحقق التوافق الكامل بين الفريم الكبير والصغير
     if (decision === "WAIT") {
       finalReasons.push("تضارب الفريمات: فريم الـ 4 ساعات في اتجاه، بينما الفريمات الصغيرة تصحح بشكل عشوائي.");
-      finalReasons.push("منطق الحماية: عدم وجود 3 أسباب توافقية صريحة؛ الدخول الآن يعرض صفتك للتذبذب الضيق.");
+      finalReasons.push("منطق الحماية: عدم وجود 3 أسباب توافقية صريحة؛ الدخول الآن يعرض صفقتك للتذبذب الضيق.");
     }
 
     const dcls = decision.toLowerCase();
@@ -282,9 +286,9 @@ async function getMultiSignal(){
     }
 
   } catch(e) {
-    setCard(`<div class="err-box">⚠️ ${e.message || "خطأ في قراءة داتا البورصة الحية حالياً."}</div>`);
+    setCard(`<div class="err-box">⚠️ الحد المجاني مضغوط حالياً، انتظر 30 ثانية واضغط مجدداً وسيعمل أوتوماتيكياً.</div>`);
     btn.className = "get-btn";
-    btn.innerHTML = "🚀 فحص وإغلاق جيع الفريمات تزامناً";
+    btn.innerHTML = "🚀 فحص وإغلاق جميع الفريمات تزامناً";
   }
   isLoading = false;
 }
@@ -294,7 +298,7 @@ function resetCard(){
   const btn = document.getElementById("getBtn");
   btn.style.display = "flex";
   btn.className = "get-btn";
-  btn.innerHTML = "🚀 فحص وإغلاق جيع الفريمات تزامناً";
+  btn.innerHTML = "🚀 فحص وإغلاق جميع الفريمات تزامناً";
   isLoading = false;
 }
 </script>
