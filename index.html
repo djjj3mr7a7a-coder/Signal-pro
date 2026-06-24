@@ -118,16 +118,8 @@
       </button>
       <div class="pair-dropdown" id="pairDropdown" style="display:none;"></div>
     </div>
-    <div class="tf-wrap">
-      <select class="tf-select" id="tfSelect">
-        <option value="1min">1 min</option>
-        <option value="5min" selected>5 min</option>
-        <option value="15min">15 min</option>
-        <option value="1h">1 hour</option>
-        <option value="4h">4 hours</option>
-      </select>
-    </div>
   </div>
+  <input type="hidden" id="tfSelect" value="5min"/>
 
   <div class="card" id="card">
     <div class="idle">Press Get Signal to start</div>
@@ -452,16 +444,8 @@ function analyze(O,H,L,C){
     reasons.push("Price near Pivot ("+sr.pivot.toFixed(5)+") — await breakout for entry");
   }
 
-  // Smart duration based on ATR volatility
-  var volatility=atr(H,L,C,14);
-  var atrPct=(volatility/last)*100;
-  var duration;
-  if(direction==="WAIT"){duration="No Entry";}
-  else if(atrPct>0.2){duration="1 min";}
-  else if(atrPct>0.12){duration="2 min";}
-  else if(atrPct>0.07){duration="3 min";}
-  else if(atrPct>0.04){duration="5 min";}
-  else{duration="15 min";}
+  // Duration = selected timeframe (passed from outside)
+  var duration="";// will be set after analyze() call
 
   return{direction:direction,dcls:dcls,accuracy:Math.round(accuracy),strength:Math.round(strength),
     reasons:reasons,sr:sr,last:last.toFixed(5),duration:duration,
@@ -533,6 +517,7 @@ async function getSignal(){
     }
     var sig=analyze(O,H,L,C);
 
+
     // MTF alignment
     var mtfData=[];
     var alignedUP=0,alignedDOWN=0;
@@ -547,9 +532,25 @@ async function getSignal(){
     var mtfAlignment=Math.max(alignedUP,alignedDOWN);
     var mtfDir=alignedUP>alignedDOWN?"UP":alignedDOWN>alignedUP?"DOWN":"NEUTRAL";
 
+    // Pick best TF = the one with most aligned direction
+    var bestTF=tf;
+    var bestCount=0;
+    TFS.forEach(function(t,i){
+      if(results[i]){
+        var b=quickBias(results[i].O,results[i].H,results[i].L,results[i].C);
+        if(b===mtfDir){
+          var cnt=0;
+          TFS.forEach(function(t2,j){if(results[j]&&quickBias(results[j].O,results[j].H,results[j].L,results[j].C)===mtfDir)cnt++;});
+          if(cnt>bestCount){bestCount=cnt;bestTF=t;}
+        }
+      }
+    });
+    var tfDurMap2={"1min":"1 min","5min":"5 min","15min":"15 min","1h":"1 hour","4h":"4 hours"};
+    sig.duration=sig.direction==="WAIT"?"No Entry":tfDurMap2[bestTF]||"5 min";
+
     // Override with WAIT if MTF disagrees with signal
     if(mtfDir!=="NEUTRAL"&&mtfDir!==sig.direction&&sig.direction!=="WAIT"){
-      sig.direction="WAIT";sig.dcls="wait";
+      sig.direction="WAIT";sig.dcls="wait";sig.duration="No Entry";
     }
     // Boost confidence if MTF agrees
     if(mtfDir===sig.direction&&sig.direction!=="WAIT"){
