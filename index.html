@@ -127,7 +127,7 @@ function saveKey(){
 }
 
 
-}
+
 
 const PAIRS=[
   {label:"EUR/USD",symbol:"EUR/USD"},{label:"GBP/USD",symbol:"GBP/USD"},
@@ -145,22 +145,10 @@ const PAIRS=[
   {label:"USD/MXN",symbol:"USD/MXN"},{label:"USD/SGD",symbol:"USD/SGD"},
 ];
 let currentPair=PAIRS[0],isLoading=false;
-const dd=document.getElementById("pairDropdown");
-PAIRS.forEach(function(p){
-  const d=document.createElement("div");
-  d.className="pair-item"+(p.symbol===currentPair.symbol?" active":"");
-  d.innerHTML=p.label;
-  d.onclick=function(){
-    currentPair=p;
-    document.getElementById("pairLabel").innerHTML=p.label;
-    document.querySelectorAll(".pair-item").forEach(function(x){x.classList.remove("active");});
-    d.classList.add("active");dd.style.display="none";resetCard();
-  };
-  dd.appendChild(d);
-});
-document.getElementById("pairBtn").onclick=function(e){e.stopPropagation();dd.style.display=dd.style.display==="none"?"block":"none";};
-document.addEventListener("click",function(){dd.style.display="none";});
-function setCard(h){document.getElementById("card").innerHTML=h;}
+
+
+
+
 
 // ======= INDICATORS =======
 function ema(data,p){
