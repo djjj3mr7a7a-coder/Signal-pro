@@ -182,20 +182,11 @@ function saveKey(){
 }
 
 function toggleSettings(){
-  var p=document.getElementById("settingsPanel");
-  p.style.display=p.style.display==="none"?"block":"none";
-  var k=localStorage.getItem("gk");
-  if(k)document.getElementById("geminiKeyInput").value=k;
-  document.getElementById("keyStatus").textContent=k?"&#10003; Key saved":"No key saved";
-}
-function saveKey(){
-  var k=document.getElementById("geminiKeyInput").value.trim();
-  if(k){
-    localStorage.setItem("gk",k);
-    GEMINI_KEY=k;
-    document.getElementById("keyStatus").textContent="&#10003; Key saved successfully!";
-    document.getElementById("keyStatus").style.color="#00e096";
-    setTimeout(function(){document.getElementById("settingsPanel").style.display="none";},1500);
+  var k=prompt("Paste your Gemini API Key:",localStorage.getItem("gk")||"");
+  if(k&&k.trim()){
+    localStorage.setItem("gk",k.trim());
+    GEMINI_KEY=k.trim();
+    alert("Key saved!");
   }
 }
 
