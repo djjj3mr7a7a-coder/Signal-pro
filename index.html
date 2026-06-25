@@ -482,22 +482,15 @@ async function getSignal(){
     // Fetch main TF first, then others sequentially
     var TFS=["5min","15min","30min","1h","4h"];
     var TF_LABELS={"5min":"5M","15min":"15M","30min":"30M","1h":"1H","4h":"4H"};
-    var mainIdx=TFS.indexOf(tf);
-    var main=await fetchTF(currentPair.symbol,tf);
-    if(!main)throw new Error("Failed to fetch main timeframe");
+    // Fetch only 3 TFs to avoid timeout
+    var tfSet=["5min","15min","1h"];
+    var main=await fetchTF(currentPair.symbol,"5min");
+    if(!main)throw new Error("No data received");
     var O=main.O,H=main.H,L=main.L,C=main.C;
-    // Fetch other TFs with small delays to avoid rate limit
-    var results=[];
-    for(var ti=0;ti<TFS.length;ti++){
-      if(ti===mainIdx){results.push(main);}
-      else{
-        try{
-          await new Promise(function(r){setTimeout(r,300);});
-          var r2=await fetchTF(currentPair.symbol,TFS[ti]);
-          results.push(r2);
-        }catch(e){results.push(null);}
-      }
-    }
+    var results=[main,null,null,null,null];
+    try{await new Promise(function(r){setTimeout(r,200);});results[1]=await fetchTF(currentPair.symbol,"15min");}catch(e){}
+    try{await new Promise(function(r){setTimeout(r,200);});results[3]=await fetchTF(currentPair.symbol,"1h");}catch(e){}
+    tf="5min";
     var sig=analyze(O,H,L,C);
 
 
