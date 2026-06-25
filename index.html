@@ -114,9 +114,7 @@
   <!-- Settings Modal -->
   <div id="settingsModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:999;align-items:center;justify-content:center;">
     <div style="background:#10121e;border:1px solid #1e2235;border-radius:16px;padding:24px;margin:20px;width:100%;max-width:360px;">
-      <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px;">&#129302; Gemini AI Key</div>
       <div style="font-size:11px;color:#555;margin-bottom:16px;">الـ Key بيتحفظ على جهازك بس — مش على الانترنت</div>
-      <input id="geminiInput" type="password" placeholder="AIza..." style="width:100%;background:#0d0f1a;border:1px solid #2a2d45;border-radius:8px;color:#e0e0f0;padding:12px;font-size:13px;outline:none;margin-bottom:12px;"/>
       <button onclick="saveKey()" style="width:100%;padding:12px;background:linear-gradient(135deg,#4fc3f7,#7c83ff);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:8px;">&#10003; Save Key</button>
       <button onclick="toggleSettings()" style="width:100%;padding:12px;background:transparent;border:1px solid #1e2235;border-radius:10px;color:#666;font-weight:700;font-size:14px;cursor:pointer;">Cancel</button>
       <div id="keyStatus" style="text-align:center;margin-top:10px;font-size:11px;color:#555;"></div>
@@ -139,7 +137,7 @@
   </div>
 
   <button class="get-btn" id="getBtn" onclick="getSignal()">&#9889; Get Signal</button>
-  <button onclick="toggleSettings()" style="width:100%;margin-top:8px;padding:11px;background:#10121e;border:1px solid #1e2235;border-radius:10px;color:#7c83ff;font-size:13px;font-weight:600;cursor:pointer;">&#9881; Gemini AI Settings</button>
+  
 
   <div class="nav">
     <div class="nav-item"><div class="nav-icon">&#128100;</div><div class="nav-label">Profile</div></div>
@@ -151,60 +149,31 @@
 </div>
 
 <script>
-const GEMINI_KEY=localStorage.getItem("gk")||"";
-async function getGeminiAnalysis(pair,tf,rsi,macd,stoch,ema20,ema50,msRend,patterns,sr){
-  try{
-    GEMINI_KEY=localStorage.getItem("gk")||"";
-    if(!GEMINI_KEY)return null;
-    var prompt="Analyze forex data. Reply ONLY with JSON:\nPair:"+pair+",TF:"+tf+",RSI:"+rsi+",MACD:"+macd+",Stoch:"+stoch+",EMA20:"+ema20+",EMA50:"+ema50+",Structure:"+msRend+",Patterns:"+(patterns.length?patterns.join(","):"None")+",S1:"+sr.s1.toFixed(5)+",R1:"+sr.r1.toFixed(5)+"\nReturn:{\"signal\":\"UP\" or \"DOWN\" or \"WAIT\",\"confidence\":50-99,\"reason\":\"max 12 words\"}";
-    var res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="+GEMINI_KEY,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.1,maxOutputTokens:80}})
-    });
-    var data=await res.json();
-    var text=data.candidates[0].content.parts[0].text.replace(/```json|```/g,"").trim();
-    var match=text.match(/\{[\s\S]*\}/);
-    return match?JSON.parse(match[0]):null;
-  }catch(e){return null;}
-}
 
-function toggleSettings(){
-  var m=document.getElementById("settingsModal");
-  m.style.display=m.style.display==="none"?"flex":"none";
-  var k=localStorage.getItem("gk");
-  if(k)document.getElementById("geminiInput").value=k;
-  document.getElementById("keyStatus").textContent=k?"Key saved ✅":"No key saved";
-}
+
 function saveKey(){
-  var k=document.getElementById("geminiInput").value.trim();
   if(k){localStorage.setItem("gk",k);document.getElementById("keyStatus").textContent="Saved ✅";}
   else{localStorage.removeItem("gk");document.getElementById("keyStatus").textContent="Key removed";}
   setTimeout(function(){toggleSettings();},800);
 }
 
-function toggleSettings(){
-  var k=prompt("Paste your Gemini API Key:",localStorage.getItem("gk")||"");
-  if(k&&k.trim()){
-    localStorage.setItem("gk",k.trim());
-    GEMINI_KEY=k.trim();
-    alert("Key saved!");
-  }
+
 }
 
 const PAIRS=[
-  {label:"EUR/USD",symbol:"EUR/USD",flag:"&#127466;&#127482;"},
-  {label:"GBP/USD",symbol:"GBP/USD",flag:"&#127468;&#127463;"},
-  {label:"USD/JPY",symbol:"USD/JPY",flag:"&#127471;&#127477;"},
-  {label:"AUD/USD",symbol:"AUD/USD",flag:"&#127462;&#127482;"},
-  {label:"USD/CAD",symbol:"USD/CAD",flag:"&#127464;&#127462;"},
-  {label:"EUR/GBP",symbol:"EUR/GBP",flag:"&#127466;&#127482;"},
-  {label:"EUR/JPY",symbol:"EUR/JPY",flag:"&#127466;&#127482;"},
-  {label:"GBP/JPY",symbol:"GBP/JPY",flag:"&#127468;&#127463;"},
-  {label:"USD/CHF",symbol:"USD/CHF",flag:"&#127464;&#127469;"},
-  {label:"NZD/USD",symbol:"NZD/USD",flag:"&#127475;&#127487;"},
-  {label:"AUD/JPY",symbol:"AUD/JPY",flag:"&#127462;&#127482;"},
-  {label:"EUR/CHF",symbol:"EUR/CHF",flag:"&#127466;&#127482;"},
+  {label:"EUR/USD",symbol:"EUR/USD"},{label:"GBP/USD",symbol:"GBP/USD"},
+  {label:"USD/JPY",symbol:"USD/JPY"},{label:"AUD/USD",symbol:"AUD/USD"},
+  {label:"USD/CAD",symbol:"USD/CAD"},{label:"USD/CHF",symbol:"USD/CHF"},
+  {label:"EUR/GBP",symbol:"EUR/GBP"},{label:"EUR/JPY",symbol:"EUR/JPY"},
+  {label:"GBP/JPY",symbol:"GBP/JPY"},{label:"NZD/USD",symbol:"NZD/USD"},
+  {label:"AUD/JPY",symbol:"AUD/JPY"},{label:"EUR/CHF",symbol:"EUR/CHF"},
+  {label:"GBP/CHF",symbol:"GBP/CHF"},{label:"EUR/AUD",symbol:"EUR/AUD"},
+  {label:"GBP/AUD",symbol:"GBP/AUD"},{label:"AUD/CAD",symbol:"AUD/CAD"},
+  {label:"AUD/NZD",symbol:"AUD/NZD"},{label:"NZD/JPY",symbol:"NZD/JPY"},
+  {label:"CAD/JPY",symbol:"CAD/JPY"},{label:"CHF/JPY",symbol:"CHF/JPY"},
+  {label:"EUR/NZD",symbol:"EUR/NZD"},{label:"GBP/NZD",symbol:"GBP/NZD"},
+  {label:"EUR/CAD",symbol:"EUR/CAD"},{label:"GBP/CAD",symbol:"GBP/CAD"},
+  {label:"USD/MXN",symbol:"USD/MXN"},{label:"USD/SGD",symbol:"USD/SGD"},
 ];
 let currentPair=PAIRS[0],isLoading=false;
 const dd=document.getElementById("pairDropdown");
@@ -463,8 +432,10 @@ function analyze(O,H,L,C){
   if(emaDown&&rsiUp&&r<35)conflicts++;
   if(macdUp&&emaDown)conflicts++;
   if(macdDown&&emaUp)conflicts++;
+  // Penalize low liquidity
+  if(!liquidityOk) totalScore=Math.round(totalScore*0.5);
   var direction,dcls;
-  if(conflicts>=2||Math.abs(totalScore)<3){direction="WAIT";dcls="wait";}
+  if(conflicts>=2||Math.abs(totalScore)<3||!liquidityOk){direction="WAIT";dcls="wait";}
   else if(totalScore>0){direction="UP";dcls="up";}
   else{direction="DOWN";dcls="down";}
 
@@ -507,7 +478,7 @@ function analyze(O,H,L,C){
     rsi:r.toFixed(1),macd:m.toFixed(5),stoch:k.toFixed(0),
     e20:e20.toFixed(5),e50:e50.toFixed(5),
     patterns:cp.patterns,ms:ms,wa:wa,tl:tl,waveBias:wa.waveBias,waveNum:wa.waveNum,waveType:wa.waveType,
-    emaScore:emaScore,totalScore:totalScore};
+    emaScore:emaScore,totalScore:totalScore,liquidityScore:liquidityScore,liquidityOk:liquidityOk,atrPct:atrPct.toFixed(4)};
 }
 
 async function fetchTF(symbol,interval){
@@ -552,8 +523,8 @@ async function getSignal(){
   var tf=document.getElementById("tfSelect").value;
   try{
     // Fetch main TF first, then others sequentially
-    var TFS=["1min","5min","15min","1h","4h"];
-    var TF_LABELS={"1min":"1M","5min":"5M","15min":"15M","1h":"1H","4h":"4H"};
+    var TFS=["5min","15min","30min","1h","4h"];
+    var TF_LABELS={"5min":"5M","15min":"15M","30min":"30M","1h":"1H","4h":"4H"};
     var mainIdx=TFS.indexOf(tf);
     var main=await fetchTF(currentPair.symbol,tf);
     if(!main)throw new Error("Failed to fetch main timeframe");
@@ -600,7 +571,7 @@ async function getSignal(){
         }
       }
     });
-    var tfDurMap2={"1min":"1 min","5min":"5 min","15min":"15 min","1h":"1 hour","4h":"4 hours"};
+    var tfDurMap2={"5min":"5 min","15min":"15 min","30min":"30 min","1h":"1 hour","4h":"4 hours"};
     sig.duration=sig.direction==="WAIT"?"No Entry":tfDurMap2[bestTF]||"5 min";
 
     // Override with WAIT if MTF disagrees with signal
@@ -617,23 +588,7 @@ async function getSignal(){
       sig.reasons[2]=mtfAlignment+" out of 5 timeframes confirm "+sig.direction+" — strong multi-timeframe alignment";
     }
 
-    // ===== Gemini AI Analysis =====
-    var gemini=null;
-    if(localStorage.getItem("gk")){
-      gemini=await getGeminiAnalysis(
-        currentPair.label,tf,sig.rsi,sig.macd,sig.stoch,
-        sig.e20,sig.e50,sig.ms.trend,sig.patterns,sig.sr
-      );
-      // If both agree = boost confidence
-      if(gemini&&gemini.signal===sig.direction&&sig.direction!=="WAIT"){
-        sig.accuracy=Math.min(97,sig.accuracy+5);
-      }
-      // If they disagree = WAIT
-      if(gemini&&gemini.signal!==sig.direction&&gemini.signal!=="WAIT"&&sig.direction!=="WAIT"){
-        sig.direction="WAIT";sig.dcls="wait";sig.duration="No Entry";
-        sig.reasons[2]="AI & Technical analysis conflict — safer to wait for confirmation";
-      }
-    }
+    
     var isUP=sig.direction==="UP";
     var darr=isUP?"&#8593;":sig.direction==="DOWN"?"&#8595;":"&#8213;";
     var tfLabel=tf.replace("min"," min").replace("1h","1H").replace("4h","4H");
@@ -674,6 +629,14 @@ async function getSignal(){
         '<div class="bar-track"><div class="bar-fill '+sig.dcls+'" style="width:'+( sig.direction==="WAIT"?0:sig.strength)+'%"></div></div>'+
         '<div class="bar-lbl"><span>Weak</span><span style="color:#555">Score: '+sig.totalScore+'</span><span>Strong</span></div>'+
       '</div>'+
+      '<div class="ibox" style="margin-bottom:8px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'+
+          '<div class="ilbl">&#128165; Liquidity</div>'+
+          '<div style="font-size:11px;font-weight:700;color:'+(sig.liquidityOk?"#00e096":"#ff4d6d")+'">'+(sig.liquidityOk?"SUFFICIENT":"LOW — AVOID")+' ('+sig.liquidityScore+'%)</div>'+
+        '</div>'+
+        '<div class="bar-track"><div class="bar-fill '+(sig.liquidityOk?"up":"down")+'" style="width:'+sig.liquidityScore+'%"></div></div>'+
+        '<div style="font-size:10px;color:#333;margin-top:3px">ATR: '+sig.atrPct+'% — '+(sig.liquidityOk?"Price will move away from entry":"Insufficient momentum for safe entry")+'</div>'+
+      '</div>'+
       '<div class="sr-box">'+
         '<div class="sr-item"><div class="sr-lbl">Support S1</div><div class="sr-val bull">'+sig.sr.s1.toFixed(5)+'</div></div>'+
         '<div class="sr-item"><div class="sr-lbl">Pivot</div><div class="sr-val neut">'+sig.sr.pivot.toFixed(5)+'</div></div>'+
@@ -692,15 +655,7 @@ async function getSignal(){
         '<div class="ilbl" style="margin-bottom:8px">&#10024; Top 3 Reasons</div>'+
         reasonsHTML+
       '</div>'+
-      (gemini?
-        '<div class="ibox" style="margin-bottom:10px;border:1px solid '+(gemini.signal===sig.direction?"rgba(0,224,150,0.2)":"rgba(255,77,109,0.2)")+'">' +
-          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">' +
-            '<div class="ilbl">&#129302; Gemini AI</div>' +
-            '<div style="font-size:11px;font-weight:700;color:'+(gemini.signal==="UP"?"#00e096":gemini.signal==="DOWN"?"#ff4d6d":"#f0c040")+'">'+gemini.signal+' ('+gemini.confidence+'%)</div>' +
-          '</div>' +
-          '<div style="font-size:11px;color:#888">'+gemini.reason+'</div>' +
-        '</div>'
-      :'')+
+      
       '<div class="actions">'+
         '<button class="btn-take '+sig.dcls+'" onclick="takeTrade()">&#10003; Take</button>'+
         '<button class="btn-skip" onclick="skipTrade()">&#10005; Skip</button>'+
