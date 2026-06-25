@@ -137,6 +137,22 @@
 </div>
 
 <script>
+const GEMINI_KEY="AQ.Ab8RN6K0dhqT7EktCJ-ogAkVGj95MgCnJ2MKmcWbnK9lkkq4hw";
+async function getGeminiAnalysis(pair,tf,rsi,macd,stoch,ema20,ema50,msRend,patterns,sr){
+  try{
+    var prompt="Analyze forex data. Reply ONLY with JSON:\nPair:"+pair+",TF:"+tf+",RSI:"+rsi+",MACD:"+macd+",Stoch:"+stoch+",EMA20:"+ema20+",EMA50:"+ema50+",Structure:"+msRend+",Patterns:"+(patterns.length?patterns.join(","):"None")+",S1:"+sr.s1.toFixed(5)+",R1:"+sr.r1.toFixed(5)+"\nReturn:{\"signal\":\"UP\" or \"DOWN\" or \"WAIT\",\"confidence\":50-99,\"reason\":\"max 12 words\"}";
+    var res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="+GEMINI_KEY,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.1,maxOutputTokens:80}})
+    });
+    var data=await res.json();
+    var text=data.candidates[0].content.parts[0].text.replace(/```json|```/g,"").trim();
+    var match=text.match(/\{[\s\S]*\}/);
+    return match?JSON.parse(match[0]):null;
+  }catch(e){return null;}
+}
+
 const PAIRS=[
   {label:"EUR/USD",symbol:"EUR/USD",flag:"&#127466;&#127482;"},
   {label:"GBP/USD",symbol:"GBP/USD",flag:"&#127468;&#127463;"},
@@ -562,6 +578,23 @@ async function getSignal(){
       sig.reasons[2]=mtfAlignment+" out of 5 timeframes confirm "+sig.direction+" — strong multi-timeframe alignment";
     }
 
+    // ===== Gemini AI Analysis =====
+    var gemini=null;
+    if(true){
+      gemini=await getGeminiAnalysis(
+        currentPair.label,tf,sig.rsi,sig.macd,sig.stoch,
+        sig.e20,sig.e50,sig.ms.trend,sig.patterns,sig.sr
+      );
+      // If both agree = boost confidence
+      if(gemini&&gemini.signal===sig.direction&&sig.direction!=="WAIT"){
+        sig.accuracy=Math.min(97,sig.accuracy+5);
+      }
+      // If they disagree = WAIT
+      if(gemini&&gemini.signal!==sig.direction&&gemini.signal!=="WAIT"&&sig.direction!=="WAIT"){
+        sig.direction="WAIT";sig.dcls="wait";sig.duration="No Entry";
+        sig.reasons[2]="AI & Technical analysis conflict — safer to wait for confirmation";
+      }
+    }
     var isUP=sig.direction==="UP";
     var darr=isUP?"&#8593;":sig.direction==="DOWN"?"&#8595;":"&#8213;";
     var tfLabel=tf.replace("min"," min").replace("1h","1H").replace("4h","4H");
@@ -620,6 +653,15 @@ async function getSignal(){
         '<div class="ilbl" style="margin-bottom:8px">&#10024; Top 3 Reasons</div>'+
         reasonsHTML+
       '</div>'+
+      (gemini?
+        '<div class="ibox" style="margin-bottom:10px;border:1px solid '+(gemini.signal===sig.direction?"rgba(0,224,150,0.2)":"rgba(255,77,109,0.2)")+'">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">' +
+            '<div class="ilbl">&#129302; Gemini AI</div>' +
+            '<div style="font-size:11px;font-weight:700;color:'+(gemini.signal==="UP"?"#00e096":gemini.signal==="DOWN"?"#ff4d6d":"#f0c040")+'">'+gemini.signal+' ('+gemini.confidence+'%)</div>' +
+          '</div>' +
+          '<div style="font-size:11px;color:#888">'+gemini.reason+'</div>' +
+        '</div>'
+      :'')+
       '<div class="actions">'+
         '<button class="btn-take '+sig.dcls+'" onclick="takeTrade()">&#10003; Take</button>'+
         '<button class="btn-skip" onclick="skipTrade()">&#10005; Skip</button>'+
