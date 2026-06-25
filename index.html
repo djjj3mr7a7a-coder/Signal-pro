@@ -154,6 +154,8 @@
 const GEMINI_KEY=localStorage.getItem("gk")||"";
 async function getGeminiAnalysis(pair,tf,rsi,macd,stoch,ema20,ema50,msRend,patterns,sr){
   try{
+    GEMINI_KEY=localStorage.getItem("gk")||"";
+    if(!GEMINI_KEY)return null;
     var prompt="Analyze forex data. Reply ONLY with JSON:\nPair:"+pair+",TF:"+tf+",RSI:"+rsi+",MACD:"+macd+",Stoch:"+stoch+",EMA20:"+ema20+",EMA50:"+ema50+",Structure:"+msRend+",Patterns:"+(patterns.length?patterns.join(","):"None")+",S1:"+sr.s1.toFixed(5)+",R1:"+sr.r1.toFixed(5)+"\nReturn:{\"signal\":\"UP\" or \"DOWN\" or \"WAIT\",\"confidence\":50-99,\"reason\":\"max 12 words\"}";
     var res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="+GEMINI_KEY,{
       method:"POST",
@@ -617,7 +619,7 @@ async function getSignal(){
 
     // ===== Gemini AI Analysis =====
     var gemini=null;
-    if(true){
+    if(localStorage.getItem("gk")){
       gemini=await getGeminiAnalysis(
         currentPair.label,tf,sig.rsi,sig.macd,sig.stoch,
         sig.e20,sig.e50,sig.ms.trend,sig.patterns,sig.sr
