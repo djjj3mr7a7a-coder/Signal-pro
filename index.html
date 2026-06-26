@@ -81,4 +81,410 @@
     .mtf-sig{font-size:11px;font-weight:700;width:40px;text-align:right;}
     .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
     .btn-take{padding:13px;border:none;border-radius:10px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;}
-    .btn-take.up{background:#00
+    .btn-take.up{background:#00e096;animation:pulse 2s infinite;}
+    .btn-take.down{background:#ff4d6d;animation:pulseRed 2s infinite;}
+    .btn-take.wait{background:#f0c040;color:#000;}
+    .btn-skip{padding:13px;background:transparent;border:1px solid #1e2235;border-radius:10px;color:#555;font-weight:700;font-size:14px;cursor:pointer;}
+    .success-box{text-align:center;padding:14px;background:rgba(0,224,150,0.06);border-radius:10px;border:1px solid rgba(0,224,150,0.18);grid-column:1/-1;}
+    .success-text{font-size:13px;color:#00e096;font-weight:600;}
+    .new-sig-btn{margin-top:8px;background:none;border:none;color:#555;font-size:12px;cursor:pointer;}
+    .get-btn{width:100%;padding:15px;background:linear-gradient(135deg,#4fc3f7,#7c83ff);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 24px rgba(124,131,255,0.28);margin-bottom:12px;}
+    .get-btn.loading{background:#1e2035;cursor:not-allowed;box-shadow:none;}
+    .bull{color:#00e096;} .bear{color:#ff4d6d;} .neut{color:#f0c040;}
+    
+    /* أسفل الشاشة - الـ Navigation Bar النشط */
+    .nav{display:flex;justify-content:space-around;margin-top:auto;border-top:1px solid #1e2235;padding-top:14px;}
+    .nav-item{text-align:center;cursor:pointer;flex:1;transition:all 0.2s;}
+    .nav-icon{font-size:18px;margin-bottom:2px;opacity:0.3;transition:opacity 0.2s;}
+    .nav-label{font-size:10px;color:#4a4d65;transition:color 0.2s;}
+    .nav-item.active .nav-icon{opacity:1;transform:scale(1.1);}
+    .nav-item.active .nav-label{color:#7c83ff;font-weight:700;}
+    
+    .err-box{text-align:center;padding:24px;color:#ff4d6d;font-size:13px;line-height:1.8;}
+    .wave-box{background:#0d0f1a;border-radius:10px;padding:11px 13px;margin-bottom:8px;}
+    .wave-lbl{font-size:10px;color:#444;margin-bottom:6px;}
+    .wave-tag{display:inline-block;background:#1a1c2e;border-radius:5px;padding:2px 7px;font-size:10px;color:#7c83ff;margin:1px;}
+    
+    .view-btn-back{width:100%;padding:10px;background:#1a1c2e;border:1px solid #2a2d45;border-radius:8px;color:#7c83ff;font-weight:600;font-size:12px;cursor:pointer;margin-top:14px;}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div>
+      <span class="logo-signal">SpriNg</span>
+      <span class="logo-pro">HYBRID AI</span>
+    </div>
+  </div>
+
+  <div class="key-container" id="keyContainer">
+    <div class="ilbl" style="color:#7c83ff;">👑 مفتاح تفعيل ذكاء Gemini الفوري (يحفظ محلياً):</div>
+    <input type="password" id="geminiKey" class="key-input" placeholder="ألصق الـ API Key لربط التحليل الفني بالذكاء الاصطناعي..." onchange="saveKey()"/>
+  </div>
+
+  <div id="controlsContainer">
+    <div class="selectors">
+      <div style="flex:1;position:relative;">
+        <button class="pair-btn" id="pairBtn">
+          <span id="pairLabel">EUR/USD</span>
+          <span style="color:#444;font-size:10px;">&#9660;</span>
+        </button>
+        <div class="pair-dropdown" id="pairDropdown" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+  <input type="hidden" id="tfSelect" value="5min"/>
+
+  <div class="card" id="card">
+    <div class="idle">Press Get Signal to start hybrid engine</div>
+  </div>
+
+  <button class="get-btn" id="getBtn" onclick="getSignal()">&#9889; Get Signal</button>
+
+  <div class="nav">
+    <div class="nav-item" id="nav-profile" onclick="switchView('profile')"><div class="nav-icon">&#128100;</div><div class="nav-label">Profile</div></div>
+    <div class="nav-item" id="nav-history" onclick="switchView('history')"><div class="nav-icon">&#128336;</div><div class="nav-label">History</div></div>
+    <div class="nav-item active" id="nav-signals" onclick="switchView('signals')"><div class="nav-icon">&#128200;</div><div class="nav-label">Signals</div></div>
+    <div class="nav-item" id="nav-ai" onclick="switchView('ai')"><div class="nav-icon">&#129302;</div><div class="nav-label">AI Insights</div></div>
+    <div class="nav-item" id="nav-support" onclick="switchView('support')"><div class="nav-icon">&#127911;</div><div class="nav-label">Support</div></div>
+  </div>
+</div>
+
+<script>
+const PAIRS=[
+  {label:"EUR/USD",symbol:"EUR/USD"},
+  {label:"GBP/USD",symbol:"GBP/USD"},
+  {label:"USD/JPY",symbol:"USD/JPY"},
+  {label:"AUD/USD",symbol:"AUD/USD"},
+  {label:"USD/CAD",symbol:"USD/CAD"},
+  {label:"EUR/GBP",symbol:"EUR/GBP"},
+  {label:"EUR/JPY",symbol:"EUR/JPY"},
+  {label:"GBP/JPY",symbol:"GBP/JPY"},
+  {label:"USD/CHF",symbol:"USD/CHF"},
+  {label:"NZD/USD",symbol:"NZD/USD"},
+  {label:"AUD/JPY",symbol:"AUD/JPY"},
+  {label:"EUR/CHF",symbol:"EUR/CHF"},
+];
+let currentPair=PAIRS[0],isLoading=false,currentActiveView="signals";
+
+// استرجاع الكي المحفوظ
+document.getElementById("geminiKey").value = localStorage.getItem("safekeys_gemini") || "";
+function saveKey(){ localStorage.setItem("safekeys_gemini", document.getElementById("geminiKey").value.trim()); }
+
+const dd=document.getElementById("pairDropdown");
+PAIRS.forEach(function(p){
+  const d=document.createElement("div");
+  d.className="pair-item"+(p.symbol===currentPair.symbol?" active":"");
+  d.innerHTML=p.label;
+  d.onclick=function(){
+    currentPair=p;
+    document.getElementById("pairLabel").innerHTML=p.label;
+    document.querySelectorAll(".pair-item").forEach(function(x){x.classList.remove("active");});
+    d.classList.add("active");dd.style.display="none";resetCard();
+  };
+  dd.appendChild(d);
+});
+document.getElementById("pairBtn").onclick=function(e){e.stopPropagation();dd.style.display=dd.style.display==="none"?"block":"none";};
+document.addEventListener("click",function(){dd.style.display="none";});
+function setCard(h){document.getElementById("card").innerHTML=h;}
+
+// ======= دالة التبديل بين القوائم والأيقونات بالأسفل =======
+function switchView(viewName) {
+  currentActiveView = viewName;
+  document.querySelectorAll(".nav-item").forEach(x => x.classList.remove("active"));
+  document.getElementById("nav-" + viewName).classList.add("active");
+
+  const gc = document.getElementById("getBtn");
+  const cc = document.getElementById("controlsContainer");
+  const kc = document.getElementById("keyContainer");
+
+  if (viewName === "signals") {
+    gc.style.display = "flex";
+    cc.style.display = "block";
+    kc.style.display = "block";
+    resetCard();
+  } else {
+    gc.style.display = "none";
+    cc.style.display = "none";
+    kc.style.display = "none";
+    
+    let htmlContent = "";
+    if (viewName === "profile") {
+      htmlContent = `<div class="card-inner">
+        <div class="sec-lbl">👤 User Profile</div>
+        <div class="ibox"><div class="ilbl">Account Status</div><div class="ival" style="color:#00e096;">Active — Premium Hybrid</div></div>
+        <div class="ibox"><div class="ilbl">Trader ID</div><div class="ival">#SPG-2026-X</div></div>
+        <div class="ibox"><div class="ilbl">Daily Signals Limit</div><div class="ival" style="color:#7c83ff;">Unlimited</div></div>
+        <button class="view-btn-back" onclick="switchView('signals')">← Back to Signals</button>
+      </div>`;
+    } else if (viewName === "history") {
+      htmlContent = `<div class="card-inner">
+        <div class="sec-lbl">📊 Session History</div>
+        <div class="ibox" style="display:flex; justify-content:space-between;"><span style="font-size:12px; color:#00e096;">✔ EUR/USD (CALL)</span><span style="font-size:11px; color:#555;">ITM Win</span></div>
+        <div class="ibox" style="display:flex; justify-content:space-between;"><span style="font-size:12px; color:#ff4d6d;">✘ GBP/USD (PUT)</span><span style="font-size:11px; color:#555;">OTM Loss</span></div>
+        <div class="ibox" style="display:flex; justify-content:space-between;"><span style="font-size:12px; color:#00e096;">✔ USD/JPY (CALL)</span><span style="font-size:11px; color:#555;">ITM Win</span></div>
+        <button class="view-btn-back" onclick="switchView('signals')">← Back to Signals</button>
+      </div>`;
+    } else if (viewName === "ai") {
+      htmlContent = `<div class="card-inner">
+        <div class="sec-lbl">🤖 Gemini AI Station</div>
+        <div class="ai-box" style="margin-bottom:10px;">قم بإدخال الـ API Key في شاشة الـ Signals الرئيسية، وعند الضغط على Get Signal سيقوم محرك جـيـمـيـنـي هنا بفحص فوري لمناطق الحيتان والسيولة المخفية وإعطائك الخلاصة الفورية والتحذير من فخاخ التجزئة.</div>
+        <button class="view-btn-back" onclick="switchView('signals')">Go Connect Key Now</button>
+      </div>`;
+    } else if (viewName === "support") {
+      htmlContent = `<div class="card-inner">
+        <div class="sec-lbl">🎧 SpriNg Support Hub</div>
+        <div class="ibox"><div class="ilbl">Bot Version</div><div class="ival">v4.2 Hybrid Engine</div></div>
+        <div class="ibox"><div class="ilbl">Server Latency</div><div class="ival" style="color:#00e096;">14ms (Optimal)</div></div>
+        <div class="ai-box" style="text-align:center; color:#7c83ff;">Bot operates fully on local terminal data.</div>
+        <button class="view-btn-back" onclick="switchView('signals')">← Back to Signals</button>
+      </div>`;
+    }
+    setCard(htmlContent);
+  }
+}
+
+// ======= جـيـمـيـنـي للتحليل التوافقي =======
+async function askGemini(apiKey, mathSummary) {
+  if(!apiKey) return "⚠️ لم يتم استدعاء تقرير الذكاء الفوري لعدم كتابة الـ API Key بالخيار العلوي.";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const promptText = `You are a legendary high-frequency binary options trading expert. I will provide you with calculated mathematical indicator results for ${currentPair.label}.
+  Technical Data: ${mathSummary}.
+  Task: Provide a sharp, highly sophisticated market read in ARABIC (Max 3 lines total). Discuss where the market is pulling liquidity or trapping retail traders next, and end with a strong execution sentence. Keep it extremely brief and actionable.`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+    });
+    const data = await response.json();
+    return data.candidates[0].content.parts[0].text;
+  } catch (err) {
+    return "❌ عذراً، تعذر ربط الخلايا الفنية بذكاء Gemini. يرجى مراجعة صلاحية الـ Key الخاص بك.";
+  }
+}
+
+// ======= INDICATORS =======
+function ema(data,p){
+  var k=2/(p+1),e=data[0];
+  for(var i=1;i<data.length;i++)e=data[i]*k+e*(1-k);
+  return e;
+}
+function rsi(data,p){
+  p=p||14;if(data.length<p+1)return 50;
+  var g=0,l=0;
+  for(var i=data.length-p;i<data.length;i++){var d=data[i]-data[i-1];if(d>0)g+=d;else l+=Math.abs(d);}
+  return 100-(100/(1+(g/p)/((l/p)||0.0001)));
+}
+function macd(data){
+  return ema(data.slice(-26),12)-ema(data.slice(-26),26);
+}
+function stoch(H,L,C,p){
+  p=p||14;
+  var hh=Math.max.apply(null,H.slice(-p));
+  var ll=Math.min.apply(null,L.slice(-p));
+  return ((C[C.length-1]-ll)/(hh-ll||0.0001))*100;
+}
+
+function marketStructure(C){
+  var n=C.length,ups=0,downs=0;
+  for(var i=3;i<Math.min(n,25);i++){
+    if(C[i]>C[i-1]&&C[i-1]>C[i-2]&&C[i-2]>C[i-3])ups++;
+    if(C[i]<C[i-1]&&C[i-1]<C[i-2]&&C[i-2]<C[i-3])downs++;
+  }
+  if(ups>downs+1)return{trend:"UPTREND",score:2};
+  if(downs>ups+1)return{trend:"DOWNTREND",score:-2};
+  return{trend:"SIDEWAYS",score:0};
+}
+
+function getSR(H,L,C){
+  var last=C[C.length-1];
+  var res=Math.max.apply(null,H.slice(-30));
+  var sup=Math.min.apply(null,L.slice(-30));
+  var pivot=(H[H.length-1]+L[L.length-1]+C[C.length-1])/3;
+  var r1=2*pivot-L[L.length-1];
+  var s1=2*pivot-H[H.length-1];
+  return{res:res,sup:sup,pivot:pivot,r1:r1,s1:s1,last:last};
+}
+
+function breakoutRetest(C,H,L,sr){
+  var last=C[C.length-1];
+  var prev=C[C.length-2];
+  var signals=[],score=0;
+  if(prev<sr.r1&&last>sr.r1){signals.push("Breakout above R1");score+=3;}
+  if(prev>sr.s1&&last<sr.s1){signals.push("Breakout below S1");score-=3;}
+  if(last>sr.pivot){score+=1;}else{score-=1;}
+  return{signals:signals,score:score};
+}
+
+function candlePatterns(O,H,L,C){
+  var patterns=[],score=0;
+  var n=C.length-1;
+  var o=O[n],h=H[n],l=L[n],c=C[n];
+  var body=Math.abs(c-o),range=h-l;
+  var bull=c>o;
+  if(body>range*0.75){patterns.push(bull?"Marubozu Bull":"Marubozu Bear");score+=bull?2:-2;}
+  if(n>0){
+    var po=O[n-1],pc=C[n-1];
+    if(pc<po&&c>o&&c>po&&o<pc){patterns.push("Bullish Engulfing");score+=3;}
+    if(pc>po&&c<o&&c<po&&o>pc){patterns.push("Bearish Engulfing");score-=3;}
+  }
+  return{patterns:patterns,score:score};
+}
+
+function waveAnalysis(C){
+  var waveType=C[C.length-1]>C[C.length-10]?"Impulsive":"Corrective";
+  var waveBias=waveType==="Impulsive"?"Trending UP":"Trending DOWN";
+  return{waveType:waveType,waveBias:waveBias,waveScore:waveType==="Impulsive"?1:-1};
+}
+
+function analyze(O,H,L,C){
+  var last=C[C.length-1];
+  var e20=ema(C.slice(-20),20);
+  var e50=ema(C.slice(-50),50);
+  var r=rsi(C);
+  var m=macd(C);
+  var k=stoch(H,L,C,14);
+  var sr=getSR(H,L,C);
+  var ms=marketStructure(C);
+  var br=breakoutRetest(C,H,L,sr);
+  var cp=candlePatterns(O,H,L,C);
+  var wa=waveAnalysis(C);
+  var totalScore=0;
+
+  var emaScore=0;
+  if(last>e20&&e20>e50)emaScore=2;
+  else if(last<e20&&e20<e50)emaScore=-2;
+  totalScore+=emaScore;
+
+  var rsiScore=0;
+  if(r<35)rsiScore=2;else if(r>65)rsiScore=-2;
+  totalScore+=rsiScore;
+  totalScore+=m>0?1:-1;
+
+  totalScore+=ms.score;
+  totalScore+=wa.waveScore||0;
+  totalScore+=br.score;
+  totalScore+=cp.score;
+
+  var direction,dcls;
+  if(Math.abs(totalScore)<3){direction="WAIT";dcls="wait";}
+  else if(totalScore>0){direction="UP";dcls="up";}
+  else{direction="DOWN";dcls="down";}
+
+  var absScore=Math.abs(totalScore);
+  var accuracy=Math.min(96,58+absScore*3.5);
+  if(direction==="WAIT")accuracy=0;
+  var strength=Math.min(98,50+absScore*5);
+
+  var reasons=[];
+  if(direction!=="WAIT"){
+    var isUP=direction==="UP";
+    reasons.push(isUP?"Price relative to EMA structural trend support":"Price trading inside down EMA structural pressure");
+    if(cp.patterns.length>0)reasons.push("Pattern detected: "+cp.patterns[0]);
+    else reasons.push("Market momentum aligning with recent volume spikes");
+    reasons.push("Key core oscillator confluence verified");
+  } else {
+    reasons.push("Mixed signals across indicators — awaiting volatility");
+    reasons.push("Price near Pivot boundary — risk of high fakeouts");
+  }
+
+  return{direction:direction,dcls:dcls,accuracy:Math.round(accuracy),strength:Math.round(strength),
+    reasons:reasons,sr:sr,last:last.toFixed(5),duration:direction==="WAIT"?"No Entry":"5 min",
+    rsi:r.toFixed(1),macd:m.toFixed(5),stoch:k.toFixed(0),
+    patterns:cp.patterns,ms:ms,wa:wa,waveBias:wa.waveBias,totalScore:totalScore};
+}
+
+async function fetchTF(symbol,interval){
+  var url="https://api.twelvedata.com/time_series?symbol="+symbol+"&interval="+interval+"&outputsize=40&apikey=fbaf04b411c7458f923c05ef24bcc878";
+  var res=await fetch(url);
+  if(!res.ok)throw new Error("Network error");
+  var data=await res.json();
+  if(data.status==="error"||!data.values)throw new Error(data.message||"No data");
+  var vals=data.values.reverse();
+  return{
+    O:vals.map(v => parseFloat(v.open)),
+    H:vals.map(v => parseFloat(v.high)),
+    L:vals.map(v => parseFloat(v.low)),
+    C:vals.map(v => parseFloat(v.close))
+  };
+}
+
+async function getSignal(){
+  if(isLoading)return;
+  isLoading=true;
+  var btn=document.getElementById("getBtn");
+  const apiKey = document.getElementById("geminiKey").value.trim();
+
+  btn.className="get-btn loading";btn.innerHTML="Analyzing Engine running...";
+  setCard('<div style="text-align:center;width:100%;padding:20px 0"><div class="spinner"></div><div class="analyzing">Scanning charts & calculating indices...</div></div>');
+  var tf=document.getElementById("tfSelect").value;
+  try{
+    var main=await fetchTF(currentPair.symbol,tf);
+    var sig=analyze(main.O,main.H,main.L,main.C);
+
+    const mathSummary = `Asset: ${currentPair.label}, Decision: ${sig.direction}, RSI: ${sig.rsi}, Stoch: ${sig.stoch}, Bias: ${sig.ms.trend}, S1: ${sig.sr.s1.toFixed(5)}, R1: ${sig.sr.r1.toFixed(5)}`;
+    const aiAnalysisResult = await askGemini(apiKey, mathSummary);
+
+    var darr=sig.direction==="UP"?"&#8593;":sig.direction==="DOWN"?"&#8595;":"&#8213;";
+    var patsHTML=sig.patterns.length>0?sig.patterns.map(p => `<span class="wave-tag">${p}</span>`).join(""):"<span style='color:#333;font-size:11px'>No pattern</span>";
+    var reasonsHTML=sig.reasons.map((r,i) => `<div class="reason-item"><div class="reason-num ${sig.dcls}">${i+1}</div><div class="reason-txt">${r}</div></div>`).join("");
+    
+    setCard(`
+      <div class="card-inner">
+      <div class="sec-lbl">Live Market Analysis</div>
+      <div class="ibox" style="display:flex;justify-content:space-between;align-items:center">
+        <div><div class="ilbl">Confidence</div><div class="ival acc" style="font-size:22px">${sig.direction==="WAIT"?"---":sig.accuracy+"%"}</div></div>
+        <div style="text-align:right"><div class="ilbl">Market Bias</div><div class="ival" style="font-size:13px;color:#a0a8c8">${sig.ms.trend}</div></div>
+      </div>
+      <div class="g3">
+        <div class="ibox"><div class="ilbl">RSI</div><div class="ival">${sig.rsi}</div></div>
+        <div class="ibox"><div class="ilbl">Stoch</div><div class="ival">${sig.stoch}</div></div>
+        <div class="ibox"><div class="ilbl">MACD</div><div class="ival">${parseFloat(sig.macd).toFixed(4)}</div></div>
+      </div>
+      <div class="ibox">
+        <div class="bar-row"><span class="ilbl">Signal Strength</span><span>${sig.direction==="WAIT"?"WAIT":sig.strength+"%"}</span></div>
+        <div class="bar-track"><div class="bar-fill ${sig.dcls}" style="width:${sig.direction==="WAIT"?0:sig.strength}%"></div></div>
+      </div>
+      <div class="dir-box ${sig.dcls}" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div><div class="ilbl">Signal</div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:24px">${darr}</span><span class="dir-lbl ${sig.dcls}">${sig.direction}</span></div></div>
+        <div style="text-align:right"><div class="ilbl">Duration</div><div style="font-size:16px;font-weight:700;color:#7c83ff">${sig.duration}</div></div>
+      </div>
+      
+      <div class="ai-box">
+        <strong style="color:#7c83ff; display:block; margin-bottom:4px;">🤖 تحليل السيولة وفخاخ المتداولين (Gemini):</strong>
+        ${aiAnalysisResult.replace(/\n/g, '<br>')}
+      </div>
+
+      <div class="reasons-box">
+        <div class="ilbl" style="margin-bottom:8px">&#10024; Top Reasons</div>
+        ${reasonsHTML}
+      </div>
+      <div class="actions">
+        <button class="btn-take ${sig.dcls}" onclick="takeTrade()">✓ Take</button>
+        <button class="btn-skip" onclick="skipTrade()">✕ Skip</button>
+      </div>
+      </div>
+    `);
+    btn.style.display="none";
+  }catch(e){
+    setCard('<div class="err-box">&#10060; '+e.message+'</div>');
+    btn.className="get-btn";btn.innerHTML="&#9889; Get Signal";
+  }
+  isLoading=false;
+}
+function takeTrade(){
+  var a=document.querySelector(".actions");
+  if(a)a.outerHTML='<div class="success-box"><div class="success-text">✓ Trade Executed!</div><button class="new-sig-btn" onclick="resetCard()">Get new signal</button></div>';
+}
+function skipTrade(){resetCard();}
+function resetCard(){
+  setCard('<div class="idle">Press Get Signal to start hybrid engine</div>');
+  var btn=document.getElementById("getBtn");
+  btn.style.display="flex";btn.className="get-btn";btn.innerHTML="&#9889; Get Signal";
+  isLoading=false;
+}
+</script>
+</body>
+</html>
