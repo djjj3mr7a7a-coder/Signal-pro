@@ -338,6 +338,80 @@ function momentum(C){
   return{label:"Weak Bearish Momentum",score:-1};
 }
 
+// ======= SMART REJECTION ZONE DETECTOR =======
+function rejectionZones(H,L,C){
+  var n=C.length;
+  var zones=[];
+  var tolerance=0.0003; // 3 pips tolerance
+
+  // Find all significant price levels touched 3+ times
+  var levels=[];
+  for(var i=5;i<n-5;i++){
+    // Swing highs
+    if(H[i]>H[i-1]&&H[i]>H[i-2]&&H[i]>H[i+1]&&H[i]>H[i+2])levels.push({price:H[i],type:"R"});
+    // Swing lows
+    if(L[i]<L[i-1]&&L[i]<L[i-2]&&L[i]<L[i+1]&&L[i]<L[i+2])levels.push({price:L[i],type:"S"});
+  }
+
+  // Cluster levels within tolerance
+  var clusters=[];
+  levels.forEach(function(lv){
+    var found=false;
+    clusters.forEach(function(cl){
+      if(Math.abs(cl.price-lv.price)/lv.price<tolerance){
+        cl.touches++;
+        cl.price=(cl.price*cl.touches+lv.price)/(cl.touches+1); // avg price
+        if(lv.type==="R")cl.rejUp++;else cl.rejDown++;
+        found=true;
+      }
+    });
+    if(!found)clusters.push({price:lv.price,touches:1,rejUp:lv.type==="R"?1:0,rejDown:lv.type==="S"?1:0});
+  });
+
+  // Keep only strong zones (3+ touches)
+  var strongZones=clusters.filter(function(cl){return cl.touches>=3;});
+  strongZones.sort(function(a,b){return b.touches-a.touches;});
+
+  // Check current price vs strong zones
+  var last=C[n-1];
+  var nearZone=null;
+  var nearType="";
+  var nearStrength=0;
+  var distPct=999;
+
+  strongZones.forEach(function(z){
+    var dist=Math.abs(last-z.price)/z.price*100;
+    if(dist<0.05&&dist<distPct){ // within 5 pips
+      distPct=dist;
+      nearZone=z;
+      nearType=z.rejDown>z.rejUp?"RESISTANCE":"SUPPORT";
+      nearStrength=Math.min(100,z.touches*20);
+    }
+  });
+
+  // Score based on proximity + rejection count
+  var score=0;
+  var label="No rejection zone nearby";
+  var atZone=false;
+
+  if(nearZone){
+    atZone=true;
+    score=nearType==="SUPPORT"?2:-2;
+    label=nearType+" zone ("+nearZone.touches+" rejections) at "+nearZone.price.toFixed(5);
+  }
+
+  return{
+    zones:strongZones.slice(0,5),
+    nearZone:nearZone,
+    nearType:nearType,
+    nearStrength:nearStrength,
+    atZone:atZone,
+    score:score,
+    label:label,
+    distPct:distPct<999?distPct.toFixed(4):"N/A"
+  };
+}
+
 // ======= MAIN ANALYSIS =======
 function analyze(O,H,L,C){
   var last=C[C.length-1];
@@ -354,6 +428,7 @@ function analyze(O,H,L,C){
   var wa=waveAnalysis(C);
   var mo=momentum(C);
   var tl=trendLines(C,H,L);
+  var rz=rejectionZones(H,L,C);
   var totalScore=0;
   // ===== MOMENTUM CONSISTENCY SCORE (Real Safety Valve) =====
   var n2=C.length;
@@ -429,6 +504,9 @@ function analyze(O,H,L,C){
   if(tl.trendDir==="UP_CHANNEL")totalScore+=1;
   else if(tl.trendDir==="DOWN_CHANNEL")totalScore-=1;
 
+  // Rejection zone score
+  totalScore+=rz.score;
+
   // Conflict detection - if major indicators disagree, force WAIT
   var emaUp=last>e20&&e20>e50;
   var emaDown=last<e20&&e20<e50;
@@ -440,6 +518,9 @@ function analyze(O,H,L,C){
   var macdDown=m<0;
   var conflicts=0;
   if(emaUp&&msDown)conflicts++;
+  // Block if at strong rejection zone against signal
+  if(rz.atZone&&rz.nearType==="RESISTANCE"&&totalScore>0)conflicts+=2;
+  if(rz.atZone&&rz.nearType==="SUPPORT"&&totalScore<0)conflicts+=2;
   if(emaDown&&msUp)conflicts++;
   if(emaUp&&rsiDown&&r>65)conflicts++;
   if(emaDown&&rsiUp&&r<35)conflicts++;
@@ -465,6 +546,7 @@ function analyze(O,H,L,C){
     if(ms.score!==0)reasons.push("Market structure shows "+ms.trend+" � "+( isUP?"Higher Highs & Higher Lows":"Lower Highs & Lower Lows"));
     if(cp.patterns.length>0)reasons.push("Candle pattern detected: "+cp.patterns[0]+" � strong "+( isUP?"bullish":"bearish")+" signal");
     if(br.signals.length>0)reasons.push(br.signals[0]+" � key level confirmation");
+    if(rz.atZone)reasons.push("Price at "+rz.nearType+" zone ("+rz.nearZone.touches+"x rejections) — high probability bounce");
     if(mo.score!==0)reasons.push(mo.label+" supports the "+direction+" direction");
     if(tl.trendDir!=="NEUTRAL"&&tl.trendDir!=="CONVERGING")reasons.push("Trend channel is "+tl.trendDir+" � price following channel direction");
     if(k<25&&isUP)reasons.push("Stochastic at "+k.toFixed(0)+" � oversold, momentum reversal forming");
@@ -489,7 +571,7 @@ function analyze(O,H,L,C){
     rsi:r.toFixed(1),macd:m.toFixed(5),stoch:k.toFixed(0),
     e20:e20.toFixed(5),e50:e50.toFixed(5),
     patterns:cp.patterns,ms:ms,wa:wa,tl:tl,waveBias:wa.waveBias,waveNum:wa.waveNum,waveType:wa.waveType,
-    emaScore:emaScore,totalScore:totalScore,liquidityOk:liquidityOk,liquidityScore:liquidityScore,atrPct:atrPct.toFixed(4),mcsDetails:mcsDetails};
+    emaScore:emaScore,totalScore:totalScore,liquidityOk:liquidityOk,liquidityScore:liquidityScore,atrPct:atrPct.toFixed(4),mcsDetails:mcsDetails,rz:rz};
 }
 
 async function fetchTF(symbol,interval){
@@ -650,6 +732,14 @@ async function getSignal(){
       '<div class="wave-box">'+
         '<div class="wave-lbl">'+sig.ms.trend+' | '+sig.waveType+': '+sig.waveBias+'</div>'+
         '<div>'+patsHTML+'</div>'+
+      '</div>'+
+      '<div class="ibox" style="margin-bottom:8px;border:1px solid '+(sig.rz.atZone?(sig.rz.nearType==='SUPPORT'?'rgba(0,224,150,0.3)':'rgba(255,77,109,0.3)'):'rgba(30,34,53,1)')+'">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'+
+          '<div class="ilbl">&#9888; Rejection Zone</div>'+
+          '<div style="font-size:11px;font-weight:700;color:'+(sig.rz.atZone?(sig.rz.nearType==='SUPPORT'?'#00e096':'#ff4d6d'):'#444')+'">'+(sig.rz.atZone?sig.rz.nearType+' ('+sig.rz.nearZone.touches+'x)':'NONE NEARBY')+'</div>'+
+        '</div>'+
+        '<div style="font-size:11px;color:#666">'+sig.rz.label+'</div>'+
+        (sig.rz.atZone?'<div style="font-size:10px;color:#555;margin-top:3px">Distance: '+sig.rz.distPct+'% | Strength: '+sig.rz.nearStrength+'%</div>':'')+
       '</div>'+
       '<div class="dir-box '+sig.dcls+'" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'+
         '<div><div class="ilbl" style="margin-bottom:4px">Signal</div>'+
