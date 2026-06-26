@@ -355,10 +355,42 @@ function analyze(O,H,L,C){
   var mo=momentum(C);
   var tl=trendLines(C,H,L);
   var totalScore=0;
+  // ===== MOMENTUM CONSISTENCY SCORE (Real Safety Valve) =====
+  var n2=C.length;
   var atrVal=atr(H,L,C,14);
   var atrPct=(atrVal/C[C.length-1])*100;
-  var liquidityOk=atrPct>0.015;
-  var liquidityScore=Math.min(100,Math.round(atrPct*600));
+
+  // 1. Last 5 candles consistent direction?
+  var last5Up=0,last5Down=0;
+  for(var li=n2-5;li<n2;li++){last5Up+=(C[li]>C[li-1]?1:0);last5Down+=(C[li]<C[li-1]?1:0);}
+  var candleConsistency=Math.max(last5Up,last5Down); // 0-5
+
+  // 2. Current candle bigger than average?
+  var avgBody=0;
+  for(var li=n2-10;li<n2-1;li++)avgBody+=Math.abs(C[li]-O[li]);
+  avgBody/=9;
+  var lastBody=Math.abs(C[n2-1]-O[n2-1]);
+  var strongCandle=lastBody>avgBody*0.8;
+
+  // 3. Price moved enough from EMA (entry zone clear)?
+  var distFromEma=Math.abs(C[n2-1]-e20)/e20*100;
+  var clearFromEntry=distFromEma>0.01;
+
+  // 4. Momentum acceleration (last candle > prev candle)?
+  var momAccel=Math.abs(C[n2-1]-C[n2-2])>Math.abs(C[n2-2]-C[n2-3]);
+
+  // Score: need at least 3/4
+  var mcsScore=0;
+  if(candleConsistency>=3)mcsScore++;
+  if(strongCandle)mcsScore++;
+  if(clearFromEntry)mcsScore++;
+  if(momAccel)mcsScore++;
+
+  var liquidityOk=mcsScore>=3;
+  var liquidityScore=Math.round(mcsScore*25);
+
+  // Details for display
+  var mcsDetails="Candles:"+candleConsistency+"/5 | Body:"+(strongCandle?"Strong":"Weak")+" | Clear:"+(clearFromEntry?"Yes":"No")+" | Accel:"+(momAccel?"Yes":"No");
 
   // EMA
   var emaScore=0;
@@ -457,7 +489,7 @@ function analyze(O,H,L,C){
     rsi:r.toFixed(1),macd:m.toFixed(5),stoch:k.toFixed(0),
     e20:e20.toFixed(5),e50:e50.toFixed(5),
     patterns:cp.patterns,ms:ms,wa:wa,tl:tl,waveBias:wa.waveBias,waveNum:wa.waveNum,waveType:wa.waveType,
-    emaScore:emaScore,totalScore:totalScore,liquidityOk:liquidityOk,liquidityScore:liquidityScore,atrPct:atrPct.toFixed(4)};
+    emaScore:emaScore,totalScore:totalScore,liquidityOk:liquidityOk,liquidityScore:liquidityScore,atrPct:atrPct.toFixed(4),mcsDetails:mcsDetails};
 }
 
 async function fetchTF(symbol,interval){
@@ -598,13 +630,17 @@ async function getSignal(){
         '<div class="bar-track"><div class="bar-fill '+sig.dcls+'" style="width:'+( sig.direction==="WAIT"?0:sig.strength)+'%"></div></div>'+
         '<div class="bar-lbl"><span>Weak</span><span style="color:#555">Score: '+sig.totalScore+'</span><span>Strong</span></div>'+
       '</div>'+
-      '<div class="ibox" style="margin-bottom:8px">'+
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">'+
-          '<div class="ilbl">&#128165; Liquidity Filter</div>'+
-          '<div style="font-size:11px;font-weight:700;color:'+(sig.liquidityOk?'#00e096':'#ff4d6d')+'">'+(sig.liquidityOk?'SUFFICIENT &#10003;':'LOW — NO ENTRY &#10006;')+'</div>'+
+      '<div class="ibox" style="margin-bottom:8px;border:1px solid '+(sig.liquidityOk?'rgba(0,224,150,0.2)':'rgba(255,77,109,0.2)')+'" >'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'+
+          '<div class="ilbl">&#128737; Momentum Safety Valve</div>'+
+          '<div style="font-size:12px;font-weight:700;color:'+(sig.liquidityOk?'#00e096':'#ff4d6d')+'">'+(sig.liquidityOk?'SAFE TO ENTER &#10003;':'BLOCKED &#10006;')+'</div>'+
         '</div>'+
         '<div class="bar-track"><div class="bar-fill '+(sig.liquidityOk?'up':'down')+'" style="width:'+sig.liquidityScore+'%"></div></div>'+
-        '<div style="font-size:10px;color:#333;margin-top:3px">ATR: '+sig.atrPct+'% | '+(sig.liquidityOk?'Price will move sufficiently from entry point':'Low volatility — wait for market activity')+'</div>'+
+        '<div style="display:flex;justify-content:space-between;margin-top:4px">'+
+          '<span style="font-size:9px;color:#333">Score: '+sig.liquidityScore+'%</span>'+
+          '<span style="font-size:9px;color:#333">'+(sig.liquidityOk?'3/4 conditions met':'Need 3/4 conditions')+'</span>'+
+        '</div>'+
+        '<div style="font-size:10px;color:#444;margin-top:5px;line-height:1.6">'+sig.mcsDetails+'</div>'+
       '</div>'+
       '<div class="sr-box">'+
         '<div class="sr-item"><div class="sr-lbl">Support S1</div><div class="sr-val bull">'+sig.sr.s1.toFixed(5)+'</div></div>'+
