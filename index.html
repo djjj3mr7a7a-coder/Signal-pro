@@ -265,7 +265,7 @@ function trendLines(C,H,L){
     if(i>0&&i<n-1&&L[i]<L[i-1]&&L[i]<L[i+1])recentLows.push({i:i,v:L[i]});
   }
   var hlSlope=0,llSlope=0;
-  if(recentHighs.length>=2){var a=recentHighs[recentHighs.length-1],b=recentHighs[recentHighs.length-2];hlSlope=(a.v-b.v)/(a.i-b.i);}
+  if(recentHighs.length>=2){var a=recentHigh Highs[recentHighs.length-1],b=recentHighs[recentHighs.length-2];hlSlope=(a.v-b.v)/(a.i-b.i);}
   if(recentLows.length>=2){var a=recentLows[recentLows.length-1],b=recentLows[recentLows.length-2];llSlope=(a.v-b.v)/(a.i-b.i);}
   var trendDir="NEUTRAL";
   if(hlSlope>0&&llSlope>0)trendDir="UP_CHANNEL";
