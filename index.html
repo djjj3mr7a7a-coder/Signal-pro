@@ -16,17 +16,15 @@
     @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,224,150,0.35)}50%{box-shadow:0 0 0 10px rgba(0,224,150,0)}}
     @keyframes pulseRed{0%,100%{box-shadow:0 0 0 0 rgba(255,77,109,0.35)}50%{box-shadow:0 0 0 10px rgba(255,77,109,0)}}
-    .wrap{width:100%;max-width:400px;padding:0 16px 40px;}
+    .wrap{width:100%;max-width:400px;padding:0 16px 40px;position:relative;}
     .header{display:flex;align-items:center;justify-content:space-between;padding:48px 0 20px;}
     .logo-signal{font-size:22px;font-weight:800;background:linear-gradient(135deg,#4fc3f7,#7c83ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
     .logo-pro{font-size:11px;font-weight:700;color:#f0c040;background:rgba(240,192,64,0.12);padding:2px 7px;border-radius:5px;margin-left:6px;vertical-align:middle;}
     .selectors{display:flex;gap:8px;margin-bottom:14px;position:relative;}
     .pair-btn{flex:1;display:flex;align-items:center;justify-content:space-between;background:#10121e;border:1px solid #1e2235;border-radius:10px;padding:10px 12px;color:#e0e0f0;font-size:13px;font-weight:600;cursor:pointer;}
-    .pair-dropdown{position:absolute;top:46px;left:0;right:70px;z-index:100;background:#10121e;border:1px solid #1e2235;border-radius:10px;max-height:220px;overflow-y:auto;box-shadow:0 8px 32px #000;}
+    .pair-dropdown{position:absolute;top:46px;left:0;right:0;z-index:9999;background:#10121e;border:1px solid #1e2235;border-radius:10px;max-height:220px;overflow-y:auto;box-shadow:0 8px 32px #000;}
     .pair-item{padding:11px 12px;font-size:13px;cursor:pointer;color:#b0b8d8;border-bottom:1px solid #0d0f1a;}
     .pair-item.active{color:#7c83ff;background:#1a1c2e;}
-    .tf-wrap{position:relative;}
-    .tf-select{background:#10121e;border:1px solid #1e2235;border-radius:10px;padding:10px 28px 10px 12px;color:#e0e0f0;font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;}
     .card{background:#10121e;border:1px solid #1a1c2e;border-radius:16px;padding:18px;margin-bottom:12px;min-height:140px;display:flex;align-items:center;justify-content:center;}
     .card-inner{width:100%;animation:fadeUp 0.4s ease;}
     .idle{text-align:center;color:#2a2d45;font-size:14px;padding:20px 0;}
@@ -39,13 +37,6 @@
     .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
     .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
     .acc{color:#7c83ff!important;}
-    .bar-row{display:flex;justify-content:space-between;margin-bottom:6px;}
-    .bar-track{background:#1a1c2e;border-radius:100px;height:5px;overflow:hidden;}
-    .bar-fill{height:100%;border-radius:100px;transition:width 1s ease;}
-    .bar-fill.up{background:linear-gradient(90deg,#4fc3f7,#00e096);}
-    .bar-fill.down{background:linear-gradient(90deg,#ff4d6d,#ff8c00);}
-    .bar-lbl{display:flex;justify-content:space-between;margin-top:3px;}
-    .bar-lbl span{font-size:9px;color:#333;}
     .dir-box{border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;}
     .dir-box.up{background:rgba(0,224,150,0.07);border:1px solid rgba(0,224,150,0.2);}
     .dir-box.down{background:rgba(255,77,109,0.07);border:1px solid rgba(255,77,109,0.2);}
@@ -62,13 +53,6 @@
     .reason-num.down{background:rgba(255,77,109,0.15);color:#ff4d6d;}
     .reason-num.wait{background:rgba(240,192,64,0.15);color:#f0c040;}
     .reason-txt{font-size:12px;color:#a0a8c8;line-height:1.5;}
-    .sr-box{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
-    .sr-item{background:#0d0f1a;border-radius:8px;padding:8px 10px;text-align:center;}
-    .sr-lbl{font-size:9px;color:#444;margin-bottom:3px;}
-    .sr-val{font-size:11px;font-weight:700;}
-    .tf-tabs{display:flex;gap:4px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
-    .tf-tab{flex-shrink:0;padding:6px 12px;background:#10121e;border:1px solid #1e2235;border-radius:8px;font-size:11px;font-weight:600;color:#555;cursor:pointer;}
-    .tf-tab.active{background:#7c83ff;border-color:#7c83ff;color:#fff;}
     .mtf-box{background:#0d0f1a;border-radius:10px;padding:12px;margin-bottom:8px;}
     .mtf-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid #0a0c14;}
     .mtf-row:last-child{border-bottom:none;}
@@ -88,34 +72,24 @@
     .get-btn{width:100%;padding:15px;background:linear-gradient(135deg,#4fc3f7,#7c83ff);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 24px rgba(124,131,255,0.28);}
     .get-btn.loading{background:#1e2035;cursor:not-allowed;box-shadow:none;}
     .bull{color:#00e096;} .bear{color:#ff4d6d;} .neut{color:#f0c040;}
-    
-    /* الـ Navigation Bar العلوي والسفلي */
     .nav{display:flex;justify-content:space-around;margin-top:24px;border-top:1px solid #10121e;padding-top:14px;}
-    .nav-item{text-align:center;cursor:pointer;}
-    .nav-icon{font-size:17px;margin-bottom:2px;color: #a0a8c8; transition: all 0.2s;}
-    .nav-label{font-size:9px;color:#6b7280; transition: all 0.2s;}
-    
-    /* جعل الأيقونات واضحة بمجرد فتح الصفحة وتغيير اللون عند النشاط */
-    .nav-item:not(.active) .nav-icon{opacity:0.75;} 
-    .nav-item.active .nav-icon{opacity:1; color:#7c83ff;}
+    .nav-item{text-align:center;cursor:pointer;flex:1;}
+    .nav-icon{font-size:17px;margin-bottom:2px;transition: transform 0.2s;}
+    .nav-item:active .nav-icon { transform: scale(0.85); }
+    .nav-label{font-size:9px;color:#333;}
     .nav-item.active .nav-label{color:#7c83ff;font-weight:700;}
-    
-    .err-box{text-align:center;padding:24px;color:#ff4d6d;font-size:13px;line-height:1.8;}
-    .wave-box{background:#0d0f1a;border-radius:10px;padding:11px 13px;margin-bottom:8px;}
-    .wave-lbl{font-size:10px;color:#444;margin-bottom:6px;}
-    .wave-content{font-size:12px;color:#a0a8c8;line-height:1.6;}
+    .nav-item.active .nav-icon{opacity:1 !important;}
+    .nav-item:not(.active) .nav-icon{opacity:0.3;}
     .wave-tag{display:inline-block;background:#1a1c2e;border-radius:5px;padding:2px 7px;font-size:10px;color:#7c83ff;margin:1px;}
-    button, .pair-btn, .nav-item, .d-item {
-        touch-action: manipulation !important;
-        -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
-        cursor: pointer !important;
+    button, .pair-btn, .nav-item {
+      touch-action: manipulation !important;
+      -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
     }
     * { -webkit-user-select: none; user-select: none; }
-    input, textarea { -webkit-user-select: text !important; }
   </style>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap" id="mainWrap">
   <div class="header">
     <div>
       <span class="logo-signal">SpriNg</span>
@@ -125,14 +99,13 @@
 
   <div class="selectors">
     <div style="flex:1;position:relative;">
-      <button class="pair-btn" id="pairBtn" onclick="toggleDd(event)">
+      <button class="pair-btn" id="pairBtn">
         <span id="pairLabel">EUR/USD</span>
         <span style="color:#444;font-size:10px;">&#9660;</span>
       </button>
       <div class="pair-dropdown" id="dd" style="display:none;"></div>
     </div>
   </div>
-  <input type="hidden" id="tfSelect" value="5min"/>
 
   <div class="card" id="card">
     <div class="idle">Press Get Signal to start</div>
@@ -141,177 +114,15 @@
   <button class="get-btn" id="getBtn" onclick="getSignal()">&#9889; Get Signal</button>
 
   <div class="nav">
-    <div class="nav-item" onclick="switchTab(this)"><div class="nav-icon">&#128100;</div><div class="nav-label">Profile</div></div>
+    <div class="nav-item" onclick="navTo('profile', this)"><div class="nav-icon">&#128100;</div><div class="nav-label">Profile</div></div>
     <div class="nav-item" onclick="showHistory()"><div class="nav-icon">&#128336;</div><div class="nav-label">History</div></div>
-    <div class="nav-item active" onclick="switchTab(this)"><div class="nav-icon">&#128200;</div><div class="nav-label">Signals</div></div>
-    <div class="nav-item" onclick="switchTab(this)"><div class="nav-icon">&#129302;</div><div class="nav-label">AI</div></div>
-    <div class="nav-item" onclick="switchTab(this)"><div class="nav-icon">&#127911;</div><div class="nav-label">Support</div></div>
+    <div class="nav-item active" onclick="navTo('signals', this)"><div class="nav-icon">&#128200;</div><div class="nav-label">Signals</div></div>
+    <div class="nav-item" onclick="navTo('ai', this)"><div class="nav-icon">&#129302;</div><div class="nav-label">AI</div></div>
+    <div class="nav-item" onclick="navTo('support', this)"><div class="nav-icon">&#127911;</div><div class="nav-label">Support</div></div>
   </div>
 </div>
 
-<div id="hPage" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#08090f;z-index:9999;overflow-y:auto;padding:20px 16px 40px;">
+<div id="hPage" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#08090f;z-index:99999;overflow-y:auto;padding:20px 16px 40px;">
   <div style="display:flex;align-items:center;justify-content:space-between;padding-top:48px;margin-bottom:20px;">
     <div style="font-size:18px;font-weight:800;color:#fff;">&#128336; Trade History</div>
-    <button onclick="hideHistory()" style="background:#10121e;border:1px solid #1e2235;border-radius:8px;padding:8px 14px;color:#7c83ff;cursor:pointer;">Close</button>
-  </div>
-  <div id="hStats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:20px;"></div>
-  <div id="hList"></div>
-</div>
-
-<script>
-var tradeHistory=JSON.parse(localStorage.getItem("th")||"[]");
-var lastTradeId=null;
-var isLoading=false;
-
-function switchTab(element) {
-  document.querySelectorAll('.nav-item').forEach(function(item) {
-    item.classList.remove('active');
-  });
-  element.classList.add('active');
-}
-
-function saveTrade(dir,duration,pair){
-  var t={id:Date.now(),time:new Date().toLocaleTimeString(),date:new Date().toLocaleDateString(),pair:pair,dir:dir,duration:duration,result:null};
-  tradeHistory.unshift(t);
-  if(tradeHistory.length>100)tradeHistory=tradeHistory.slice(0,100);
-  localStorage.setItem("th",JSON.stringify(tradeHistory));
-  return t.id;
-}
-
-function setResult(id,result){
-  tradeHistory=tradeHistory.map(function(t){if(t.id===id)t.result=result;return t;});
-  localStorage.setItem("th",JSON.stringify(tradeHistory));
-  var box=document.querySelector(".success-box");
-  if(box){
-    var c=result==="WIN"?"#00e096":"#ff4d6d";
-    box.innerHTML='<div style="font-size:14px;font-weight:700;color:'+c+';">'+(result==="WIN"?"&#9989;":"&#10060;")+' Marked as '+result+'!</div><button class="new-sig-btn" onclick="resetCard()">Get new signal</button>';
-  }
-}
-
-function showHistory(){
-  var hBtn = document.querySelector("div[onclick='showHistory()']");
-  if(hBtn) switchTab(hBtn);
-
-  var done=tradeHistory.filter(function(t){return t.result!==null;});
-  var wins=done.filter(function(t){return t.result==="WIN";}).length;
-  var losses=done.filter(function(t){return t.result==="LOSS";}).length;
-  var rate=done.length>0?Math.round(wins/done.length*100):0;
-  
-  document.getElementById("hStats").innerHTML=
-    '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#7c83ff;">'+tradeHistory.length+'</div><div style="font-size:9px;color:#444;">TOTAL</div></div>'+
-    '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#00e096;">'+wins+'</div><div style="font-size:9px;color:#444;">WINS</div></div>'+
-    '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#ff4d6d;">'+losses+'</div><div style="font-size:9px;color:#444;">LOSSES</div></div>'+
-    '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:'+(rate>=65?"#00e096":rate>=50?"#f0c040":"#ff4d6d")+';">'+rate+'%</div><div style="font-size:9px;color:#444;">WIN RATE</div></div>';
-  
-  document.getElementById("hList").innerHTML=tradeHistory.length===0?
-    '<div style="text-align:center;color:#2a2d45;padding:30px;font-size:13px;">No trades yet</div>':
-    tradeHistory.slice(0,30).map(function(t){
-      var rc=t.result==="WIN"?"#00e096":t.result==="LOSS"?"#ff4d6d":"#f0c040";
-      return '<div style="background:#10121e;border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">'+
-        '<div><div style="font-size:13px;font-weight:700;color:#e0e0f0;">'+t.pair+'</div>'+
-        '<div style="font-size:10px;color:#444;">'+t.date+' '+t.time+' | '+t.dir+'</div></div>'+
-        (t.result===null?
-          '<div style="display:flex;gap:6px;">'+
-            '<button onclick="setResult('+t.id+',\'WIN\')" style="padding:4px 8px;background:rgba(0,224,150,0.15);border:1px solid #00e096;border-radius:6px;color:#00e096;font-size:11px;font-weight:700;cursor:pointer;">WIN</button>'+
-            '<button onclick="setResult('+t.id+',\'LOSS\')" style="padding:4px 8px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d;border-radius:6px;color:#ff4d6d;font-size:11px;font-weight:700;cursor:pointer;">LOSS</button>'+
-        '</div>':
-          '<span style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;color:'+rc+';background:'+rc+'22;">'+t.result+'</span>')+
-      '</div>';
-    }).join("");
-  document.getElementById("hPage").style.display="block";
-}
-
-function hideHistory(){
-  var hPage = document.getElementById("hPage");
-  if(hPage) hPage.style.display="none";
-  var sigBtn = document.querySelector("div[class*='nav-item']:nth-child(3)");
-  if(sigBtn) {
-    document.querySelectorAll('.nav-item').forEach(function(item) { item.classList.remove('active'); });
-    sigBtn.classList.add('active');
-  }
-}
-
-const PAIRS=[
-  {label:"EUR/USD",symbol:"EUR/USD"},{label:"GBP/USD",symbol:"GBP/USD"},
-  {label:"USD/JPY",symbol:"USD/JPY"},{label:"AUD/USD",symbol:"AUD/USD"},
-  {label:"USD/CAD",symbol:"USD/CAD"},{label:"USD/CHF",symbol:"USD/CHF"},
-  {label:"EUR/GBP",symbol:"EUR/GBP"},{label:"EUR/JPY",symbol:"EUR/JPY"},
-  {label:"GBP/JPY",symbol:"GBP/JPY"},{label:"NZD/USD",symbol:"NZD/USD"},
-  {label:"AUD/JPY",symbol:"AUD/JPY"},{label:"EUR/CHF",symbol:"EUR/CHF"},
-  {label:"GBP/CHF",symbol:"GBP/CHF"},{label:"EUR/AUD",symbol:"EUR/AUD"},
-  {label:"GBP/AUD",symbol:"GBP/AUD"},{label:"AUD/CAD",symbol:"AUD/CAD"},
-  {label:"AUD/NZD",symbol:"AUD/NZD"},{label:"NZD/JPY",symbol:"NZD/JPY"},
-  {label:"CAD/JPY",symbol:"CAD/JPY"},{label:"CHF/JPY",symbol:"CHF/JPY"},
-  {label:"EUR/NZD",symbol:"EUR/NZD"},{label:"GBP/NZD",symbol:"GBP/NZD"},
-  {label:"EUR/CAD",symbol:"EUR/CAD"},{label:"GBP/CAD",symbol:"GBP/CAD"},
-  {label:"USD/MXN",symbol:"USD/MXN"},{label:"USD/SGD",symbol:"USD/SGD"},
-];
-let currentPair=PAIRS[0];
-const dd=document.getElementById("dd");
-PAIRS.forEach(function(p){
-  const d=document.createElement("div");
-  d.className="pair-item"+(p.symbol===currentPair.symbol?" active":"");
-  d.innerHTML=p.label;
-  d.onclick=function(){
-    currentPair=p;
-    document.getElementById("pairLabel").innerHTML=p.label;
-    document.querySelectorAll(".pair-item").forEach(function(x){x.classList.remove("active");});
-    d.classList.add("active");dd.style.display="none";resetCard();
-  };
-  dd.appendChild(d);
-});
-
-function toggleDd(e){
-  e.stopPropagation();
-  var d=document.getElementById("dd");
-  d.style.display=d.style.display==="none"?"block":"none";
-}
-document.getElementById("pairBtn").onclick=function(e){e.stopPropagation();dd.style.display=dd.style.display==="none"?"block":"none";};
-document.addEventListener("click",function(){dd.style.display="none";});
-
-function setCard(h){document.getElementById("card").innerHTML=h;}
-
-function getSignal(){
-  if(isLoading) return;
-  isLoading=true;
-  var btn=document.getElementById("getBtn");
-  btn.className="get-btn loading";
-  btn.innerHTML="Analyzing...";
-  
-  setCard('<div class="card-inner"><div class="spinner"></div><div class="analyzing">Fetching market data...</div></div>');
-  
-  setTimeout(function(){
-    // هنا بيتم إنشاء إشارة وهمية كمثال لتشغيل الـ Card
-    var directions = ["up", "down", "wait"];
-    var randomDir = directions[Math.floor(Math.random() * directions.length)];
-    var dirText = randomDir === "up" ? "CALL" : randomDir === "down" ? "PUT" : "WAIT";
-    
-    var html = '<div class="card-inner">';
-    html += '<div class="dir-box ' + randomDir + '"><span class="dir-lbl ' + randomDir + '">' + dirText + '</span></div>';
-    html += '<div class="ibox"><div class="ilbl">Asset</div><div class="ival">' + currentPair.label + '</div></div>';
-    
-    if(randomDir !== "wait") {
-      var tradeId = saveTrade(dirText, "5 min", currentPair.label);
-      html += '<div class="actions">';
-      html += '<button onclick="setResult(' + tradeId + ',\'WIN\')" class="btn-take up">WIN</button>';
-      html += '<button onclick="setResult(' + tradeId + ',\'LOSS\')" class="btn-take down">LOSS</button>';
-      html += '</div>';
-    } else {
-      html += '<button onclick="resetCard()" class="btn-skip" style="width:100%">Try Another Pair</button>';
-    }
-    html += '</div>';
-    
-    setCard(html);
-    btn.style.display="none";
-  }, 1500);
-}
-
-function resetCard(){
-  setCard('<div class="idle">Press Get Signal to start</div>');
-  var btn=document.getElementById("getBtn");
-  btn.style.display="flex";btn.className="get-btn";btn.innerHTML="&#9889; Get Signal";
-  isLoading=false;
-}
-</script>
-</body>
-</html>
+    <button onclick="hideHistory()" style="background:#10121e;border:1px solid #1e2235;border-radius:8px;padding:8px 14px;color:#7c83ff;font-size:12
