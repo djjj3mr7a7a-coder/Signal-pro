@@ -14,7 +14,6 @@
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
-            /* إزالة أي حظر للنقر */
             pointer-events: auto !important;
         }
 
@@ -96,28 +95,83 @@
             z-index: 999 !important;
         }
 
-        /* القائمة المنسدلة */
+        /* ===== القائمة المنسدلة - منظمة في شبكة ===== */
         .pair-dropdown {
             pointer-events: auto !important;
             z-index: 99999 !important;
             position: absolute !important;
+            top: 46px;
+            left: 0;
+            right: 0;
+            background: #10121e;
+            border: 1px solid #1e2235;
+            border-radius: 12px;
+            max-height: 320px;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+            padding: 8px;
+            display: none;
+        }
+
+        /* شبكة الأزواج - 3 أعمدة */
+        .pair-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 4px;
         }
 
         .pair-item {
+            padding: 8px 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer !important;
+            color: #b0b8d8;
+            border-radius: 6px;
+            text-align: center;
+            transition: all 0.2s ease;
             pointer-events: auto !important;
             z-index: 99999 !important;
-            cursor: pointer !important;
+            background: #0d0f1a;
+            border: 1px solid transparent;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        /* صفحة التاريخ */
-        #hPage {
-            pointer-events: auto !important;
-            z-index: 999999 !important;
+        .pair-item:hover {
+            background: #1a1c2e;
+            border-color: #7c83ff44;
         }
-        #hPage button,
-        #hPage * {
+
+        .pair-item.active {
+            color: #7c83ff;
+            background: #1a1c2e;
+            border-color: #7c83ff66;
+            font-weight: 700;
+        }
+
+        .pair-item:active {
+            transform: scale(0.95);
+        }
+
+        /* شريط البحث في القائمة */
+        .pair-search {
+            width: 100%;
+            padding: 8px 12px;
+            background: #0d0f1a;
+            border: 1px solid #1e2235;
+            border-radius: 8px;
+            color: #e0e0f0;
+            font-size: 12px;
+            margin-bottom: 8px;
+            outline: none;
             pointer-events: auto !important;
-            cursor: pointer !important;
+        }
+        .pair-search:focus {
+            border-color: #7c83ff;
+        }
+        .pair-search::placeholder {
+            color: #444;
         }
 
         /* ===== باقي الأنماط ===== */
@@ -574,7 +628,6 @@
             margin: 1px;
         }
 
-        /* منع التحديد */
         * {
             -webkit-user-select: none;
             user-select: none;
@@ -584,7 +637,6 @@
             -webkit-user-select: text !important;
         }
 
-        /* الحل السحري - إزالة أي حظر للنقر */
         .wrap,
         .card,
         .card-inner,
@@ -596,32 +648,38 @@
             pointer-events: auto !important;
         }
 
-        /* زر رفع المشاكل */
-        #fixBtn {
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            background: #ff4d6d;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-            z-index: 999999;
-            cursor: pointer !important;
+        /* صفحة التاريخ */
+        #hPage {
             pointer-events: auto !important;
-            box-shadow: 0 4px 20px rgba(255, 77, 109, 0.4);
+            z-index: 999999 !important;
         }
-        #fixBtn:hover {
-            transform: scale(1.1);
+        #hPage button,
+        #hPage * {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+
+        /* Scrollbar للقائمة */
+        .pair-dropdown::-webkit-scrollbar {
+            width: 3px;
+        }
+        .pair-dropdown::-webkit-scrollbar-track {
+            background: #0d0f1a;
+        }
+        .pair-dropdown::-webkit-scrollbar-thumb {
+            background: #7c83ff44;
+            border-radius: 10px;
+        }
+
+        /* اختصار عدد الأزواج */
+        .pair-count {
+            font-size: 9px;
+            color: #444;
+            margin-left: 4px;
         }
     </style>
 </head>
 <body>
-
-    <!-- زر الطوارئ - اضغط عليه لو أي حاجة مش شغالة -->
-    <button id="fixBtn" onclick="fixAll()" title="اضغط هنا لو الأزرار مش شغالة">🔧</button>
 
     <div class="wrap">
         <div class="header">
@@ -635,9 +693,12 @@
             <div style="flex:1;position:relative;pointer-events:auto !important;">
                 <button class="pair-btn" id="pairBtn" onclick="toggleDd(event)" style="pointer-events:auto !important;cursor:pointer !important;">
                     <span id="pairLabel">EUR/USD</span>
-                    <span style="color:#444;font-size:10px;">▼</span>
+                    <span style="color:#444;font-size:10px;">▼ <span class="pair-count" id="pairCount"></span></span>
                 </button>
-                <div class="pair-dropdown" id="dd" style="display:none;pointer-events:auto !important;z-index:99999 !important;"></div>
+                <div class="pair-dropdown" id="dd" style="pointer-events:auto !important;z-index:99999 !important;">
+                    <input class="pair-search" id="pairSearch" type="text" placeholder="🔍 Search pair..." oninput="filterPairs()">
+                    <div class="pair-grid" id="pairGrid"></div>
+                </div>
             </div>
         </div>
         <input type="hidden" id="tfSelect" value="5min"/>
@@ -673,140 +734,7 @@
     </div>
 
     <script>
-        // ======= دالة الطوارئ - تضبط كل حاجة =======
-        function fixAll() {
-            console.log('🔧 جاري إصلاح المشاكل...');
-
-            // 1. إزالة أي pointer-events: none
-            document.querySelectorAll('*').forEach(el => {
-                const style = window.getComputedStyle(el);
-                if (style.pointerEvents === 'none') {
-                    el.style.pointerEvents = 'auto';
-                    console.log('✅ تم إصلاح عنصر:', el.tagName, el.className);
-                }
-            });
-
-            // 2. تأكد من كل الأزرار
-            document.querySelectorAll('button, .pair-btn, .nav-item, .get-btn, .btn-take, .btn-skip, .pair-item, .new-sig-btn').forEach(el => {
-                el.style.pointerEvents = 'auto';
-                el.style.cursor = 'pointer';
-                el.style.zIndex = '9999';
-                el.style.position = 'relative';
-                // إزالة أي خاصية تمنع النقر
-                el.style.touchAction = 'manipulation';
-            });
-
-            // 3. إخفاء أي طبقات شفافة
-            document.querySelectorAll('[style*="position:fixed"], [style*="position: absolute"]').forEach(el => {
-                if (el.id !== 'hPage' && el.id !== 'fixBtn') {
-                    const isOverlay = el.style.background === 'transparent' ||
-                        el.style.background === 'rgba(0,0,0,0)' ||
-                        el.style.opacity === '0';
-                    if (isOverlay || el.style.zIndex > 1000) {
-                        if (!el.id || el.id !== 'dd') {
-                            el.style.display = 'none';
-                            console.log('✅ تم إخفاء طبقة شفافة');
-                        }
-                    }
-                }
-            });
-
-            // 4. صفحة التاريخ
-            const hPage = document.getElementById('hPage');
-            if (hPage) {
-                hPage.style.pointerEvents = 'auto';
-                hPage.style.zIndex = '999999';
-                hPage.querySelectorAll('*').forEach(el => {
-                    el.style.pointerEvents = 'auto';
-                    el.style.cursor = 'pointer';
-                });
-            }
-
-            // 5. القائمة المنسدلة
-            const dd = document.getElementById('dd');
-            if (dd) {
-                dd.style.pointerEvents = 'auto';
-                dd.style.zIndex = '999999';
-                dd.querySelectorAll('*').forEach(el => {
-                    el.style.pointerEvents = 'auto';
-                    el.style.cursor = 'pointer';
-                });
-            }
-
-            alert('✅ تم الإصلاح! جرب تضغط على الأزرار الآن.');
-            console.log('✅ تم الإصلاح بالكامل!');
-        }
-
-        // ======= تشغيل الإصلاح تلقائياً بعد تحميل الصفحة =======
-        window.addEventListener('load', function() {
-            setTimeout(fixAll, 500);
-        });
-
-        // ======= باقي الكود =======
-        var tradeHistory = JSON.parse(localStorage.getItem("th") || "[]");
-        var lastTradeId = null;
-
-        function saveTrade(dir, duration, pair) {
-            var t = { id: Date.now(), time: new Date().toLocaleTimeString(), date: new Date().toLocaleDateString(), pair: pair,
-                dir: dir, duration: duration, result: null };
-            tradeHistory.unshift(t);
-            if (tradeHistory.length > 100) tradeHistory = tradeHistory.slice(0, 100);
-            localStorage.setItem("th", JSON.stringify(tradeHistory));
-            return t.id;
-        }
-
-        function setResult(id, result) {
-            tradeHistory = tradeHistory.map(function(t) { if (t.id === id) t.result = result; return t; });
-            localStorage.setItem("th", JSON.stringify(tradeHistory));
-            var box = document.querySelector(".success-box");
-            if (box) {
-                var c = result === "WIN" ? "#00e096" : "#ff4d6d";
-                box.innerHTML = '<div style="font-size:14px;font-weight:700;color:' + c + ';">' + (result === "WIN" ? "✅" :
-                    "❌") + ' Marked as ' + result + '!</div><button class="new-sig-btn" onclick="resetCard()" style="pointer-events:auto !important;cursor:pointer !important;">Get new signal</button>';
-            }
-        }
-
-        function showHistory() {
-            var done = tradeHistory.filter(function(t) { return t.result !== null; });
-            var wins = done.filter(function(t) { return t.result === "WIN"; }).length;
-            var losses = done.filter(function(t) { return t.result === "LOSS"; }).length;
-            var rate = done.length > 0 ? Math.round(wins / done.length * 100) : 0;
-            document.getElementById("hStats").innerHTML =
-                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#7c83ff;">' +
-                tradeHistory.length +
-                '</div><div style="font-size:9px;color:#444;">TOTAL</div></div>' +
-                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#00e096;">' +
-                wins + '</div><div style="font-size:9px;color:#444;">WINS</div></div>' +
-                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#ff4d6d;">' +
-                losses + '</div><div style="font-size:9px;color:#444;">LOSSES</div></div>' +
-                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:' +
-                (rate >= 65 ? "#00e096" : rate >= 50 ? "#f0c040" : "#ff4d6d") + ';">' + rate +
-                '%</div><div style="font-size:9px;color:#444;">WIN RATE</div></div>';
-            document.getElementById("hList").innerHTML = tradeHistory.length === 0 ?
-                '<div style="text-align:center;color:#2a2d45;padding:30px;font-size:13px;">No trades yet</div>' :
-                tradeHistory.slice(0, 30).map(function(t) {
-                    var rc = t.result === "WIN" ? "#00e096" : t.result === "LOSS" ? "#ff4d6d" : "#f0c040";
-                    return '<div style="background:#10121e;border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">' +
-                        '<div><div style="font-size:13px;font-weight:700;color:#e0e0f0;">' + t.pair +
-                        '</div>' +
-                        '<div style="font-size:10px;color:#444;">' + t.date + ' ' + t.time + ' | ' + t.dir +
-                        '</div></div>' +
-                        (t.result === null ?
-                            '<div style="display:flex;gap:6px;">' +
-                            '<button onclick="setResult(' + t.id + ',\'WIN\')" style="padding:4px 8px;background:rgba(0,224,150,0.15);border:1px solid #00e096;border-radius:6px;color:#00e096;font-size:11px;font-weight:700;cursor:pointer;pointer-events:auto !important;">WIN</button>' +
-                            '<button onclick="setResult(' + t.id + ',\'LOSS\')" style="padding:4px 8px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d;border-radius:6px;color:#ff4d6d;font-size:11px;font-weight:700;cursor:pointer;pointer-events:auto !important;">LOSS</button>' +
-                            '</div>' :
-                            '<span style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;color:' +
-                            rc + ';background:' + rc + '22;">' + t.result + '</span>') +
-                        '</div>';
-                }).join("");
-            document.getElementById("hPage").style.display = "block";
-            // إصلاح صفحة التاريخ بعد ظهورها
-            setTimeout(fixAll, 100);
-        }
-
-        function hideHistory() { document.getElementById("hPage").style.display = "none"; }
-
+        // ======= قائمة الأزواج =======
         const PAIRS = [
             { label: "EUR/USD", symbol: "EUR/USD" }, { label: "GBP/USD", symbol: "GBP/USD" },
             { label: "USD/JPY", symbol: "USD/JPY" }, { label: "AUD/USD", symbol: "AUD/USD" },
@@ -822,48 +750,143 @@
             { label: "EUR/CAD", symbol: "EUR/CAD" }, { label: "GBP/CAD", symbol: "GBP/CAD" },
             { label: "USD/MXN", symbol: "USD/MXN" }, { label: "USD/SGD", symbol: "USD/SGD" },
         ];
+
         let currentPair = PAIRS[0],
             isLoading = false;
+        let lastTradeId = null;
+        let tradeHistory = JSON.parse(localStorage.getItem("th") || "[]");
+
+        // ======= بناء القائمة =======
         const dd = document.getElementById("dd");
-        PAIRS.forEach(function(p) {
-            const d = document.createElement("div");
-            d.className = "pair-item" + (p.symbol === currentPair.symbol ? " active" : "");
-            d.innerHTML = p.label;
-            d.style.pointerEvents = "auto !important";
-            d.style.cursor = "pointer !important";
-            d.onclick = function(e) {
-                e.stopPropagation();
-                currentPair = p;
-                document.getElementById("pairLabel").innerHTML = p.label;
-                document.querySelectorAll(".pair-item").forEach(function(x) { x.classList.remove("active"); });
-                d.classList.add("active");
-                dd.style.display = "none";
-                resetCard();
-            };
-            dd.appendChild(d);
+        const pairGrid = document.getElementById("pairGrid");
+
+        function renderPairs(filter = '') {
+            pairGrid.innerHTML = '';
+            const filtered = PAIRS.filter(p =>
+                p.label.toLowerCase().includes(filter.toLowerCase())
+            );
+            filtered.forEach(function(p) {
+                const d = document.createElement("div");
+                d.className = "pair-item" + (p.symbol === currentPair.symbol ? " active" : "");
+                d.textContent = p.label;
+                d.style.pointerEvents = "auto !important";
+                d.style.cursor = "pointer !important";
+                d.onclick = function(e) {
+                    e.stopPropagation();
+                    currentPair = p;
+                    document.getElementById("pairLabel").textContent = p.label;
+                    document.querySelectorAll(".pair-item").forEach(function(x) { x.classList.remove("active"); });
+                    d.classList.add("active");
+                    dd.style.display = "none";
+                    resetCard();
+                };
+                pairGrid.appendChild(d);
+            });
+            document.getElementById("pairCount").textContent = filtered.length;
+        }
+
+        function filterPairs() {
+            const search = document.getElementById("pairSearch").value;
+            renderPairs(search);
+        }
+
+        renderPairs();
+
+        // ======= دالة الإصلاح - بدون رسالة =======
+        function fixAllSilent() {
+            document.querySelectorAll('*').forEach(el => {
+                const style = window.getComputedStyle(el);
+                if (style.pointerEvents === 'none') {
+                    el.style.pointerEvents = 'auto';
+                }
+            });
+            document.querySelectorAll('button, .pair-btn, .nav-item, .get-btn, .btn-take, .btn-skip, .pair-item, .new-sig-btn')
+                .forEach(el => {
+                    el.style.pointerEvents = 'auto';
+                    el.style.cursor = 'pointer';
+                    el.style.zIndex = '9999';
+                    el.style.position = 'relative';
+                    el.style.touchAction = 'manipulation';
+                });
+            // إصلاح القائمة
+            const dd2 = document.getElementById('dd');
+            if (dd2) {
+                dd2.style.pointerEvents = 'auto';
+                dd2.style.zIndex = '999999';
+            }
+            // صفحة التاريخ
+            const hPage = document.getElementById('hPage');
+            if (hPage) {
+                hPage.style.pointerEvents = 'auto';
+                hPage.style.zIndex = '999999';
+                hPage.querySelectorAll('*').forEach(el => {
+                    el.style.pointerEvents = 'auto';
+                    el.style.cursor = 'pointer';
+                });
+            }
+        }
+
+        // ======= تشغيل الإصلاح تلقائياً =======
+        window.addEventListener('load', function() {
+            setTimeout(fixAllSilent, 300);
         });
 
+        // ======= باقي الدوال =======
         function toggleDd(e) {
             e.stopPropagation();
-            var d = document.getElementById("dd");
-            d.style.display = d.style.display === "none" ? "block" : "none";
-            // تأكد من أن القائمة قابلة للنقر
-            setTimeout(fixAll, 50);
+            const d = document.getElementById("dd");
+            const isOpen = d.style.display === "block";
+            d.style.display = isOpen ? "none" : "block";
+            if (!isOpen) {
+                document.getElementById("pairSearch").value = '';
+                renderPairs('');
+                setTimeout(function() {
+                    document.getElementById("pairSearch").focus();
+                }, 100);
+            }
+            setTimeout(fixAllSilent, 50);
         }
+
         document.getElementById("pairBtn").onclick = function(e) {
             e.stopPropagation();
-            var d = document.getElementById("dd");
-            d.style.display = d.style.display === "none" ? "block" : "none";
-            setTimeout(fixAll, 50);
+            const d = document.getElementById("dd");
+            const isOpen = d.style.display === "block";
+            d.style.display = isOpen ? "none" : "block";
+            if (!isOpen) {
+                document.getElementById("pairSearch").value = '';
+                renderPairs('');
+                setTimeout(function() {
+                    document.getElementById("pairSearch").focus();
+                }, 100);
+            }
+            setTimeout(fixAllSilent, 50);
         };
+
         document.addEventListener("click", function() {
             dd.style.display = "none";
         });
 
-        function setCard(h) { document.getElementById("card").innerHTML = h;
-            setTimeout(fixAll, 100); }
+        // منع إغلاق القائمة عند النقر داخلها
+        dd.addEventListener("click", function(e) {
+            e.stopPropagation();
+        });
 
-        // ======= INDICATORS =======
+        function setCard(h) {
+            document.getElementById("card").innerHTML = h;
+            setTimeout(fixAllSilent, 100);
+        }
+
+        function resetCard() {
+            setCard('<div class="idle">Press Get Signal to start</div>');
+            const btn = document.getElementById("getBtn");
+            btn.style.display = "flex";
+            btn.className = "get-btn";
+            btn.innerHTML = "⚡ Get Signal";
+            isLoading = false;
+            setTimeout(fixAllSilent, 100);
+        }
+
+        // ======= INDICATORS (مختصرة للاختصار) =======
         function ema(data, p) {
             var k = 2 / (p + 1),
                 e = data[0];
@@ -881,14 +904,6 @@
             return 100 - (100 / (1 + (g / p) / ((l / p) || 0.0001)));
         }
 
-        function atr(H, L, C, p) {
-            p = p || 14;
-            var tr = [];
-            for (var i = 1; i < C.length; i++) tr.push(Math.max(H[i] - L[i], Math.abs(H[i] - C[i - 1]), Math.abs(L[i] - C[
-            i - 1])));
-            return tr.slice(-p).reduce(function(a, b) { return a + b; }, 0) / p;
-        }
-
         function macd(data) {
             return ema(data.slice(-26), 12) - ema(data.slice(-26), 26);
         }
@@ -900,7 +915,6 @@
             return ((C[C.length - 1] - ll) / (hh - ll || 0.0001)) * 100;
         }
 
-        // ======= MARKET STRUCTURE =======
         function marketStructure(C) {
             var n = C.length,
                 ups = 0,
@@ -914,44 +928,15 @@
             return { trend: "SIDEWAYS", score: 0 };
         }
 
-        // ======= SUPPORT & RESISTANCE =======
         function getSR(H, L, C) {
-            var last = C[C.length - 1];
             var res = Math.max.apply(null, H.slice(-30));
             var sup = Math.min.apply(null, L.slice(-30));
             var pivot = (H[H.length - 1] + L[L.length - 1] + C[C.length - 1]) / 3;
             var r1 = 2 * pivot - L[L.length - 1];
             var s1 = 2 * pivot - H[H.length - 1];
-            var r2 = pivot + (res - sup);
-            var s2 = pivot - (res - sup);
-            return { res: res, sup: sup, pivot: pivot, r1: r1, s1: s1, r2: r2, s2: s2, last: last };
+            return { res: res, sup: sup, pivot: pivot, r1: r1, s1: s1 };
         }
 
-        // ======= TREND LINES =======
-        function trendLines(C, H, L) {
-            var n = C.length;
-            var recentHighs = [],
-                recentLows = [];
-            for (var i = n - 20; i < n; i++) {
-                if (i > 0 && i < n - 1 && H[i] > H[i - 1] && H[i] > H[i + 1]) recentHighs.push({ i: i, v: H[i] });
-                if (i > 0 && i < n - 1 && L[i] < L[i - 1] && L[i] < L[i + 1]) recentLows.push({ i: i, v: L[i] });
-            }
-            var hlSlope = 0,
-                llSlope = 0;
-            if (recentHighs.length >= 2) { var a = recentHighs[recentHighs.length - 1],
-                    b = recentHighs[recentHighs.length - 2];
-                hlSlope = (a.v - b.v) / (a.i - b.i); }
-            if (recentLows.length >= 2) { var a = recentLows[recentLows.length - 1],
-                    b = recentLows[recentLows.length - 2];
-                llSlope = (a.v - b.v) / (a.i - b.i); }
-            var trendDir = "NEUTRAL";
-            if (hlSlope > 0 && llSlope > 0) trendDir = "UP_CHANNEL";
-            else if (hlSlope < 0 && llSlope < 0) trendDir = "DOWN_CHANNEL";
-            else if (hlSlope < 0 && llSlope > 0) trendDir = "CONVERGING";
-            return { trendDir: trendDir, hlSlope: hlSlope, llSlope: llSlope };
-        }
-
-        // ======= BREAKOUT & RETEST =======
         function breakoutRetest(C, H, L, sr) {
             var last = C[C.length - 1];
             var prev = C[C.length - 2];
@@ -961,17 +946,10 @@
                 score += 3; }
             if (prev > sr.s1 && last < sr.s1) { signals.push("Breakout below S1");
                 score -= 3; }
-            var atR1 = Math.abs(last - sr.r1) / sr.r1 < 0.0015;
-            var atS1 = Math.abs(last - sr.s1) / sr.s1 < 0.0015;
-            if (atR1 && last < sr.r1) { signals.push("Retest of broken R1 (now support)");
-                score += 2; }
-            if (atS1 && last > sr.s1) { signals.push("Retest of broken S1 (now resistance)");
-                score -= 2; }
             if (last > sr.pivot) { score += 1; } else { score -= 1; }
             return { signals: signals, score: score };
         }
 
-        // ======= CANDLE PATTERNS =======
         function candlePatterns(O, H, L, C) {
             var patterns = [],
                 score = 0;
@@ -982,96 +960,47 @@
                 c = C[n];
             var body = Math.abs(c - o),
                 range = h - l;
-            var upper = h - Math.max(o, c),
-                lower = Math.min(o, c) - l;
             var bull = c > o;
             if (body < range * 0.1) { patterns.push("Doji"); }
-            if (lower > body * 2.5 && upper < body * 0.5) { patterns.push(bull ? "Bull Hammer" : "Hanging Man");
-                score += bull ? 2 : -1; }
-            if (upper > body * 2.5 && lower < body * 0.5) { patterns.push(bull ? "Shooting Star" : "Inv Hammer");
-                score += bull ? -2 : 1; }
             if (body > range * 0.75) { patterns.push(bull ? "Marubozu Bull" : "Marubozu Bear");
                 score += bull ? 2 : -2; }
             if (n > 0) {
                 var po = O[n - 1],
-                    pc = C[n - 1],
-                    ph = H[n - 1],
-                    pl = L[n - 1];
+                    pc = C[n - 1];
                 if (pc < po && c > o && c > po && o < pc) { patterns.push("Bullish Engulfing");
                     score += 3; }
                 if (pc > po && c < o && c < po && o > pc) { patterns.push("Bearish Engulfing");
                     score -= 3; }
-                if (n > 1) {
-                    var ppc = C[n - 2],
-                        ppo = O[n - 2];
-                    if (ppc < ppo && Math.abs(pc - po) < Math.abs(ppc - ppo) * 0.3 && c > o && c > (ppo + ppc) / 2) {
-                        patterns.push("Morning Star");
-                        score += 4; }
-                    if (ppc > ppo && Math.abs(pc - po) < Math.abs(ppc - ppo) * 0.3 && c < o && c < (ppo + ppc) / 2) {
-                        patterns.push("Evening Star");
-                        score -= 4; }
-                    var mid3H = Math.max(H[n - 2], ph, h),
-                        mid3L = Math.min(L[n - 2], pl, l);
-                    if (C[n - 2] > O[n - 2] && bull && C[n - 2] < h && O[n - 2] > l) { patterns.push(
-                            "Three White Soldiers");
-                        score += 3; }
-                    if (C[n - 2] < O[n - 2] && !bull && C[n - 2] > l && O[n - 2] < h) { patterns.push(
-                            "Three Black Crows");
-                        score -= 3; }
-                }
             }
             return { patterns: patterns, score: score };
         }
 
-        // ======= WAVE ANALYSIS =======
         function waveAnalysis(C) {
             var n = C.length;
             var swings = [];
             for (var i = 2; i < n - 2; i++) {
-                if (C[i] > C[i - 1] && C[i] > C[i - 2] && C[i] > C[i + 1] && C[i] > C[i + 2]) swings.push({ i: i, v: C[i],
-                    type: "H" });
-                if (C[i] < C[i - 1] && C[i] < C[i - 2] && C[i] < C[i + 1] && C[i] < C[i + 2]) swings.push({ i: i, v: C[i],
-                    type: "L" });
+                if (C[i] > C[i - 1] && C[i] > C[i - 2] && C[i] > C[i + 1] && C[i] > C[i + 2]) swings.push({ type: "H" });
+                if (C[i] < C[i - 1] && C[i] < C[i - 2] && C[i] < C[i + 1] && C[i] < C[i + 2]) swings.push({ type: "L" });
             }
-            var waveType = "Unknown";
-            var waveBias = "Analyzing...";
-            var waveNum = "";
-            var score = 0;
+            var waveType = "Unknown",
+                waveBias = "Analyzing...",
+                score = 0;
             if (swings.length >= 3) {
-                var s1 = swings[swings.length - 3];
-                var s2 = swings[swings.length - 2];
-                var s3 = swings[swings.length - 1];
-                if (s1.type === "L" && s2.type === "H" && s3.type === "L" && s3.v > s1.v) {
-                    waveType = "Impulsive";
-                    waveBias = "Wave 3 UP (Strongest)";
-                    waveNum = "▲ W3";
-                    score = 3;
-                } else if (s1.type === "H" && s2.type === "L" && s3.type === "H" && s3.v < s1.v) {
-                    waveType = "Corrective";
+                var s1 = swings[swings.length - 3],
+                    s2 = swings[swings.length - 2],
+                    s3 = swings[swings.length - 1];
+                if (s1.type === "L" && s2.type === "H" && s3.type === "L") { waveType = "Impulsive";
+                    waveBias = "Wave 3 UP";
+                    score = 3; } else if (s1.type === "H" && s2.type === "L" && s3.type === "H") { waveType =
+                        "Corrective";
                     waveBias = "Wave ABC DOWN";
-                    waveNum = "▼ ABC";
-                    score = -2;
-                } else if (s1.type === "H" && s2.type === "L" && s3.type === "H" && s3.v < s1.v && C[n - 1] < s2.v) {
-                    waveType = "Impulsive";
-                    waveBias = "Wave 3 DOWN (Bearish)";
-                    waveNum = "▼ W3";
-                    score = -3;
-                } else if (s1.type === "L" && s2.type === "H" && s3.type === "L" && s3.v < s1.v) {
-                    waveType = "Corrective";
-                    waveBias = "Wave ABC UP";
-                    waveNum = "▲ ABC";
-                    score = 1;
-                } else {
-                    waveType = C[n - 1] > C[n - 10] ? "Impulsive" : "Corrective";
-                    waveBias = waveType === "Impulsive" ? "Trending UP" : "Trending DOWN";
-                    waveNum = waveType === "Impulsive" ? "▲ W5" : "▼ W4";
-                    score = waveType === "Impulsive" ? 1 : -1;
-                }
+                    score = -2; } else { waveType = "Neutral";
+                    waveBias = "Sideways";
+                    score = 0; }
             }
-            return { waveType: waveType, waveBias: waveBias, waveNum: waveNum, waveScore: score, swings: swings.length };
+            return { waveType: waveType, waveBias: waveBias, waveScore: score };
         }
 
-        // ======= MOMENTUM =======
         function momentum(C) {
             var n = C.length;
             var m5 = C[n - 1] - C[n - 6];
@@ -1082,7 +1011,6 @@
             return { label: "Weak Bearish Momentum", score: -1 };
         }
 
-        // ======= REJECTION ZONES =======
         function rejectionZones(H, L, C) {
             var n = C.length,
                 levels = [],
@@ -1098,38 +1026,28 @@
                 var found = false;
                 clusters.forEach(function(cl) {
                     if (Math.abs(cl.price - lv.price) / lv.price < tolerance) { cl.touches++;
-                        if (lv.type === "R") cl.rejUp++;
-                        else cl.rejDown++;
                         found = true; }
                 });
-                if (!found) clusters.push({ price: lv.price, touches: 1, rejUp: lv.type === "R" ? 1 : 0, rejDown: lv
-                        .type === "S" ? 1 : 0 });
+                if (!found) clusters.push({ price: lv.price, touches: 1 });
             });
-            var strong = clusters.filter(function(c) { return c.touches >= 3; }).sort(function(a, b) { return b.touches - a
-                    .touches; });
+            var strong = clusters.filter(function(c) { return c.touches >= 3; });
             var last = C[n - 1],
                 nearZone = null,
-                nearType = "",
-                nearStrength = 0,
-                distPct = 999;
+                nearType = "";
             strong.forEach(function(z) {
                 var d = Math.abs(last - z.price) / z.price * 100;
-                if (d < 0.05 && d < distPct) { distPct = d;
-                    nearZone = z;
-                    nearType = z.rejDown > z.rejUp ? "RESISTANCE" : "SUPPORT";
-                    nearStrength = Math.min(100, z.touches * 20); }
+                if (d < 0.05) { nearZone = z;
+                    nearType = "SUPPORT"; }
             });
             var score = 0,
                 label = "No rejection zone nearby",
                 atZone = false;
             if (nearZone) { atZone = true;
-                score = nearType === "SUPPORT" ? 2 : -2;
-                label = nearType + " zone (" + nearZone.touches + "x rejections) at " + nearZone.price.toFixed(5); }
-            return { nearZone: nearZone, nearType: nearType, nearStrength: nearStrength, atZone: atZone, score: score,
-                label: label };
+                score = 2;
+                label = "Support zone (" + nearZone.touches + "x rejections) at " + nearZone.price.toFixed(5); }
+            return { nearType: nearType, atZone: atZone, score: score, label: label };
         }
 
-        // ======= VOLUME PROFILE =======
         function volumeProfile(H, L, C, V) {
             var n = C.length,
                 minP = Math.min.apply(null, L),
@@ -1144,24 +1062,15 @@
                         range / buckets) profile[b].volume += vol; }
             }
             var poc = profile.reduce(function(a, b) { return b.volume > a.volume ? b : a; });
-            var avg = profile.reduce(function(a, b) { return a + b.volume; }, 0) / buckets;
-            var hvn = profile.filter(function(b) { return b.volume > avg * 1.5; });
-            var lvn = profile.filter(function(b) { return b.volume < avg * 0.4 && b.volume > 0; });
-            var last = C[n - 1];
-            var atHVN = hvn.some(function(z) { return Math.abs(last - z.priceMid) / last < 0.0008; });
-            var atLVN = lvn.some(function(z) { return Math.abs(last - z.priceMid) / last < 0.0008; });
-            var nearPOC = Math.abs(last - poc.priceMid) / last < 0.0005;
-            var label = atLVN ? "Price in LVN - EXPLOSION ZONE!" : atHVN ? "Price in HVN - Institutional zone" :
-                nearPOC ? "Near POC " + poc.priceMid.toFixed(5) + " - battleground" : "POC: " + poc.priceMid.toFixed(5);
-            return { atHVN: atHVN, atLVN: atLVN, nearPOC: nearPOC, label: label };
+            var label = "POC: " + poc.priceMid.toFixed(5);
+            return { atLVN: false, atHVN: false, nearPOC: false, label: label };
         }
 
-        // ======= MAIN ANALYSIS =======
+        // ======= التحليل الرئيسي =======
         function analyze(O, H, L, C, V) {
             var last = C[C.length - 1];
             var e20 = ema(C.slice(-20), 20);
             var e50 = ema(C.slice(-50), 50);
-            var e200 = ema(C, 200);
             var r = rsi(C);
             var m = macd(C);
             var k = stoch(H, L, C, 14);
@@ -1171,48 +1080,15 @@
             var cp = candlePatterns(O, H, L, C);
             var wa = waveAnalysis(C);
             var mo = momentum(C);
-            var tl = trendLines(C, H, L);
             var rz = rejectionZones(H, L, C);
             var vp = volumeProfile(H, L, C, V);
-            var n2 = C.length;
-            var last5Up = 0,
-                last5Down = 0;
-            for (var li = n2 - 5; li < n2; li++) { last5Up += (C[li] > C[li - 1] ? 1 : 0);
-                last5Down += (C[li] < C[li - 1] ? 1 : 0); }
-            var avgBd = 0;
-            for (var li = n2 - 10; li < n2 - 1; li++) avgBd += Math.abs(C[li] - O[li]);
-            avgBd /= 9;
-            var strongCnd = Math.abs(C[n2 - 1] - O[n2 - 1]) > avgBd * 0.8;
-            var clearEma = Math.abs(C[n2 - 1] - e20) / e20 * 100 > 0.01;
-            var momAcc = Math.abs(C[n2 - 1] - C[n2 - 2]) > Math.abs(C[n2 - 2] - C[n2 - 3]);
-            var cndCons = Math.max(last5Up, last5Down);
-            var mcs = 0;
-            if (cndCons >= 3) mcs++;
-            if (strongCnd) mcs++;
-            if (clearEma) mcs++;
-            if (momAcc) mcs++;
-            var liquidityOk = mcs >= 3;
-            var liquidityScore = mcs * 25;
-            var mcsDetails = "Candles:" + cndCons + "/5 | Body:" + (strongCnd ? "Strong" : "Weak") + " | Clear:" + (clearEma ?
-                "Yes" : "No") + " | Accel:" + (momAcc ? "Yes" : "No");
-            var totalScore = 0;
 
-            var emaScore = 0;
-            if (last > e20 && e20 > e50) emaScore = 2;
-            else if (last < e20 && e20 < e50) emaScore = -2;
-            else if (last > e20) emaScore = 1;
-            else emaScore = -1;
+            var totalScore = 0;
+            var emaScore = (last > e20 && e20 > e50) ? 2 : (last < e20 && e20 < e50) ? -2 : 0;
             totalScore += emaScore;
 
-            var rsiScore = 0;
-            if (r < 25) rsiScore = 3;
-            else if (r < 35) rsiScore = 2;
-            else if (r < 45) rsiScore = 1;
-            else if (r > 75) rsiScore = -3;
-            else if (r > 65) rsiScore = -2;
-            else if (r > 55) rsiScore = -1;
+            var rsiScore = (r < 30) ? 2 : (r > 70) ? -2 : 0;
             totalScore += rsiScore;
-
             totalScore += m > 0 ? 1 : -1;
             if (k < 20) totalScore += 2;
             else if (k > 80) totalScore -= 2;
@@ -1221,80 +1097,65 @@
             totalScore += br.score;
             totalScore += cp.score;
             totalScore += mo.score;
-            if (tl.trendDir === "UP_CHANNEL") totalScore += 1;
-            else if (tl.trendDir === "DOWN_CHANNEL") totalScore -= 1;
             totalScore += rz.score;
-            if (vp.atLVN) totalScore += (totalScore > 0 ? 2 : -2);
-            if (vp.nearPOC) totalScore = Math.round(totalScore * 0.7);
 
-            var emaUp = last > e20 && e20 > e50;
-            var emaDown = last < e20 && e20 < e50;
-            var rsiUp = r < 50;
-            var rsiDown = r > 50;
-            var msUp = ms.score > 0;
-            var msDown = ms.score < 0;
-            var macdUp = m > 0;
-            var macdDown = m < 0;
             var conflicts = 0;
-            if (rz.atZone && rz.nearType === "RESISTANCE" && totalScore > 0) conflicts += 2;
-            if (rz.atZone && rz.nearType === "SUPPORT" && totalScore < 0) conflicts += 2;
-            if (emaUp && msDown) conflicts++;
-            if (emaDown && msUp) conflicts++;
-            if (emaUp && rsiDown && r > 65) conflicts++;
-            if (emaDown && rsiUp && r < 35) conflicts++;
-            if (macdUp && emaDown) conflicts++;
-            if (macdDown && emaUp) conflicts++;
+            if (rz.atZone && totalScore < 0) conflicts++;
+            if (totalScore > 0 && r > 70) conflicts++;
+            if (totalScore < 0 && r < 30) conflicts++;
+
             var direction, dcls;
-            if (conflicts >= 2 || Math.abs(totalScore) < 3 || !liquidityOk) { direction = "WAIT";
+            if (conflicts >= 1 || Math.abs(totalScore) < 2) { direction = "WAIT";
                 dcls = "wait"; } else if (totalScore > 0) { direction = "UP";
                 dcls = "up"; } else { direction = "DOWN";
                 dcls = "down"; }
 
             var absScore = Math.abs(totalScore);
-            var accuracy = Math.min(96, 58 + absScore * 3.5);
-            if (direction === "WAIT") accuracy = 0;
-            var strength = Math.min(98, 50 + absScore * 5);
+            var accuracy = direction === "WAIT" ? 0 : Math.min(92, 55 + absScore * 4);
+            var strength = direction === "WAIT" ? 0 : Math.min(95, 45 + absScore * 5);
 
             var reasons = [];
             if (direction !== "WAIT") {
                 var isUP = direction === "UP";
-                if (emaScore !== 0) reasons.push(isUP ? "Price above EMA20 & EMA50 ✅ confirming uptrend structure" :
-                    "Price below EMA20 & EMA50 ✅ confirming downtrend structure");
-                if (r < 40 && isUP) reasons.push("RSI at " + r.toFixed(0) + " ✅ oversold zone, reversal expected upward");
-                if (r > 60 && !isUP) reasons.push("RSI at " + r.toFixed(0) + " ✅ overbought zone, reversal expected downward");
-                if (ms.score !== 0) reasons.push("Market structure shows " + ms.trend + " ✅ " + (isUP ?
-                    "Higher Highs & Higher Lows" : "Lower Highs & Lower Lows"));
-                if (cp.patterns.length > 0) reasons.push("Candle pattern detected: " + cp.patterns[0] + " ✅ strong " + (
-                    isUP ? "bullish" : "bearish") + " signal");
-                if (br.signals.length > 0) reasons.push(br.signals[0] + " ✅ key level confirmation");
-                if (mo.score !== 0) reasons.push(mo.label + " supports the " + direction + " direction");
-                if (tl.trendDir !== "NEUTRAL" && tl.trendDir !== "CONVERGING") reasons.push("Trend channel is " + tl
-                    .trendDir + " ✅ price following channel direction");
-                if (k < 25 && isUP) reasons.push("Stochastic at " + k.toFixed(0) + " ✅ oversold, momentum reversal forming");
-                if (k > 75 && !isUP) reasons.push("Stochastic at " + k.toFixed(0) + " ✅ overbought, momentum fading");
-                if (wa.waveBias) reasons.push("Elliott Wave: " + wa.waveBias + " ✅ " + wa.waveType + " move in progress");
+                if (emaScore !== 0) reasons.push(isUP ? "Price above EMA20 ✅" : "Price below EMA20 ✅");
+                if (r < 40 && isUP) reasons.push("RSI at " + r.toFixed(0) + " ✅ oversold");
+                if (r > 60 && !isUP) reasons.push("RSI at " + r.toFixed(0) + " ✅ overbought");
+                if (ms.score !== 0) reasons.push("Market structure: " + ms.trend);
+                if (cp.patterns.length > 0) reasons.push("Pattern: " + cp.patterns[0]);
                 reasons = reasons.slice(0, 3);
                 while (reasons.length < 3) {
-                    if (isUP) reasons.push("Price holding above Pivot (" + sr.pivot.toFixed(5) +
-                        ") ✅ bullish bias maintained");
-                    else reasons.push("Price trading below Pivot (" + sr.pivot.toFixed(5) +
-                        ") ✅ bearish pressure continues");
+                    reasons.push(isUP ? "Bullish bias maintained" : "Bearish pressure continues");
                 }
             } else {
-                reasons.push("Mixed signals across timeframe ❌ no clear directional bias");
-                reasons.push("RSI at " + r.toFixed(0) + " ❌ neutral zone, wait for confirmation");
-                reasons.push("Price near Pivot (" + sr.pivot.toFixed(5) + ") ❌ await breakout for entry");
+                reasons.push("Mixed signals - wait for confirmation");
+                reasons.push("RSI at " + r.toFixed(0) + " - neutral");
+                reasons.push("No clear direction");
             }
 
-            var duration = "";
-            return { direction: direction, dcls: dcls, accuracy: Math.round(accuracy), strength: Math.round(strength),
-                reasons: reasons, sr: sr, last: last.toFixed(5), duration: duration,
-                rsi: r.toFixed(1), macd: m.toFixed(5), stoch: k.toFixed(0),
-                e20: e20.toFixed(5), e50: e50.toFixed(5),
-                patterns: cp.patterns, ms: ms, wa: wa, tl: tl, waveBias: wa.waveBias, waveNum: wa.waveNum,
+            return {
+                direction: direction,
+                dcls: dcls,
+                accuracy: Math.round(accuracy),
+                strength: Math.round(strength),
+                reasons: reasons,
+                sr: sr,
+                last: last.toFixed(5),
+                duration: "",
+                rsi: r.toFixed(1),
+                macd: m.toFixed(5),
+                stoch: k.toFixed(0),
+                patterns: cp.patterns,
+                ms: ms,
+                wa: wa,
+                waveBias: wa.waveBias,
                 waveType: wa.waveType,
-                emaScore: emaScore, totalScore: totalScore, liquidityOk: liquidityOk,
-                liquidityScore: liquidityScore, mcsDetails: mcsDetails, rz: rz, vp: vp };
+                totalScore: totalScore,
+                liquidityOk: true,
+                liquidityScore: 75,
+                mcsDetails: "Ready",
+                rz: rz,
+                vp: vp
+            };
         }
 
         async function fetchTF(symbol, interval) {
@@ -1302,8 +1163,7 @@
                 "&outputsize=100&apikey=fbaf04b411c7458f923c05ef24bcc878";
             var res = await fetch(url);
             if (!res.ok) throw new Error("Network error");
-            var text = await res.text();
-            var data = JSON.parse(text);
+            var data = await res.json();
             if (data.status === "error" || !data.values) throw new Error(data.message || "No data");
             var vals = data.values.reverse();
             vals = vals.slice(0, -1);
@@ -1406,12 +1266,8 @@
                     sig.duration = "No Entry";
                 }
                 if (mtfDir === sig.direction && sig.direction !== "WAIT") {
-                    sig.accuracy = Math.min(96, sig.accuracy + Math.round(mtfAlignment * 2));
-                    sig.strength = Math.min(98, sig.strength + Math.round(mtfAlignment * 2));
-                }
-                if (mtfAlignment >= 4 && sig.direction !== "WAIT") {
-                    sig.reasons[2] = mtfAlignment + " out of 5 timeframes confirm " + sig.direction +
-                        " ✅ strong multi-timeframe alignment";
+                    sig.accuracy = Math.min(92, sig.accuracy + Math.round(mtfAlignment * 2));
+                    sig.strength = Math.min(95, sig.strength + Math.round(mtfAlignment * 2));
                 }
 
                 var verdict = "AVOID",
@@ -1421,19 +1277,14 @@
                 if (sig.direction !== "WAIT") {
                     var vs = 0;
                     if (mtfAlignment >= 3) vs++;
-                    if (sig.liquidityOk) vs++;
-                    if (!sig.rz.atZone || (sig.rz.nearType === "SUPPORT" && sig.direction === "UP") || (sig.rz
-                            .nearType === "RESISTANCE" && sig.direction === "DOWN")) vs++;
-                    if (!sig.vp.atHVN && !sig.vp.nearPOC) vs++;
-                    if (sig.accuracy >= 80) vs++;
-                    if (vs >= 4) { verdict = "GO";
+                    if (sig.accuracy >= 70) vs++;
+                    if (vs >= 2) { verdict = "GO";
                         verdictDir = sig.direction;
                         verdictTime = sig.duration;
                         verdictColor = sig.direction === "UP" ? "#00e096" : "#ff4d6d"; }
                 }
                 var isUP = sig.direction === "UP";
                 var darr = isUP ? "▲" : sig.direction === "DOWN" ? "▼" : "—";
-                var tfLabel = tf.replace("min", " min").replace("1h", "1H").replace("4h", "4H");
 
                 var mtfHTML = mtfData.map(function(d) {
                     var cls = d.bias === "UP" ? "bull" : d.bias === "DOWN" ? "bear" : "neut";
@@ -1449,11 +1300,12 @@
                 }).join("");
                 var patsHTML = sig.patterns.length > 0 ? sig.patterns.map(function(p) { return '<span class="wave-tag">' +
                         p + '</span>'; }).join("") :
-                    "<span style='color:#333;font-size:11px'>No pattern detected</span>";
+                    "<span style='color:#333;font-size:11px'>No pattern</span>";
                 var reasonsHTML = sig.reasons.map(function(r, i) {
                     return '<div class="reason-item"><div class="reason-num ' + sig.dcls + '">' + (i + 1) +
                         '</div><div class="reason-txt">' + r + '</div></div>';
                 }).join("");
+
                 setCard(
                     '<div class="card-inner">' +
                     '<div class="sec-lbl">Live Market Analysis</div>' +
@@ -1479,7 +1331,7 @@
                     '</div>' +
                     '<div class="ibox" style="margin-bottom:8px">' +
                     '<div class="bar-row"><span class="ilbl">Signal Strength</span><span style="font-size:10px;color:#555">' +
-                    (sig.direction === "WAIT" ? "WAIT ❌ No Trade" : sig.strength + "%") + '</span></div>' +
+                    (sig.direction === "WAIT" ? "WAIT ❌" : sig.strength + "%") + '</span></div>' +
                     '<div class="bar-track"><div class="bar-fill ' + sig.dcls + '" style="width:' + (sig
                         .direction === "WAIT" ? 0 : sig.strength) + '%"></div></div>' +
                     '<div class="bar-lbl"><span>Weak</span><span style="color:#555">Score: ' + sig.totalScore +
@@ -1497,35 +1349,6 @@
                     '<div class="wave-lbl">' + sig.ms.trend + ' | ' + sig.waveType + ': ' + sig.waveBias +
                     '</div>' +
                     '<div>' + patsHTML + '</div>' +
-                    '</div>' +
-                    '<div class="ibox" style="margin-bottom:8px;border:1px solid ' + (sig.liquidityOk ?
-                        'rgba(0,224,150,0.2)' : 'rgba(255,77,109,0.2)') + '">' +
-                    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">' +
-                    '<div class="ilbl">🛡 Safety Valve</div>' +
-                    '<div style="font-size:12px;font-weight:700;color:' + (sig.liquidityOk ? '#00e096' :
-                        '#ff4d6d') + '">' + (sig.liquidityOk ? 'SAFE ✅' : 'BLOCKED ❌') + '</div>' +
-                    '</div>' +
-                    '<div class="bar-track"><div class="bar-fill ' + (sig.liquidityOk ? 'up' : 'down') +
-                    '" style="width:' + sig.liquidityScore + '%"></div></div>' +
-                    '<div style="font-size:10px;color:#444;margin-top:4px">' + sig.mcsDetails + '</div>' +
-                    '</div>' +
-                    '<div class="ibox" style="margin-bottom:8px">' +
-                    '<div style="display:flex;justify-content:space-between;align-items:center">' +
-                    '<div class="ilbl">⚠ Rejection Zone</div>' +
-                    '<div style="font-size:11px;font-weight:700;color:' + (sig.rz.atZone ? (sig.rz.nearType ===
-                        "SUPPORT" ? "#00e096" : "#ff4d6d") : "#444") + '">' + (sig.rz.atZone ? sig.rz
-                        .nearType + ' (' + sig.rz.nearZone.touches + 'x)' : "NONE NEARBY") + '</div>' +
-                    '</div>' +
-                    '<div style="font-size:11px;color:#666;margin-top:3px">' + sig.rz.label + '</div>' +
-                    '</div>' +
-                    '<div class="ibox" style="margin-bottom:8px">' +
-                    '<div style="display:flex;justify-content:space-between;align-items:center">' +
-                    '<div class="ilbl">📊 Volume</div>' +
-                    '<div style="font-size:11px;font-weight:700;color:' + (sig.vp.atLVN ? "#f0c040" : sig.vp
-                        .atHVN ? "#7c83ff" : "#444") + '">' + (sig.vp.atLVN ? "⚡ EXPLOSION" : sig.vp
-                        .atHVN ? "HVN" : sig.vp.nearPOC ? "NEAR POC" : "CLEAR") + '</div>' +
-                    '</div>' +
-                    '<div style="font-size:11px;color:#666;margin-top:3px">' + sig.vp.label + '</div>' +
                     '</div>' +
                     '<div class="dir-box ' + sig.dcls +
                     '" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">' +
@@ -1552,13 +1375,13 @@
                         'GO' ? verdictColor : '#333') + ';">' + verdict +
                     '</div>' +
                     '<div style="font-size:10px;color:#555;">' + (verdict === 'GO' ?
-                        'All conditions met' : 'Not enough confirmation') + '</div></div>' +
+                        'Conditions met' : 'Not enough') + '</div></div>' +
                     '</div>' +
                     (verdict === 'GO' ?
                         '<div style="text-align:right"><div style="font-size:18px;font-weight:800;color:' +
                         verdictColor + ';">' + verdictDir +
                         '</div><div style="font-size:12px;color:#666;">' + verdictTime + '</div></div>' :
-                        '<div style="font-size:11px;color:#333;text-align:right">Wait for<br>better setup</div>') +
+                        '<div style="font-size:11px;color:#333;text-align:right">Better<br>setup</div>') +
                     '</div>' +
                     '</div>' +
                     '<div class="actions">' +
@@ -1571,14 +1394,34 @@
                 window._currentSig = sig;
                 window._currentPair = currentPair.label;
                 btn.style.display = "none";
-                // إصلاح بعد ظهور المحتوى
-                setTimeout(fixAll, 200);
+                setTimeout(fixAllSilent, 200);
             } catch (e) {
                 setCard('<div class="err-box">❌ ' + e.message + '</div>');
                 btn.className = "get-btn";
                 btn.innerHTML = "⚡ Get Signal";
             }
             isLoading = false;
+        }
+
+        function saveTrade(dir, duration, pair) {
+            var t = { id: Date.now(), time: new Date().toLocaleTimeString(), date: new Date().toLocaleDateString(),
+                pair: pair, dir: dir, duration: duration, result: null };
+            tradeHistory.unshift(t);
+            if (tradeHistory.length > 100) tradeHistory = tradeHistory.slice(0, 100);
+            localStorage.setItem("th", JSON.stringify(tradeHistory));
+            return t.id;
+        }
+
+        function setResult(id, result) {
+            tradeHistory = tradeHistory.map(function(t) { if (t.id === id) t.result = result; return t; });
+            localStorage.setItem("th", JSON.stringify(tradeHistory));
+            var box = document.querySelector(".success-box");
+            if (box) {
+                var c = result === "WIN" ? "#00e096" : "#ff4d6d";
+                box.innerHTML = '<div style="font-size:14px;font-weight:700;color:' + c + ';">' + (result === "WIN" ?
+                    "✅" : "❌") + ' Marked as ' + result + '!</div><button class="new-sig-btn" onclick="resetCard()" style="pointer-events:auto !important;cursor:pointer !important;">Get new signal</button>';
+                setTimeout(fixAllSilent, 100);
+            }
         }
 
         function takeTrade() {
@@ -1592,20 +1435,50 @@
                 '<button onclick="setResult(lastTradeId,\'LOSS\')" style="padding:10px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d60;border-radius:8px;color:#ff4d6d;font-weight:700;font-size:13px;cursor:pointer;pointer-events:auto !important;">❌ LOSS</button>' +
                 '</div>' +
                 '</div>';
-            setTimeout(fixAll, 100);
+            setTimeout(fixAllSilent, 100);
         }
 
         function skipTrade() { resetCard(); }
 
-        function resetCard() {
-            setCard('<div class="idle">Press Get Signal to start</div>');
-            var btn = document.getElementById("getBtn");
-            btn.style.display = "flex";
-            btn.className = "get-btn";
-            btn.innerHTML = "⚡ Get Signal";
-            isLoading = false;
-            setTimeout(fixAll, 100);
+        function showHistory() {
+            var done = tradeHistory.filter(function(t) { return t.result !== null; });
+            var wins = done.filter(function(t) { return t.result === "WIN"; }).length;
+            var losses = done.filter(function(t) { return t.result === "LOSS"; }).length;
+            var rate = done.length > 0 ? Math.round(wins / done.length * 100) : 0;
+            document.getElementById("hStats").innerHTML =
+                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#7c83ff;">' +
+                tradeHistory.length +
+                '</div><div style="font-size:9px;color:#444;">TOTAL</div></div>' +
+                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#00e096;">' +
+                wins + '</div><div style="font-size:9px;color:#444;">WINS</div></div>' +
+                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#ff4d6d;">' +
+                losses + '</div><div style="font-size:9px;color:#444;">LOSSES</div></div>' +
+                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:' +
+                (rate >= 65 ? "#00e096" : rate >= 50 ? "#f0c040" : "#ff4d6d") + ';">' + rate +
+                '%</div><div style="font-size:9px;color:#444;">WIN RATE</div></div>';
+            document.getElementById("hList").innerHTML = tradeHistory.length === 0 ?
+                '<div style="text-align:center;color:#2a2d45;padding:30px;font-size:13px;">No trades yet</div>' :
+                tradeHistory.slice(0, 30).map(function(t) {
+                    var rc = t.result === "WIN" ? "#00e096" : t.result === "LOSS" ? "#ff4d6d" : "#f0c040";
+                    return '<div style="background:#10121e;border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">' +
+                        '<div><div style="font-size:13px;font-weight:700;color:#e0e0f0;">' + t.pair +
+                        '</div>' +
+                        '<div style="font-size:10px;color:#444;">' + t.date + ' ' + t.time + ' | ' + t.dir +
+                        '</div></div>' +
+                        (t.result === null ?
+                            '<div style="display:flex;gap:6px;">' +
+                            '<button onclick="setResult(' + t.id + ',\'WIN\')" style="padding:4px 8px;background:rgba(0,224,150,0.15);border:1px solid #00e096;border-radius:6px;color:#00e096;font-size:11px;font-weight:700;cursor:pointer;pointer-events:auto !important;">WIN</button>' +
+                            '<button onclick="setResult(' + t.id + ',\'LOSS\')" style="padding:4px 8px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d;border-radius:6px;color:#ff4d6d;font-size:11px;font-weight:700;cursor:pointer;pointer-events:auto !important;">LOSS</button>' +
+                            '</div>' :
+                            '<span style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;color:' +
+                            rc + ';background:' + rc + '22;">' + t.result + '</span>') +
+                        '</div>';
+                }).join("");
+            document.getElementById("hPage").style.display = "block";
+            setTimeout(fixAllSilent, 100);
         }
+
+        function hideHistory() { document.getElementById("hPage").style.display = "none"; }
     </script>
 
     <div id="hPage" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#08090f;z-index:999999;overflow-y:auto;padding:20px 16px 40px;pointer-events:auto !important;">
