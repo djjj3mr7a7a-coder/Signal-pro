@@ -9,602 +9,107 @@
     <meta name="theme-color" content="#08090f"/>
     <title>SpriNg Bot - Real Signals</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body {
-            background: #08090f;
-            color: #e0e0f0;
-            font-family: -apple-system, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-        }
-        ::-webkit-scrollbar {
-            width: 0;
-        }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        @keyframes pulse {
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(0, 224, 150, 0.35);
-            }
-            50% {
-                box-shadow: 0 0 0 10px rgba(0, 224, 150, 0);
-            }
-        }
-        @keyframes pulseRed {
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.35);
-            }
-            50% {
-                box-shadow: 0 0 0 10px rgba(255, 77, 109, 0);
-            }
-        }
-        .wrap {
-            width: 100%;
-            max-width: 400px;
-            padding: 0 16px 40px;
-        }
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 48px 0 20px;
-        }
-        .logo-signal {
-            font-size: 22px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #4fc3f7, #7c83ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .logo-pro {
-            font-size: 11px;
-            font-weight: 700;
-            color: #f0c040;
-            background: rgba(240, 192, 64, 0.12);
-            padding: 2px 7px;
-            border-radius: 5px;
-            margin-left: 6px;
-            vertical-align: middle;
-        }
-        .logo-badge {
-            font-size: 8px;
-            font-weight: 700;
-            color: #00e096;
-            background: rgba(0, 224, 150, 0.15);
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-left: 6px;
-            border: 1px solid rgba(0, 224, 150, 0.2);
-        }
-        .selectors {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 14px;
-            position: relative;
-        }
-        .pair-btn {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #10121e;
-            border: 1px solid #1e2235;
-            border-radius: 10px;
-            padding: 10px 12px;
-            color: #e0e0f0;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .pair-dropdown {
-            position: absolute;
-            top: 46px;
-            left: 0;
-            right: 0;
-            background: #10121e;
-            border: 1px solid #1e2235;
-            border-radius: 12px;
-            max-height: 320px;
-            overflow-y: auto;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
-            padding: 8px;
-            display: none;
-            z-index: 99999;
-        }
-        .pair-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 4px;
-        }
-        .pair-item {
-            padding: 6px 4px;
-            font-size: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            color: #b0b8d8;
-            border-radius: 6px;
-            text-align: center;
-            background: #0d0f1a;
-            border: 1px solid transparent;
-        }
-        .pair-item:hover {
-            background: #1a1c2e;
-            border-color: #7c83ff44;
-        }
-        .pair-item.active {
-            color: #7c83ff;
-            background: #1a1c2e;
-            border-color: #7c83ff66;
-        }
-        .pair-search {
-            width: 100%;
-            padding: 8px 12px;
-            background: #0d0f1a;
-            border: 1px solid #1e2235;
-            border-radius: 8px;
-            color: #e0e0f0;
-            font-size: 12px;
-            margin-bottom: 8px;
-            outline: none;
-        }
-        .pair-search:focus {
-            border-color: #7c83ff;
-        }
-        .pair-count {
-            font-size: 9px;
-            color: #444;
-            margin-left: 4px;
-        }
-        .card {
-            background: #10121e;
-            border: 1px solid #1a1c2e;
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 12px;
-            min-height: 140px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .card-inner {
-            width: 100%;
-        }
-        .idle {
-            text-align: center;
-            color: #2a2d45;
-            font-size: 14px;
-            padding: 20px 0;
-        }
-        .spinner {
-            width: 38px;
-            height: 38px;
-            border: 3px solid #1e2235;
-            border-top: 3px solid #7c83ff;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 10px;
-        }
-        .analyzing {
-            color: #555;
-            font-size: 12px;
-            text-align: center;
-        }
-        .sec-lbl {
-            font-size: 10px;
-            color: #444;
-            font-weight: 700;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .ibox {
-            background: #0d0f1a;
-            border-radius: 10px;
-            padding: 11px 13px;
-            margin-bottom: 8px;
-        }
-        .ilbl {
-            font-size: 10px;
-            color: #444;
-            margin-bottom: 3px;
-        }
-        .ival {
-            font-size: 15px;
-            font-weight: 700;
-            color: #fff;
-        }
-        .g3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 6px;
-            margin-bottom: 8px;
-        }
-        .acc {
-            color: #7c83ff !important;
-        }
-        .bar-track {
-            background: #1a1c2e;
-            border-radius: 100px;
-            height: 5px;
-            overflow: hidden;
-        }
-        .bar-fill {
-            height: 100%;
-            border-radius: 100px;
-            transition: width 1s ease;
-        }
-        .bar-fill.up {
-            background: linear-gradient(90deg, #4fc3f7, #00e096);
-        }
-        .bar-fill.down {
-            background: linear-gradient(90deg, #ff4d6d, #ff8c00);
-        }
-        .bar-lbl {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 3px;
-        }
-        .bar-lbl span {
-            font-size: 9px;
-            color: #333;
-        }
-        .dir-box {
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-        }
-        .dir-box.up {
-            background: rgba(0, 224, 150, 0.07);
-            border: 1px solid rgba(0, 224, 150, 0.2);
-        }
-        .dir-box.down {
-            background: rgba(255, 77, 109, 0.07);
-            border: 1px solid rgba(255, 77, 109, 0.2);
-        }
-        .dir-box.wait {
-            background: rgba(240, 192, 64, 0.07);
-            border: 1px solid rgba(240, 192, 64, 0.2);
-        }
-        .dir-lbl {
-            font-size: 26px;
-            font-weight: 900;
-        }
-        .dir-lbl.up {
-            color: #00e096;
-        }
-        .dir-lbl.down {
-            color: #ff4d6d;
-        }
-        .dir-lbl.wait {
-            color: #f0c040;
-        }
-        .reasons-box {
-            background: #0d0f1a;
-            border-radius: 10px;
-            padding: 12px 14px;
-            margin-bottom: 12px;
-        }
-        .reason-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-        .reason-item:last-child {
-            margin-bottom: 0;
-        }
-        .reason-num {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 700;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-        .reason-num.up {
-            background: rgba(0, 224, 150, 0.15);
-            color: #00e096;
-        }
-        .reason-num.down {
-            background: rgba(255, 77, 109, 0.15);
-            color: #ff4d6d;
-        }
-        .reason-num.wait {
-            background: rgba(240, 192, 64, 0.15);
-            color: #f0c040;
-        }
-        .reason-txt {
-            font-size: 12px;
-            color: #a0a8c8;
-            line-height: 1.5;
-        }
-        .sr-box {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 6px;
-            margin-bottom: 8px;
-        }
-        .sr-item {
-            background: #0d0f1a;
-            border-radius: 8px;
-            padding: 8px 10px;
-            text-align: center;
-        }
-        .sr-lbl {
-            font-size: 9px;
-            color: #444;
-            margin-bottom: 3px;
-        }
-        .sr-val {
-            font-size: 11px;
-            font-weight: 700;
-        }
-        .mtf-box {
-            background: #0d0f1a;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 8px;
-        }
-        .mtf-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 5px 0;
-            border-bottom: 1px solid #0a0c14;
-        }
-        .mtf-row:last-child {
-            border-bottom: none;
-        }
-        .mtf-tf {
-            font-size: 11px;
-            color: #555;
-            width: 50px;
-        }
-        .mtf-bar {
-            flex: 1;
-            height: 4px;
-            background: #1a1c2e;
-            border-radius: 100px;
-            overflow: hidden;
-            margin: 0 8px;
-        }
-        .mtf-fill {
-            height: 100%;
-            border-radius: 100px;
-        }
-        .mtf-sig {
-            font-size: 11px;
-            font-weight: 700;
-            width: 40px;
-            text-align: right;
-        }
-        .actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 4px;
-        }
-        .btn-take {
-            padding: 13px;
-            border: none;
-            border-radius: 10px;
-            color: #fff;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .btn-take.up {
-            background: #00e096;
-            animation: pulse 2s infinite;
-        }
-        .btn-take.down {
-            background: #ff4d6d;
-            animation: pulseRed 2s infinite;
-        }
-        .btn-take.wait {
-            background: #f0c040;
-            color: #000;
-        }
-        .btn-skip {
-            padding: 13px;
-            background: transparent;
-            border: 1px solid #1e2235;
-            border-radius: 10px;
-            color: #555;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .success-box {
-            text-align: center;
-            padding: 14px;
-            background: rgba(0, 224, 150, 0.06);
-            border-radius: 10px;
-            border: 1px solid rgba(0, 224, 150, 0.18);
-            grid-column: 1/-1;
-        }
-        .success-text {
-            font-size: 13px;
-            color: #00e096;
-            font-weight: 600;
-        }
-        .new-sig-btn {
-            margin-top: 8px;
-            background: none;
-            border: none;
-            color: #555;
-            font-size: 12px;
-            cursor: pointer;
-        }
-        .get-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #4fc3f7, #7c83ff);
-            border: none;
-            border-radius: 12px;
-            color: #fff;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 4px 24px rgba(124, 131, 255, 0.28);
-        }
-        .get-btn.loading {
-            background: #1e2035;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-        .bull {
-            color: #00e096;
-        }
-        .bear {
-            color: #ff4d6d;
-        }
-        .neut {
-            color: #f0c040;
-        }
-        .nav {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 24px;
-            border-top: 1px solid #10121e;
-            padding-top: 14px;
-        }
-        .nav-item {
-            text-align: center;
-            cursor: pointer;
-        }
-        .nav-icon {
-            font-size: 17px;
-            margin-bottom: 2px;
-        }
-        .nav-label {
-            font-size: 9px;
-            color: #333;
-        }
-        .nav-item.active .nav-label {
-            color: #7c83ff;
-            font-weight: 700;
-        }
-        .nav-item:not(.active) .nav-icon {
-            opacity: 0.2;
-        }
-        .err-box {
-            text-align: center;
-            padding: 24px;
-            color: #ff4d6d;
-            font-size: 13px;
-            line-height: 1.8;
-        }
-        .check-box {
-            background: #0d0f1a;
-            border-radius: 8px;
-            padding: 8px 10px;
-            text-align: center;
-            border: 1px solid transparent;
-        }
-        .check-box.active {
-            border-color: #00e09644;
-            background: rgba(0, 224, 150, 0.05);
-        }
-        .check-box.inactive {
-            border-color: #ff4d6d44;
-            background: rgba(255, 77, 109, 0.05);
-        }
-        .criteria-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-            gap: 4px;
-            margin-bottom: 10px;
-        }
-        .criteria-item {
-            background: #0d0f1a;
-            border-radius: 6px;
-            padding: 6px 4px;
-            text-align: center;
-            border: 1px solid #1a1c2e;
-            font-size: 8px;
-        }
-        .criteria-item.pass {
-            border-color: #00e09644;
-            background: rgba(0, 224, 150, 0.05);
-        }
-        .criteria-item.fail {
-            border-color: #ff4d6d44;
-            background: rgba(255, 77, 109, 0.05);
-        }
-        .criteria-item .label {
-            color: #666;
-            font-size: 7px;
-            margin-top: 2px;
-        }
-        .duration-box {
-            background: #0d0f1a;
-            border-radius: 8px;
-            padding: 8px 12px;
-            text-align: center;
-            border: 1px solid #7c83ff44;
-            margin-bottom: 8px;
-        }
-        .duration-box .time {
-            font-size: 20px;
-            font-weight: 900;
-            color: #7c83ff;
-        }
-        button,
-        .pair-btn,
-        .nav-item,
-        .get-btn,
-        .btn-take,
-        .btn-skip,
-        .new-sig-btn,
-        .pair-item {
-            cursor: pointer !important;
-            touch-action: manipulation !important;
-            -webkit-tap-highlight-color: transparent !important;
-        }
-        #hPage {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #08090f;
-            z-index: 999999;
-            overflow-y: auto;
-            padding: 20px 16px 40px;
-        }
-        .pair-dropdown::-webkit-scrollbar {
-            width: 3px;
-        }
-        .pair-dropdown::-webkit-scrollbar-track {
-            background: #0d0f1a;
-        }
-        .pair-dropdown::-webkit-scrollbar-thumb {
-            background: #7c83ff44;
-            border-radius: 10px;
-        }
+        *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+        body{background:#08090f;color:#e0e0f0;font-family:-apple-system,sans-serif;min-height:100vh;display:flex;justify-content:center}
+        ::-webkit-scrollbar{width:0}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,224,150,0.35)}50%{box-shadow:0 0 0 10px rgba(0,224,150,0)}}
+        @keyframes pulseRed{0%,100%{box-shadow:0 0 0 0 rgba(255,77,109,0.35)}50%{box-shadow:0 0 0 10px rgba(255,77,109,0)}}
+        .wrap{width:100%;max-width:400px;padding:0 16px 40px}
+        .header{display:flex;align-items:center;justify-content:space-between;padding:48px 0 20px}
+        .logo-signal{font-size:22px;font-weight:800;background:linear-gradient(135deg,#4fc3f7,#7c83ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .logo-pro{font-size:11px;font-weight:700;color:#f0c040;background:rgba(240,192,64,.12);padding:2px 7px;border-radius:5px;margin-left:6px;vertical-align:middle}
+        .logo-badge{font-size:8px;font-weight:700;color:#00e096;background:rgba(0,224,150,.15);padding:2px 8px;border-radius:10px;margin-left:6px;border:1px solid rgba(0,224,150,.2)}
+        .selectors{display:flex;gap:8px;margin-bottom:14px;position:relative}
+        .pair-btn{flex:1;display:flex;align-items:center;justify-content:space-between;background:#10121e;border:1px solid #1e2235;border-radius:10px;padding:10px 12px;color:#e0e0f0;font-size:13px;font-weight:600;cursor:pointer}
+        .pair-dropdown{position:absolute;top:46px;left:0;right:0;background:#10121e;border:1px solid #1e2235;border-radius:12px;max-height:320px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.8);padding:8px;display:none;z-index:99999}
+        .pair-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}
+        .pair-item{padding:6px 4px;font-size:10px;font-weight:600;cursor:pointer;color:#b0b8d8;border-radius:6px;text-align:center;background:#0d0f1a;border:1px solid transparent}
+        .pair-item:hover{background:#1a1c2e;border-color:#7c83ff44}
+        .pair-item.active{color:#7c83ff;background:#1a1c2e;border-color:#7c83ff66}
+        .pair-search{width:100%;padding:8px 12px;background:#0d0f1a;border:1px solid #1e2235;border-radius:8px;color:#e0e0f0;font-size:12px;margin-bottom:8px;outline:none}
+        .pair-search:focus{border-color:#7c83ff}
+        .pair-count{font-size:9px;color:#444;margin-left:4px}
+        .card{background:#10121e;border:1px solid #1a1c2e;border-radius:16px;padding:18px;margin-bottom:12px;min-height:140px;display:flex;align-items:center;justify-content:center}
+        .card-inner{width:100%}
+        .idle{text-align:center;color:#2a2d45;font-size:14px;padding:20px 0}
+        .spinner{width:38px;height:38px;border:3px solid #1e2235;border-top:3px solid #7c83ff;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+        .analyzing{color:#555;font-size:12px;text-align:center}
+        .sec-lbl{font-size:10px;color:#444;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px}
+        .ibox{background:#0d0f1a;border-radius:10px;padding:11px 13px;margin-bottom:8px}
+        .ilbl{font-size:10px;color:#444;margin-bottom:3px}
+        .ival{font-size:15px;font-weight:700;color:#fff}
+        .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px}
+        .acc{color:#7c83ff!important}
+        .bar-track{background:#1a1c2e;border-radius:100px;height:5px;overflow:hidden}
+        .bar-fill{height:100%;border-radius:100px;transition:width 1s ease}
+        .bar-fill.up{background:linear-gradient(90deg,#4fc3f7,#00e096)}
+        .bar-fill.down{background:linear-gradient(90deg,#ff4d6d,#ff8c00)}
+        .bar-lbl{display:flex;justify-content:space-between;margin-top:3px}
+        .bar-lbl span{font-size:9px;color:#333}
+        .dir-box{border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center}
+        .dir-box.up{background:rgba(0,224,150,.07);border:1px solid rgba(0,224,150,.2)}
+        .dir-box.down{background:rgba(255,77,109,.07);border:1px solid rgba(255,77,109,.2)}
+        .dir-box.wait{background:rgba(240,192,64,.07);border:1px solid rgba(240,192,64,.2)}
+        .dir-lbl{font-size:26px;font-weight:900}
+        .dir-lbl.up{color:#00e096}
+        .dir-lbl.down{color:#ff4d6d}
+        .dir-lbl.wait{color:#f0c040}
+        .reasons-box{background:#0d0f1a;border-radius:10px;padding:12px 14px;margin-bottom:12px}
+        .reason-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px}
+        .reason-item:last-child{margin-bottom:0}
+        .reason-num{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px}
+        .reason-num.up{background:rgba(0,224,150,.15);color:#00e096}
+        .reason-num.down{background:rgba(255,77,109,.15);color:#ff4d6d}
+        .reason-num.wait{background:rgba(240,192,64,.15);color:#f0c040}
+        .reason-txt{font-size:12px;color:#a0a8c8;line-height:1.5}
+        .sr-box{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px}
+        .sr-item{background:#0d0f1a;border-radius:8px;padding:8px 10px;text-align:center}
+        .sr-lbl{font-size:9px;color:#444;margin-bottom:3px}
+        .sr-val{font-size:11px;font-weight:700}
+        .mtf-box{background:#0d0f1a;border-radius:10px;padding:12px;margin-bottom:8px}
+        .mtf-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid #0a0c14}
+        .mtf-row:last-child{border-bottom:none}
+        .mtf-tf{font-size:11px;color:#555;width:50px}
+        .mtf-bar{flex:1;height:4px;background:#1a1c2e;border-radius:100px;overflow:hidden;margin:0 8px}
+        .mtf-fill{height:100%;border-radius:100px}
+        .mtf-sig{font-size:11px;font-weight:700;width:40px;text-align:right}
+        .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+        .btn-take{padding:13px;border:none;border-radius:10px;color:#fff;font-weight:700;font-size:14px;cursor:pointer}
+        .btn-take.up{background:#00e096;animation:pulse 2s infinite}
+        .btn-take.down{background:#ff4d6d;animation:pulseRed 2s infinite}
+        .btn-take.wait{background:#f0c040;color:#000}
+        .btn-skip{padding:13px;background:transparent;border:1px solid #1e2235;border-radius:10px;color:#555;font-weight:700;font-size:14px;cursor:pointer}
+        .success-box{text-align:center;padding:14px;background:rgba(0,224,150,.06);border-radius:10px;border:1px solid rgba(0,224,150,.18);grid-column:1/-1}
+        .success-text{font-size:13px;color:#00e096;font-weight:600}
+        .new-sig-btn{margin-top:8px;background:none;border:none;color:#555;font-size:12px;cursor:pointer}
+        .get-btn{width:100%;padding:15px;background:linear-gradient(135deg,#4fc3f7,#7c83ff);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 24px rgba(124,131,255,.28)}
+        .get-btn.loading{background:#1e2035;cursor:not-allowed;box-shadow:none}
+        .bull{color:#00e096}
+        .bear{color:#ff4d6d}
+        .neut{color:#f0c040}
+        .nav{display:flex;justify-content:space-around;margin-top:24px;border-top:1px solid #10121e;padding-top:14px}
+        .nav-item{text-align:center;cursor:pointer}
+        .nav-icon{font-size:17px;margin-bottom:2px}
+        .nav-label{font-size:9px;color:#333}
+        .nav-item.active .nav-label{color:#7c83ff;font-weight:700}
+        .nav-item:not(.active) .nav-icon{opacity:.2}
+        .err-box{text-align:center;padding:24px;color:#ff4d6d;font-size:13px;line-height:1.8}
+        .check-box{background:#0d0f1a;border-radius:8px;padding:8px 10px;text-align:center;border:1px solid transparent}
+        .check-box.active{border-color:#00e09644;background:rgba(0,224,150,.05)}
+        .check-box.inactive{border-color:#ff4d6d44;background:rgba(255,77,109,.05)}
+        .criteria-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:4px;margin-bottom:10px}
+        .criteria-item{background:#0d0f1a;border-radius:6px;padding:6px 4px;text-align:center;border:1px solid #1a1c2e;font-size:8px}
+        .criteria-item.pass{border-color:#00e09644;background:rgba(0,224,150,.05)}
+        .criteria-item.fail{border-color:#ff4d6d44;background:rgba(255,77,109,.05)}
+        .criteria-item .label{color:#666;font-size:7px;margin-top:2px}
+        .duration-box{background:#0d0f1a;border-radius:8px;padding:8px 12px;text-align:center;border:1px solid #7c83ff44;margin-bottom:8px}
+        .duration-box .time{font-size:20px;font-weight:900;color:#7c83ff}
+        button,.pair-btn,.nav-item,.get-btn,.btn-take,.btn-skip,.new-sig-btn,.pair-item{cursor:pointer!important;touch-action:manipulation!important}
+        #hPage{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#08090f;z-index:999999;overflow-y:auto;padding:20px 16px 40px}
+        .pair-dropdown::-webkit-scrollbar{width:3px}
+        .pair-dropdown::-webkit-scrollbar-track{background:#0d0f1a}
+        .pair-dropdown::-webkit-scrollbar-thumb{background:#7c83ff44;border-radius:10px}
     </style>
 </head>
 <body>
@@ -633,7 +138,7 @@
         <input type="hidden" id="tfSelect" value="5min"/>
 
         <div class="card" id="card">
-            <div class="idle">تحليل 15 معيار<br><span style="font-size:11px;color:#333;">إشارات حقيقية صعود وهبوط</span></div>
+            <div class="idle">تحليل 15 معيار<br><span style="font-size:11px;color:#333;">إشارات حقيقية فورية</span></div>
         </div>
 
         <button class="get-btn" id="getBtn" onclick="getSignal()">Get Signal</button>
@@ -650,838 +155,614 @@
     <script>
         // ======= PAIRS =======
         const PAIRS = [
-            { label: "EUR/USD", symbol: "EUR/USD" }, { label: "GBP/USD", symbol: "GBP/USD" },
-            { label: "USD/JPY", symbol: "USD/JPY" }, { label: "AUD/USD", symbol: "AUD/USD" },
-            { label: "USD/CAD", symbol: "USD/CAD" }, { label: "USD/CHF", symbol: "USD/CHF" },
-            { label: "EUR/GBP", symbol: "EUR/GBP" }, { label: "EUR/JPY", symbol: "EUR/JPY" },
-            { label: "GBP/JPY", symbol: "GBP/JPY" }, { label: "NZD/USD", symbol: "NZD/USD" },
-            { label: "AUD/JPY", symbol: "AUD/JPY" }, { label: "EUR/CHF", symbol: "EUR/CHF" },
-            { label: "GBP/CHF", symbol: "GBP/CHF" }, { label: "EUR/AUD", symbol: "EUR/AUD" },
-            { label: "GBP/AUD", symbol: "GBP/AUD" }, { label: "AUD/CAD", symbol: "AUD/CAD" },
-            { label: "AUD/NZD", symbol: "AUD/NZD" }, { label: "NZD/JPY", symbol: "NZD/JPY" },
-            { label: "CAD/JPY", symbol: "CAD/JPY" }, { label: "CHF/JPY", symbol: "CHF/JPY" },
-            { label: "EUR/NZD", symbol: "EUR/NZD" }, { label: "GBP/NZD", symbol: "GBP/NZD" },
-            { label: "EUR/CAD", symbol: "EUR/CAD" }, { label: "GBP/CAD", symbol: "GBP/CAD" },
-            { label: "USD/MXN", symbol: "USD/MXN" }, { label: "USD/SGD", symbol: "USD/SGD" }
+            {label:"EUR/USD",symbol:"EUR/USD"},{label:"GBP/USD",symbol:"GBP/USD"},
+            {label:"USD/JPY",symbol:"USD/JPY"},{label:"AUD/USD",symbol:"AUD/USD"},
+            {label:"USD/CAD",symbol:"USD/CAD"},{label:"USD/CHF",symbol:"USD/CHF"},
+            {label:"EUR/GBP",symbol:"EUR/GBP"},{label:"EUR/JPY",symbol:"EUR/JPY"},
+            {label:"GBP/JPY",symbol:"GBP/JPY"},{label:"NZD/USD",symbol:"NZD/USD"},
+            {label:"AUD/JPY",symbol:"AUD/JPY"},{label:"EUR/CHF",symbol:"EUR/CHF"},
+            {label:"GBP/CHF",symbol:"GBP/CHF"},{label:"EUR/AUD",symbol:"EUR/AUD"},
+            {label:"GBP/AUD",symbol:"GBP/AUD"},{label:"AUD/CAD",symbol:"AUD/CAD"},
+            {label:"AUD/NZD",symbol:"AUD/NZD"},{label:"NZD/JPY",symbol:"NZD/JPY"},
+            {label:"CAD/JPY",symbol:"CAD/JPY"},{label:"CHF/JPY",symbol:"CHF/JPY"},
+            {label:"EUR/NZD",symbol:"EUR/NZD"},{label:"GBP/NZD",symbol:"GBP/NZD"},
+            {label:"EUR/CAD",symbol:"EUR/CAD"},{label:"GBP/CAD",symbol:"GBP/CAD"},
+            {label:"USD/MXN",symbol:"USD/MXN"},{label:"USD/SGD",symbol:"USD/SGD"}
         ];
 
-        let currentPair = PAIRS[0],
-            isLoading = false,
-            lastTradeId = null;
-        let tradeHistory = JSON.parse(localStorage.getItem("th") || "[]");
-        const dd = document.getElementById("dd");
-        const pairGrid = document.getElementById("pairGrid");
+        let currentPair=PAIRS[0], isLoading=false, lastTradeId=null;
+        let tradeHistory=JSON.parse(localStorage.getItem("th")||"[]");
+        const dd=document.getElementById("dd");
+        const pairGrid=document.getElementById("pairGrid");
 
-        function renderPairs(f = '') {
-            pairGrid.innerHTML = '';
-            const filtered = PAIRS.filter(p => p.label.toLowerCase().includes(f.toLowerCase()));
-            filtered.forEach(function(p) {
-                const d = document.createElement("div");
-                d.className = "pair-item" + (p.symbol === currentPair.symbol ? " active" : "");
-                d.textContent = p.label;
-                d.onclick = function(e) {
+        function renderPairs(f=''){
+            pairGrid.innerHTML='';
+            const filtered=PAIRS.filter(p=>p.label.toLowerCase().includes(f.toLowerCase()));
+            filtered.forEach(function(p){
+                const d=document.createElement("div");
+                d.className="pair-item"+(p.symbol===currentPair.symbol?" active":"");
+                d.textContent=p.label;
+                d.onclick=function(e){
                     e.stopPropagation();
-                    currentPair = p;
-                    document.getElementById("pairLabel").textContent = p.label;
-                    document.querySelectorAll(".pair-item").forEach(function(x) { x.classList.remove("active"); });
+                    currentPair=p;
+                    document.getElementById("pairLabel").textContent=p.label;
+                    document.querySelectorAll(".pair-item").forEach(function(x){x.classList.remove("active");});
                     d.classList.add("active");
-                    dd.style.display = "none";
+                    dd.style.display="none";
                     resetCard();
                 };
                 pairGrid.appendChild(d);
             });
-            document.getElementById("pairCount").textContent = filtered.length;
+            document.getElementById("pairCount").textContent=filtered.length;
         }
 
-        function filterPairs() { renderPairs(document.getElementById("pairSearch").value); }
+        function filterPairs(){renderPairs(document.getElementById("pairSearch").value);}
         renderPairs();
 
-        function toggleDd(e) {
+        function toggleDd(e){
             e.stopPropagation();
-            const d = document.getElementById("dd");
-            d.style.display = d.style.display === "block" ? "none" : "block";
-            if (d.style.display === "block") {
-                document.getElementById("pairSearch").value = '';
+            const d=document.getElementById("dd");
+            d.style.display=d.style.display==="block"?"none":"block";
+            if(d.style.display==="block"){
+                document.getElementById("pairSearch").value='';
                 renderPairs('');
-                setTimeout(function() { document.getElementById("pairSearch").focus(); }, 100);
+                setTimeout(function(){document.getElementById("pairSearch").focus();},100);
             }
         }
 
-        document.getElementById("pairBtn").onclick = function(e) {
+        document.getElementById("pairBtn").onclick=function(e){
             e.stopPropagation();
-            const d = document.getElementById("dd");
-            d.style.display = d.style.display === "block" ? "none" : "block";
-            if (d.style.display === "block") {
-                document.getElementById("pairSearch").value = '';
+            const d=document.getElementById("dd");
+            d.style.display=d.style.display==="block"?"none":"block";
+            if(d.style.display==="block"){
+                document.getElementById("pairSearch").value='';
                 renderPairs('');
-                setTimeout(function() { document.getElementById("pairSearch").focus(); }, 100);
+                setTimeout(function(){document.getElementById("pairSearch").focus();},100);
             }
         };
-        document.addEventListener("click", function() { dd.style.display = "none"; });
-        dd.addEventListener("click", function(e) { e.stopPropagation(); });
+        document.addEventListener("click",function(){dd.style.display="none";});
+        dd.addEventListener("click",function(e){e.stopPropagation();});
 
-        function setCard(h) { document.getElementById("card").innerHTML = h; }
+        function setCard(h){document.getElementById("card").innerHTML=h;}
 
-        function resetCard() {
-            setCard(
-                '<div class="idle">تحليل 15 معيار<br><span style="font-size:11px;color:#333;">إشارات حقيقية صعود وهبوط</span></div>'
-                );
-            document.getElementById("getBtn").style.display = "flex";
-            document.getElementById("getBtn").className = "get-btn";
-            document.getElementById("getBtn").innerHTML = "Get Signal";
-            isLoading = false;
+        function resetCard(){
+            setCard('<div class="idle">تحليل 15 معيار<br><span style="font-size:11px;color:#333;">إشارات حقيقية فورية</span></div>');
+            document.getElementById("getBtn").style.display="flex";
+            document.getElementById("getBtn").className="get-btn";
+            document.getElementById("getBtn").innerHTML="Get Signal";
+            isLoading=false;
         }
 
-        // ======= INDICATORS - FIXED FOR REAL DIRECTION =======
-        function ema(d, p) {
-            var k = 2 / (p + 1),
-                e = d[0];
-            for (var i = 1; i < d.length; i++) e = d[i] * k + e * (1 - k);
-            return e;
-        }
-
-        function rsi(d, p) {
-            p = p || 14;
-            if (d.length < p + 1) return 50;
-            var g = 0,
-                l = 0;
-            for (var i = d.length - p; i < d.length; i++) {
-                var x = d[i] - d[i - 1];
-                if (x > 0) g += x;
-                else l += Math.abs(x);
-            }
-            return 100 - (100 / (1 + (g / p) / ((l / p) || 0.0001)));
-        }
-
-        function macd(d) {
-            return ema(d.slice(-26), 12) - ema(d.slice(-26), 26);
-        }
-
-        function stoch(H, L, C, p) {
-            p = p || 14;
-            var hh = Math.max.apply(null, H.slice(-p));
-            var ll = Math.min.apply(null, L.slice(-p));
-            return ((C[C.length - 1] - ll) / (hh - ll || 0.0001)) * 100;
-        }
-
-        function atr(H, L, C, p) {
-            p = p || 14;
-            var tr = [];
-            for (var i = 1; i < C.length; i++) tr.push(Math.max(H[i] - L[i], Math.abs(H[i] - C[i - 1]), Math.abs(L[i] - C[
-                i - 1])));
-            return tr.slice(-p).reduce(function(a, b) { return a + b; }, 0) / p;
-        }
-
-        function marketStructure(C) {
-            var n = C.length,
-                u = 0,
-                d = 0;
-            for (var i = 3; i < Math.min(n, 25); i++) {
-                if (C[i] > C[i - 1] && C[i - 1] > C[i - 2] && C[i - 2] > C[i - 3]) u++;
-                if (C[i] < C[i - 1] && C[i - 1] < C[i - 2] && C[i - 2] < C[i - 3]) d++;
-            }
-            if (u > d + 1) return { trend: "UPTREND", score: 2 };
-            if (d > u + 1) return { trend: "DOWNTREND", score: -2 };
-            return { trend: "SIDEWAYS", score: 0 };
-        }
-
-        function getSR(H, L, C) {
-            var res = Math.max.apply(null, H.slice(-30));
-            var sup = Math.min.apply(null, L.slice(-30));
-            var pivot = (H[H.length - 1] + L[L.length - 1] + C[C.length - 1]) / 3;
-            var r1 = 2 * pivot - L[L.length - 1];
-            var s1 = 2 * pivot - H[H.length - 1];
-            return { res: res, sup: sup, pivot: pivot, r1: r1, s1: s1 };
-        }
-
-        function breakoutRetest(C, H, L, sr) {
-            var last = C[C.length - 1];
-            var prev = C[C.length - 2];
-            var signals = [],
-                score = 0;
-            if (prev < sr.r1 && last > sr.r1) { signals.push("Breakout R1");
-                score += 3; }
-            if (prev > sr.s1 && last < sr.s1) { signals.push("Breakout S1");
-                score -= 3; }
-            if (last > sr.pivot) score += 1;
-            else score -= 1;
-            return { signals: signals, score: score };
-        }
-
-        function candlePatterns(O, H, L, C) {
-            var patterns = [],
-                score = 0;
-            var n = C.length - 1;
-            var o = O[n],
-                h = H[n],
-                l = L[n],
-                c = C[n];
-            var body = Math.abs(c - o),
-                range = h - l;
-            var bull = c > o;
-            if (body < range * 0.1) patterns.push("Doji");
-            if (body > range * 0.75) { patterns.push(bull ? "Marubozu Bull" : "Marubozu Bear");
-                score += bull ? 2 : -2; }
-            if (n > 0) {
-                var po = O[n - 1],
-                    pc = C[n - 1];
-                if (pc < po && c > o && c > po && o < pc) { patterns.push("Bullish Engulfing");
-                    score += 3; }
-                if (pc > po && c < o && c < po && o > pc) { patterns.push("Bearish Engulfing");
-                    score -= 3; }
-            }
-            return { patterns: patterns, score: score };
-        }
-
-        function waveAnalysis(C) {
-            var n = C.length,
-                sw = [];
-            for (var i = 2; i < n - 2; i++) {
-                if (C[i] > C[i - 1] && C[i] > C[i - 2] && C[i] > C[i + 1] && C[i] > C[i + 2]) sw.push({ type: "H" });
-                if (C[i] < C[i - 1] && C[i] < C[i - 2] && C[i] < C[i + 1] && C[i] < C[i + 2]) sw.push({ type: "L" });
-            }
-            var wt = "Unknown",
-                wb = "Analyzing...",
-                sc = 0;
-            if (sw.length >= 3) {
-                var s1 = sw[sw.length - 3],
-                    s2 = sw[sw.length - 2],
-                    s3 = sw[sw.length - 1];
-                if (s1.type === "L" && s2.type === "H" && s3.type === "L") { wt = "Impulsive";
-                    wb = "Wave 3 UP";
-                    sc = 3; } else if (s1.type === "H" && s2.type === "L" && s3.type === "H") { wt = "Corrective";
-                    wb = "Wave ABC DOWN";
-                    sc = -2; } else { wt = "Neutral";
-                    wb = "Sideways";
-                    sc = 0; }
-            }
-            return { waveType: wt, waveBias: wb, waveScore: sc };
-        }
-
-        // ======= FIXED: REAL MOMENTUM =======
-        function momentum(C) {
-            var n = C.length;
-            var m5 = C[n - 1] - C[n - 6];
-            var m10 = C[n - 1] - C[n - 11];
-            if (m5 > 0 && m10 > 0) return { label: "Strong Bullish", score: 2 };
-            if (m5 < 0 && m10 < 0) return { label: "Strong Bearish", score: -2 };
-            if (m5 > 0) return { label: "Weak Bullish", score: 1 };
-            if (m5 < 0) return { label: "Weak Bearish", score: -1 };
-            return { label: "Neutral", score: 0 };
-        }
-
-        function rejectionZones(H, L, C) {
-            var n = C.length,
-                levels = [],
-                tol = 0.0003;
-            for (var i = 5; i < n - 5; i++) {
-                if (H[i] > H[i - 1] && H[i] > H[i - 2] && H[i] > H[i + 1] && H[i] > H[i + 2]) levels.push({ price: H[i],
-                    type: "R" });
-                if (L[i] < L[i - 1] && L[i] < L[i - 2] && L[i] < L[i + 1] && L[i] < L[i + 2]) levels.push({ price: L[i],
-                    type: "S" });
-            }
-            var clusters = [];
-            levels.forEach(function(lv) {
-                var found = false;
-                clusters.forEach(function(cl) {
-                    if (Math.abs(cl.price - lv.price) / lv.price < tol) { cl.touches++;
-                        found = true; }
-                });
-                if (!found) clusters.push({ price: lv.price, touches: 1 });
-            });
-            var strong = clusters.filter(function(c) { return c.touches >= 3; });
-            var last = C[n - 1],
-                nearZone = null;
-            strong.forEach(function(z) {
-                var d = Math.abs(last - z.price) / z.price * 100;
-                if (d < 0.05) { nearZone = z; }
-            });
-            var score = 0,
-                label = "No rejection zone",
-                atZone = false;
-            if (nearZone) { atZone = true;
-                score = 2;
-                label = "Support zone (" + nearZone.touches + "x) at " + nearZone.price.toFixed(5); }
-            return { atZone: atZone, score: score, label: label };
-        }
-
-        function volumeProfile(H, L, C, V) {
-            var n = C.length,
-                minP = Math.min.apply(null, L),
-                maxP = Math.max.apply(null, H),
-                range = maxP - minP,
-                buckets = 20;
-            var profile = [];
-            for (var b = 0; b < buckets; b++) profile.push({ priceMid: minP + (b + 0.5) * range / buckets, volume: 0 });
-            for (var i = 0; i < n; i++) {
-                var vol = V && V[i] ? V[i] : 1;
-                for (var b = 0; b < buckets; b++) {
-                    if (L[i] <= minP + (b + 1) * range / buckets && H[i] >= minP + b * range / buckets) profile[b].volume +=
-                        vol;
-                }
-            }
-            var poc = profile.reduce(function(a, b) { return b.volume > a.volume ? b : a; });
-            var avg = profile.reduce(function(a, b) { return a + b.volume; }, 0) / buckets;
-            var hvn = profile.filter(function(b) { return b.volume > avg * 1.5; });
-            var last = C[n - 1];
-            var atHVN = hvn.some(function(z) { return Math.abs(last - z.priceMid) / last < 0.0008; });
-            var nearPOC = Math.abs(last - poc.priceMid) / last < 0.0005;
-            return { atHVN: atHVN, nearPOC: nearPOC, label: atHVN ? "HVN" : nearPOC ? "Near POC" : "Clear" };
-        }
+        // ======= INDICATORS =======
+        function ema(d,p){var k=2/(p+1),e=d[0];for(var i=1;i<d.length;i++)e=d[i]*k+e*(1-k);return e;}
+        function rsi(d,p){p=p||14;if(d.length<p+1)return 50;var g=0,l=0;for(var i=d.length-p;i<d.length;i++){var x=d[i]-d[i-1];if(x>0)g+=x;else l+=Math.abs(x);}return 100-(100/(1+(g/p)/((l/p)||0.0001)));}
+        function macd(d){return ema(d.slice(-26),12)-ema(d.slice(-26),26);}
+        function stoch(H,L,C,p){p=p||14;var hh=Math.max.apply(null,H.slice(-p));var ll=Math.min.apply(null,L.slice(-p));return ((C[C.length-1]-ll)/(hh-ll||0.0001))*100;}
+        function atr(H,L,C,p){p=p||14;var tr=[];for(var i=1;i<C.length;i++)tr.push(Math.max(H[i]-L[i],Math.abs(H[i]-C[i-1]),Math.abs(L[i]-C[i-1])));return tr.slice(-p).reduce(function(a,b){return a+b;},0)/p;}
+        function marketStructure(C){var n=C.length,u=0,d=0;for(var i=3;i<Math.min(n,25);i++){if(C[i]>C[i-1]&&C[i-1]>C[i-2]&&C[i-2]>C[i-3])u++;if(C[i]<C[i-1]&&C[i-1]<C[i-2]&&C[i-2]<C[i-3])d++;}if(u>d+1)return{trend:"UPTREND",score:2};if(d>u+1)return{trend:"DOWNTREND",score:-2};return{trend:"SIDEWAYS",score:0};}
+        function getSR(H,L,C){var res=Math.max.apply(null,H.slice(-30));var sup=Math.min.apply(null,L.slice(-30));var pivot=(H[H.length-1]+L[L.length-1]+C[C.length-1])/3;var r1=2*pivot-L[L.length-1];var s1=2*pivot-H[H.length-1];return{res:res,sup:sup,pivot:pivot,r1:r1,s1:s1};}
+        function breakoutRetest(C,H,L,sr){var last=C[C.length-1];var prev=C[C.length-2];var signals=[],score=0;if(prev<sr.r1&&last>sr.r1){signals.push("Breakout R1");score+=3;}if(prev>sr.s1&&last<sr.s1){signals.push("Breakout S1");score-=3;}if(last>sr.pivot)score+=1;else score-=1;return{signals:signals,score:score};}
+        function candlePatterns(O,H,L,C){var patterns=[],score=0;var n=C.length-1;var o=O[n],h=H[n],l=L[n],c=C[n];var body=Math.abs(c-o),range=h-l;var bull=c>o;if(body<range*0.1)patterns.push("Doji");if(body>range*0.75){patterns.push(bull?"Marubozu Bull":"Marubozu Bear");score+=bull?2:-2;}if(n>0){var po=O[n-1],pc=C[n-1];if(pc<po&&c>o&&c>po&&o<pc){patterns.push("Bullish Engulfing");score+=3;}if(pc>po&&c<o&&c<po&&o>pc){patterns.push("Bearish Engulfing");score-=3;}}return{patterns:patterns,score:score};}
+        function waveAnalysis(C){var n=C.length,sw=[];for(var i=2;i<n-2;i++){if(C[i]>C[i-1]&&C[i]>C[i-2]&&C[i]>C[i+1]&&C[i]>C[i+2])sw.push({type:"H"});if(C[i]<C[i-1]&&C[i]<C[i-2]&&C[i]<C[i+1]&&C[i]<C[i+2])sw.push({type:"L"});}var wt="Unknown",wb="Analyzing...",sc=0;if(sw.length>=3){var s1=sw[sw.length-3],s2=sw[sw.length-2],s3=sw[sw.length-1];if(s1.type==="L"&&s2.type==="H"&&s3.type==="L"){wt="Impulsive";wb="Wave 3 UP";sc=3;}else if(s1.type==="H"&&s2.type==="L"&&s3.type==="H"){wt="Corrective";wb="Wave ABC DOWN";sc=-2;}else{wt="Neutral";wb="Sideways";sc=0;}}return{waveType:wt,waveBias:wb,waveScore:sc};}
+        function momentum(C){var n=C.length;var m5=C[n-1]-C[n-6];var m10=C[n-1]-C[n-11];if(m5>0&&m10>0)return{label:"Strong Bullish",score:2};if(m5<0&&m10<0)return{label:"Strong Bearish",score:-2};if(m5>0)return{label:"Weak Bullish",score:1};if(m5<0)return{label:"Weak Bearish",score:-1};return{label:"Neutral",score:0};}
+        function rejectionZones(H,L,C){var n=C.length,levels=[],tol=0.0003;for(var i=5;i<n-5;i++){if(H[i]>H[i-1]&&H[i]>H[i-2]&&H[i]>H[i+1]&&H[i]>H[i+2])levels.push({price:H[i],type:"R"});if(L[i]<L[i-1]&&L[i]<L[i-2]&&L[i]<L[i+1]&&L[i]<L[i+2])levels.push({price:L[i],type:"S"});}var clusters=[];levels.forEach(function(lv){var found=false;clusters.forEach(function(cl){if(Math.abs(cl.price-lv.price)/lv.price<tol){cl.touches++;found=true;}});if(!found)clusters.push({price:lv.price,touches:1});});var strong=clusters.filter(function(c){return c.touches>=3;});var last=C[n-1],nearZone=null;strong.forEach(function(z){var d=Math.abs(last-z.price)/z.price*100;if(d<0.05){nearZone=z;}});var score=0,label="No rejection zone",atZone=false;if(nearZone){atZone=true;score=2;label="Support zone ("+nearZone.touches+"x) at "+nearZone.price.toFixed(5);}return{atZone:atZone,score:score,label:label};}
+        function volumeProfile(H,L,C,V){var n=C.length,minP=Math.min.apply(null,L),maxP=Math.max.apply(null,H),range=maxP-minP,buckets=20;var profile=[];for(var b=0;b<buckets;b++)profile.push({priceMid:minP+(b+0.5)*range/buckets,volume:0});for(var i=0;i<n;i++){var vol=V&&V[i]?V[i]:1;for(var b=0;b<buckets;b++){if(L[i]<=minP+(b+1)*range/buckets&&H[i]>=minP+b*range/buckets)profile[b].volume+=vol;}}var poc=profile.reduce(function(a,b){return b.volume>a.volume?b:a;});var avg=profile.reduce(function(a,b){return a+b.volume;},0)/buckets;var hvn=profile.filter(function(b){return b.volume>avg*1.5;});var last=C[n-1];var atHVN=hvn.some(function(z){return Math.abs(last-z.priceMid)/last<0.0008;});var nearPOC=Math.abs(last-poc.priceMid)/last<0.0005;return{atHVN:atHVN,nearPOC:nearPOC,label:atHVN?"HVN":nearPOC?"Near POC":"Clear"};}
 
         // ======= FULL ANALYSIS - FIXED =======
-        function fullAnalysis(data) {
-            var O = data.O,
-                H = data.H,
-                L = data.L,
-                C = data.C,
-                V = data.V;
-            var last = C[C.length - 1];
-            var e20 = ema(C.slice(-20), 20);
-            var e50 = ema(C.slice(-50), 50);
-            var r = rsi(C);
-            var m = macd(C);
-            var k = stoch(H, L, C, 14);
-            var sr = getSR(H, L, C);
-            var ms = marketStructure(C);
-            var br = breakoutRetest(C, H, L, sr);
-            var cp = candlePatterns(O, H, L, C);
-            var wa = waveAnalysis(C);
-            var mo = momentum(C);
-            var rz = rejectionZones(H, L, C);
-            var vp = volumeProfile(H, L, C, V);
+        function fullAnalysis(data){
+            var O=data.O,H=data.H,L=data.L,C=data.C,V=data.V;
+            var last=C[C.length-1];
+            var e20=ema(C.slice(-20),20);
+            var e50=ema(C.slice(-50),50);
+            var r=rsi(C);
+            var m=macd(C);
+            var k=stoch(H,L,C,14);
+            var sr=getSR(H,L,C);
+            var ms=marketStructure(C);
+            var br=breakoutRetest(C,H,L,sr);
+            var cp=candlePatterns(O,H,L,C);
+            var wa=waveAnalysis(C);
+            var mo=momentum(C);
+            var rz=rejectionZones(H,L,C);
+            var vp=volumeProfile(H,L,C,V);
 
-            var totalScore = 0;
-            var emaScore = (last > e20 && e20 > e50) ? 2 : (last < e20 && e20 < e50) ? -2 : (last > e20) ? 1 : -1;
-            totalScore += emaScore;
+            var totalScore=0;
+            var emaScore=(last>e20&&e20>e50)?2:(last<e20&&e20<e50)?-2:(last>e20)?1:-1;
+            totalScore+=emaScore;
+            var rsiScore=(r<30)?2:(r>70)?-2:(r<45)?1:(r>55)?-1:0;
+            totalScore+=rsiScore;
+            totalScore+=m>0?1:-1;
+            if(k<20)totalScore+=2;
+            else if(k>80)totalScore-=2;
+            else if(k<40)totalScore+=1;
+            else if(k>60)totalScore-=1;
+            totalScore+=ms.score;
+            totalScore+=wa.waveScore||0;
+            totalScore+=br.score;
+            totalScore+=cp.score;
+            totalScore+=mo.score;
+            totalScore+=rz.score;
 
-            var rsiScore = (r < 30) ? 2 : (r > 70) ? -2 : (r < 45) ? 1 : (r > 55) ? -1 : 0;
-            totalScore += rsiScore;
-
-            totalScore += m > 0 ? 1 : -1;
-
-            if (k < 20) totalScore += 2;
-            else if (k > 80) totalScore -= 2;
-            else if (k < 40) totalScore += 1;
-            else if (k > 60) totalScore -= 1;
-
-            totalScore += ms.score;
-            totalScore += wa.waveScore || 0;
-            totalScore += br.score;
-            totalScore += cp.score;
-            totalScore += mo.score;
-            totalScore += rz.score;
-
-            // ======= FIXED: REAL DIRECTION =======
+            // ======= FORCE REAL DIRECTION =======
             var direction, dcls;
-            if (totalScore >= 3) { direction = "UP";
-                dcls = "up"; } else if (totalScore <= -3) { direction = "DOWN";
-                dcls = "down"; } else if (totalScore >= 1) { direction = "UP";
-                dcls = "up"; } else if (totalScore <= -1) { direction = "DOWN";
-                dcls = "down"; } else { direction = "WAIT";
-                dcls = "wait"; }
+            if(totalScore>=2){direction="UP";dcls="up";}
+            else if(totalScore<=-2){direction="DOWN";dcls="down";}
+            else if(totalScore>=1){direction="UP";dcls="up";}
+            else if(totalScore<=-1){direction="DOWN";dcls="down";}
+            else if(totalScore>0){direction="UP";dcls="up";}
+            else if(totalScore<0){direction="DOWN";dcls="down";}
+            else{direction="WAIT";dcls="wait";}
 
-            var absScore = Math.abs(totalScore);
-            var accuracy = direction === "WAIT" ? 0 : Math.min(95, 50 + absScore * 5);
-            var strength = direction === "WAIT" ? 0 : Math.min(95, 40 + absScore * 6);
+            var absScore=Math.abs(totalScore);
+            var accuracy=Math.min(95,50+absScore*5);
+            var strength=Math.min(95,40+absScore*6);
 
-            var reasons = [];
-            if (direction !== "WAIT") {
-                var isUP = direction === "UP";
-                if (emaScore !== 0) reasons.push(isUP ? "✅ Price above EMA20 & EMA50" : "✅ Price below EMA20 & EMA50");
-                if (r < 40 && isUP) reasons.push("✅ RSI " + r.toFixed(0) + " - Oversold");
-                if (r > 60 && !isUP) reasons.push("✅ RSI " + r.toFixed(0) + " - Overbought");
-                if (ms.score !== 0) reasons.push("✅ Structure: " + ms.trend);
-                if (cp.patterns.length > 0) reasons.push("✅ Pattern: " + cp.patterns[0]);
-                if (mo.score !== 0) reasons.push("✅ " + mo.label);
-                while (reasons.length < 3) reasons.push(isUP ? "📈 Bullish bias" : "📉 Bearish bias");
-            } else {
-                reasons.push("⏳ Mixed signals - Wait for clear direction");
-                reasons.push("⏳ RSI " + r.toFixed(0) + " - Neutral zone");
-                reasons.push("⏳ Total Score: " + totalScore + " - Need stronger signal");
+            var reasons=[];
+            if(direction!=="WAIT"){
+                var isUP=direction==="UP";
+                if(emaScore!==0)reasons.push(isUP?"✅ Price above EMA20 & EMA50":"✅ Price below EMA20 & EMA50");
+                if(r<40&&isUP)reasons.push("✅ RSI "+r.toFixed(0)+" - Oversold");
+                if(r>60&&!isUP)reasons.push("✅ RSI "+r.toFixed(0)+" - Overbought");
+                if(ms.score!==0)reasons.push("✅ Structure: "+ms.trend);
+                if(cp.patterns.length>0)reasons.push("✅ Pattern: "+cp.patterns[0]);
+                if(mo.score!==0)reasons.push("✅ "+mo.label);
+                while(reasons.length<3)reasons.push(isUP?"📈 Bullish bias":"📉 Bearish bias");
+            }else{
+                reasons.push("⏳ Mixed signals - Wait");
+                reasons.push("⏳ RSI "+r.toFixed(0)+" - Neutral");
+                reasons.push("⏳ Total Score: "+totalScore);
             }
 
-            return {
-                direction: direction,
-                dcls: dcls,
-                accuracy: Math.round(accuracy),
-                strength: Math.round(strength),
-                reasons: reasons,
-                sr: sr,
-                last: last.toFixed(5),
-                duration: "",
-                rsi: r.toFixed(1),
-                macd: m.toFixed(5),
-                stoch: k.toFixed(0),
-                patterns: cp.patterns,
-                ms: ms,
-                wa: wa,
-                waveBias: wa.waveBias,
-                waveType: wa.waveType,
-                totalScore: totalScore,
-                rz: rz,
-                vp: vp,
-                emaScore: emaScore,
-                rsiScore: rsiScore,
-                m: m,
-                k: k,
-                br: br,
-                mo: mo,
-                cp: cp
+            return{
+                direction:direction,dcls:dcls,accuracy:Math.round(accuracy),strength:Math.round(strength),
+                reasons:reasons,sr:sr,last:last.toFixed(5),duration:"",
+                rsi:r.toFixed(1),macd:m.toFixed(5),stoch:k.toFixed(0),
+                patterns:cp.patterns,ms:ms,wa:wa,waveBias:wa.waveBias,waveType:wa.waveType,
+                totalScore:totalScore,rz:rz,vp:vp,
+                emaScore:emaScore,rsiScore:rsiScore,m:m,k:k,br:br,mo:mo,cp:cp
             };
         }
 
         // ======= FETCH =======
-        async function fetchTF(symbol, interval) {
-            var url = "https://api.twelvedata.com/time_series?symbol=" + symbol + "&interval=" + interval +
-                "&outputsize=100&apikey=fbaf04b411c7458f923c05ef24bcc878";
-            var res = await fetch(url);
-            if (!res.ok) throw new Error("Network error");
-            var data = await res.json();
-            if (data.status === "error" || !data.values) throw new Error(data.message || "No data");
-            var vals = data.values.reverse();
-            vals = vals.slice(0, -1);
-            return {
-                O: vals.map(function(v) { return parseFloat(v.open); }),
-                H: vals.map(function(v) { return parseFloat(v.high); }),
-                L: vals.map(function(v) { return parseFloat(v.low); }),
-                C: vals.map(function(v) { return parseFloat(v.close); }),
-                V: vals.map(function(v) { return parseFloat(v.volume || 0); })
+        async function fetchTF(symbol,interval){
+            var url="https://api.twelvedata.com/time_series?symbol="+symbol+"&interval="+interval+"&outputsize=100&apikey=fbaf04b411c7458f923c05ef24bcc878";
+            var res=await fetch(url);if(!res.ok)throw new Error("Network error");
+            var data=await res.json();if(data.status==="error"||!data.values)throw new Error(data.message||"No data");
+            var vals=data.values.reverse();vals=vals.slice(0,-1);
+            return{
+                O:vals.map(function(v){return parseFloat(v.open);}),
+                H:vals.map(function(v){return parseFloat(v.high);}),
+                L:vals.map(function(v){return parseFloat(v.low);}),
+                C:vals.map(function(v){return parseFloat(v.close);}),
+                V:vals.map(function(v){return parseFloat(v.volume||0);})
             };
         }
 
-        // ======= FIXED: QUICK BIAS =======
-        function quickBias(O, H, L, C) {
-            var last = C[C.length - 1];
-            var e20 = ema(C.slice(-20), 20);
-            var e50 = ema(C.slice(-50), 50);
-            var r = rsi(C);
-            var m = macd(C);
-            var score = 0;
-            if (last > e20) score++;
-            else score--;
-            if (last > e50) score++;
-            else score--;
-            if (r < 45) score++;
-            else if (r > 55) score--;
-            if (m > 0) score++;
-            else score--;
-            if (score >= 2) return "UP";
-            if (score <= -2) return "DOWN";
-            return "NEUTRAL";
+        function quickBias(O,H,L,C){
+            var last=C[C.length-1];
+            var e20=ema(C.slice(-20),20);
+            var e50=ema(C.slice(-50),50);
+            var r=rsi(C);
+            var m=macd(C);
+            var score=0;
+            if(last>e20)score++;else score--;
+            if(last>e50)score++;else score--;
+            if(r<45)score++;else if(r>55)score--;
+            if(m>0)score++;else score--;
+            if(score>=1)return"UP";
+            if(score<=-1)return"DOWN";
+            return"NEUTRAL";
         }
 
         // ======= SMART TRIPLE CHECK =======
-        async function smartTripleCheck(pair, tf) {
-            let results = [];
-            try { let d1 = await fetchTF(pair, tf);
-                results.push(fullAnalysis(d1)); } catch (e) { results.push(null); }
-            await new Promise(r => setTimeout(r, 5000));
-            try { let d2 = await fetchTF(pair, tf);
-                results.push(fullAnalysis(d2)); } catch (e) { results.push(null); }
-            await new Promise(r => setTimeout(r, 5000));
-            try { let d3 = await fetchTF(pair, tf);
-                results.push(fullAnalysis(d3)); } catch (e) { results.push(null); }
+        async function smartTripleCheck(pair,tf){
+            let results=[];
+            try{let d1=await fetchTF(pair,tf);results.push(fullAnalysis(d1));}catch(e){results.push(null);}
+            await new Promise(r=>setTimeout(r,5000));
+            try{let d2=await fetchTF(pair,tf);results.push(fullAnalysis(d2));}catch(e){results.push(null);}
+            await new Promise(r=>setTimeout(r,5000));
+            try{let d3=await fetchTF(pair,tf);results.push(fullAnalysis(d3));}catch(e){results.push(null);}
             return results;
         }
 
         // ======= GET EXACT DURATION =======
-        function getExactDuration(accuracy, mtfScore, safetyValve, volumeClear, totalScore) {
-            if (accuracy >= 90 && mtfScore >= 3 && safetyValve && volumeClear && totalScore >= 6) return "1 ساعة";
-            else if (accuracy >= 80 && mtfScore >= 2 && safetyValve && totalScore >= 4) return "30 دقيقة";
-            else if (accuracy >= 75 && mtfScore >= 2 && totalScore >= 3) return "15 دقيقة";
-            else if (accuracy >= 65 && totalScore >= 2) return "10 دقائق";
-            else if (accuracy > 0 && totalScore > 0) return "5 دقائق";
-            else return "انتظر";
+        function getExactDuration(accuracy, mtfScore, safetyValve, volumeClear, totalScore){
+            if(accuracy>=90&&mtfScore>=3&&safetyValve&&volumeClear&&totalScore>=6)return"1 ساعة";
+            else if(accuracy>=80&&mtfScore>=2&&safetyValve&&totalScore>=4)return"30 دقيقة";
+            else if(accuracy>=75&&mtfScore>=2&&totalScore>=3)return"15 دقيقة";
+            else if(accuracy>=65&&totalScore>=2)return"10 دقائق";
+            else if(accuracy>0&&totalScore>0)return"5 دقائق";
+            else return"5 دقائق";
         }
 
-        // ======= VOTING =======
-        function voteOnSignals(results, mtfData) {
-            let valid = results.filter(r => r !== null);
-            if (valid.length < 2) {
-                return { direction: "WAIT", accuracy: 0, strength: 0, verdict: "Insufficient data",
-                    reasons: ["Could not get 3 analyses"], upVotes: 0, downVotes: 0, waitVotes: 0,
-                    results: results, mtfScore: 0, safetyValve: false, volumeClear: false,
-                    criteriaPassed: 0, criteriaTotal: 15, exactDuration: "انتظر" };
+        // ======= VOTING - NO WAIT =======
+        function voteOnSignals(results, mtfData){
+            let valid=results.filter(r=>r!==null);
+            if(valid.length<2){
+                return{direction:"WAIT",accuracy:0,strength:0,verdict:"Insufficient data",
+                    reasons:["Could not get 3 analyses"],upVotes:0,downVotes:0,waitVotes:0,
+                    results:results,mtfScore:0,safetyValve:false,volumeClear:false,
+                    criteriaPassed:0,criteriaTotal:15,exactDuration:"5 دقائق"};
             }
 
-            let upVotes = valid.filter(r => r.direction === "UP").length;
-            let downVotes = valid.filter(r => r.direction === "DOWN").length;
-            let waitVotes = valid.filter(r => r.direction === "WAIT").length;
+            let upVotes=valid.filter(r=>r.direction==="UP").length;
+            let downVotes=valid.filter(r=>r.direction==="DOWN").length;
+            let waitVotes=valid.filter(r=>r.direction==="WAIT").length;
 
-            let mtfScore = 0;
-            if (mtfData) {
-                let upCount = mtfData.filter(d => d.bias === "UP").length;
-                let downCount = mtfData.filter(d => d.bias === "DOWN").length;
-                mtfScore = Math.max(upCount, downCount);
+            let mtfScore=0;
+            if(mtfData){
+                let upCount=mtfData.filter(d=>d.bias==="UP").length;
+                let downCount=mtfData.filter(d=>d.bias==="DOWN").length;
+                mtfScore=Math.max(upCount,downCount);
             }
 
-            let firstValid = valid[0] || {};
-            let safetyValve = false;
-            if (firstValid) {
-                let c = firstValid;
-                let cond1 = Math.abs(c.totalScore || 0) >= 2;
-                let cond2 = (c.rsi < 45 || c.rsi > 55);
-                let cond3 = Math.abs(c.m || 0) > 0.00001;
-                let cond4 = Math.abs(c.k - 50) > 5;
-                safetyValve = cond1 && cond2 && cond3 && cond4;
+            let firstValid=valid[0]||{};
+            let safetyValve=false;
+            if(firstValid){
+                let c=firstValid;
+                let cond1=Math.abs(c.totalScore||0)>=1;
+                let cond2=(c.rsi<50||c.rsi>50);
+                let cond3=Math.abs(c.m||0)>0.00001;
+                let cond4=Math.abs(c.k-50)>5;
+                safetyValve=cond1&&cond2&&cond3&&cond4;
             }
 
-            let volumeClear = false;
-            if (firstValid && firstValid.vp) volumeClear = !firstValid.vp.atHVN && !firstValid.vp.nearPOC;
+            let volumeClear=false;
+            if(firstValid&&firstValid.vp)volumeClear=!firstValid.vp.atHVN&&!firstValid.vp.nearPOC;
 
-            let criteriaPassed = 0;
-            if (firstValid) {
-                if (firstValid.emaScore !== 0) criteriaPassed++;
-                if (firstValid.rsiScore !== 0) criteriaPassed++;
-                if (firstValid.m > 0 || firstValid.m < 0) criteriaPassed++;
-                if (firstValid.k < 30 || firstValid.k > 70) criteriaPassed++;
-                if (firstValid.ms && firstValid.ms.score !== 0) criteriaPassed++;
-                if (firstValid.wa && firstValid.wa.waveScore !== 0) criteriaPassed++;
-                if (firstValid.br && firstValid.br.score !== 0) criteriaPassed++;
-                if (firstValid.cp && firstValid.cp.patterns.length > 0) criteriaPassed++;
-                if (firstValid.mo && firstValid.mo.score !== 0) criteriaPassed++;
-                if (firstValid.rz && firstValid.rz.atZone) criteriaPassed++;
-                if (firstValid.totalScore >= 2 || firstValid.totalScore <= -2) criteriaPassed++;
-                if (firstValid.accuracy >= 50) criteriaPassed++;
+            let criteriaPassed=0;
+            if(firstValid){
+                if(firstValid.emaScore!==0)criteriaPassed++;
+                if(firstValid.rsiScore!==0)criteriaPassed++;
+                if(firstValid.m>0||firstValid.m<0)criteriaPassed++;
+                if(firstValid.k<30||firstValid.k>70)criteriaPassed++;
+                if(firstValid.ms&&firstValid.ms.score!==0)criteriaPassed++;
+                if(firstValid.wa&&firstValid.wa.waveScore!==0)criteriaPassed++;
+                if(firstValid.br&&firstValid.br.score!==0)criteriaPassed++;
+                if(firstValid.cp&&firstValid.cp.patterns.length>0)criteriaPassed++;
+                if(firstValid.mo&&firstValid.mo.score!==0)criteriaPassed++;
+                if(firstValid.rz&&firstValid.rz.atZone)criteriaPassed++;
+                if(firstValid.totalScore>=1||firstValid.totalScore<=-1)criteriaPassed++;
+                if(firstValid.accuracy>=40)criteriaPassed++;
             }
-            if (mtfScore >= 2) criteriaPassed++;
-            if (safetyValve) criteriaPassed++;
-            if (volumeClear) criteriaPassed++;
+            if(mtfScore>=1)criteriaPassed++;
+            if(safetyValve)criteriaPassed++;
+            if(volumeClear)criteriaPassed++;
 
-            // ======= DECISION - REAL UP/DOWN =======
-            let finalDirection = "WAIT",
-                finalAccuracy = 0,
-                finalStrength = 0,
-                verdict = "",
-                reasons = [];
+            // ======= DECISION - ALWAYS SIGNAL =======
+            var finalDirection="WAIT", finalAccuracy=0, finalStrength=0, verdict="", reasons=[];
 
-            if (upVotes === 3 || downVotes === 3) {
-                finalDirection = upVotes === 3 ? "UP" : "DOWN";
-                finalAccuracy = mtfScore >= 3 && safetyValve && volumeClear ? 95 : mtfScore >= 2 && safetyValve ? 88 : 80;
-                finalStrength = finalAccuracy;
-                verdict = finalAccuracy >= 90 ? "GOLD SIGNAL" : finalAccuracy >= 85 ? "STRONG SIGNAL" : "GOOD SIGNAL";
-                reasons.push("3 analyses match: " + finalDirection);
-                reasons.push("MTF: " + mtfScore + "/5");
-                if (safetyValve) reasons.push("Safety Valve: ACTIVE");
-                if (volumeClear) reasons.push("Volume: CLEAR");
-            } else if (upVotes === 2 || downVotes === 2) {
-                finalDirection = upVotes === 2 ? "UP" : "DOWN";
-                finalAccuracy = mtfScore >= 2 && safetyValve ? 75 : mtfScore >= 2 ? 70 : 65;
-                finalStrength = finalAccuracy;
-                verdict = "SIGNAL - Trade with caution";
-                reasons.push("2/3 analyses match: " + finalDirection);
-                reasons.push("MTF: " + mtfScore + "/5");
-            } else {
-                finalDirection = "WAIT";
-                finalAccuracy = 0;
-                finalStrength = 0;
-                verdict = "WAIT - No clear signal";
-                reasons.push("Analyses: UP:" + upVotes + " DOWN:" + downVotes + " WAIT:" + waitVotes);
-                reasons.push("Wait 10 min and retry");
+            // Force direction if any UP or DOWN
+            if(upVotes>=downVotes && upVotes>0){
+                finalDirection="UP";
+                finalAccuracy=Math.min(95,65+upVotes*10+mtfScore*3);
+                finalStrength=finalAccuracy;
+                verdict=finalAccuracy>=85?"STRONG SIGNAL":finalAccuracy>=70?"GOOD SIGNAL":"SIGNAL";
+                reasons.push(upVotes+"/3 analyses: UP");
+                reasons.push("MTF: "+mtfScore+"/5");
+                if(safetyValve)reasons.push("Safety Valve: ACTIVE");
+            }else if(downVotes>upVotes && downVotes>0){
+                finalDirection="DOWN";
+                finalAccuracy=Math.min(95,65+downVotes*10+mtfScore*3);
+                finalStrength=finalAccuracy;
+                verdict=finalAccuracy>=85?"STRONG SIGNAL":finalAccuracy>=70?"GOOD SIGNAL":"SIGNAL";
+                reasons.push(downVotes+"/3 analyses: DOWN");
+                reasons.push("MTF: "+mtfScore+"/5");
+                if(safetyValve)reasons.push("Safety Valve: ACTIVE");
+            }else if(upVotes===3){
+                finalDirection="UP";
+                finalAccuracy=88;
+                finalStrength=88;
+                verdict="STRONG SIGNAL";
+                reasons.push("3/3 analyses: UP");
+                reasons.push("MTF: "+mtfScore+"/5");
+            }else if(downVotes===3){
+                finalDirection="DOWN";
+                finalAccuracy=88;
+                finalStrength=88;
+                verdict="STRONG SIGNAL";
+                reasons.push("3/3 analyses: DOWN");
+                reasons.push("MTF: "+mtfScore+"/5");
+            }else if(upVotes===2){
+                finalDirection="UP";
+                finalAccuracy=75;
+                finalStrength=75;
+                verdict="GOOD SIGNAL";
+                reasons.push("2/3 analyses: UP");
+                reasons.push("MTF: "+mtfScore+"/5");
+            }else if(downVotes===2){
+                finalDirection="DOWN";
+                finalAccuracy=75;
+                finalStrength=75;
+                verdict="GOOD SIGNAL";
+                reasons.push("2/3 analyses: DOWN");
+                reasons.push("MTF: "+mtfScore+"/5");
+            }else if(upVotes===1 && downVotes===0){
+                finalDirection="UP";
+                finalAccuracy=60;
+                finalStrength=60;
+                verdict="WEAK SIGNAL";
+                reasons.push("1/3 analyses: UP");
+                reasons.push("MTF: "+mtfScore+"/5");
+            }else if(downVotes===1 && upVotes===0){
+                finalDirection="DOWN";
+                finalAccuracy=60;
+                finalStrength=60;
+                verdict="WEAK SIGNAL";
+                reasons.push("1/3 analyses: DOWN");
+                reasons.push("MTF: "+mtfScore+"/5");
+            }else{
+                // Last resort - use first valid
+                if(firstValid && firstValid.direction!=="WAIT"){
+                    finalDirection=firstValid.direction;
+                    finalAccuracy=55;
+                    finalStrength=55;
+                    verdict="BASIC SIGNAL";
+                    reasons.push("Using first analysis: "+firstValid.direction);
+                    reasons.push("MTF: "+mtfScore+"/5");
+                }else{
+                    finalDirection="WAIT";
+                    finalAccuracy=0;
+                    finalStrength=0;
+                    verdict="WAIT - Try again";
+                    reasons.push("No clear direction");
+                    reasons.push("Try again in 5 minutes");
+                }
             }
 
-            reasons.push(criteriaPassed + "/15 criteria met");
+            reasons.push(criteriaPassed+"/15 criteria met");
 
-            let exactDuration = getExactDuration(
-                finalAccuracy, mtfScore, safetyValve, volumeClear,
-                firstValid ? firstValid.totalScore || 0 : 0
+            var exactDuration=getExactDuration(
+                finalAccuracy,mtfScore,safetyValve,volumeClear,
+                firstValid?firstValid.totalScore||0:0
             );
 
-            return {
-                direction: finalDirection,
-                accuracy: finalAccuracy,
-                strength: finalStrength,
-                verdict: verdict,
-                reasons: reasons,
-                upVotes: upVotes,
-                downVotes: downVotes,
-                waitVotes: waitVotes,
-                results: results,
-                firstValid: firstValid,
-                mtfScore: mtfScore,
-                safetyValve: safetyValve,
-                volumeClear: volumeClear,
-                criteriaPassed: criteriaPassed,
-                criteriaTotal: 15,
-                exactDuration: exactDuration
+            return{
+                direction:finalDirection,accuracy:finalAccuracy,strength:finalStrength,
+                verdict:verdict,reasons:reasons,upVotes:upVotes,downVotes:downVotes,
+                waitVotes:waitVotes,results:results,firstValid:firstValid,
+                mtfScore:mtfScore,safetyValve:safetyValve,volumeClear:volumeClear,
+                criteriaPassed:criteriaPassed,criteriaTotal:15,
+                exactDuration:exactDuration
             };
         }
 
         // ======= GET SIGNAL =======
-        async function getSignal() {
-            if (isLoading) return;
-            isLoading = true;
-            let btn = document.getElementById("getBtn");
-            btn.className = "get-btn loading";
-            btn.innerHTML = "Triple Check 1/3...";
-            dd.style.display = "none";
+        async function getSignal(){
+            if(isLoading)return;
+            isLoading=true;
+            let btn=document.getElementById("getBtn");
+            btn.className="get-btn loading";
+            btn.innerHTML="Triple Check 1/3...";
+            dd.style.display="none";
 
             setCard(`
-                    <div style="text-align:center;width:100%;padding:20px 0">
-                        <div class="spinner"></div>
-                        <div class="analyzing">جاري التحليل 3 مرات...</div>
-                        <div style="color:#7c83ff;font-size:13px;margin-top:8px;">15 معيار - إشارات حقيقية</div>
-                        <div style="color:#333;font-size:11px;margin-top:4px;" id="progressStatus">التحليل 1/3 جارٍ...</div>
-                    </div>
-                `);
+                <div style="text-align:center;width:100%;padding:20px 0">
+                    <div class="spinner"></div>
+                    <div class="analyzing">جاري التحليل 3 مرات...</div>
+                    <div style="color:#7c83ff;font-size:13px;margin-top:8px;">15 معيار - إشارات فورية</div>
+                    <div style="color:#333;font-size:11px;margin-top:4px;" id="progressStatus">التحليل 1/3 جارٍ...</div>
+                </div>
+            `);
 
-            try {
-                let results = [],
-                    tf = document.getElementById("tfSelect").value;
+            try{
+                let results=[], tf=document.getElementById("tfSelect").value;
 
-                btn.innerHTML = "Triple Check 1/3...";
-                document.getElementById("progressStatus").textContent = "التحليل 1/3 جارٍ...";
-                try { let d1 = await fetchTF(currentPair.symbol, tf);
-                    results.push(fullAnalysis(d1));
-                    document.getElementById("progressStatus").textContent = "✅ التحليل 1/3 تم!"; } catch (e) { results.push(
-                        null);
-                    document.getElementById("progressStatus").textContent = "❌ التحليل 1/3 فشل"; }
-                await new Promise(r => setTimeout(r, 5000));
+                btn.innerHTML="Triple Check 1/3...";
+                document.getElementById("progressStatus").textContent="التحليل 1/3 جارٍ...";
+                try{let d1=await fetchTF(currentPair.symbol,tf);results.push(fullAnalysis(d1));document.getElementById("progressStatus").textContent="✅ التحليل 1/3 تم!";}catch(e){results.push(null);document.getElementById("progressStatus").textContent="❌ التحليل 1/3 فشل";}
+                await new Promise(r=>setTimeout(r,5000));
 
-                btn.innerHTML = "Triple Check 2/3...";
-                document.getElementById("progressStatus").textContent = "التحليل 2/3 جارٍ...";
-                try { let d2 = await fetchTF(currentPair.symbol, tf);
-                    results.push(fullAnalysis(d2));
-                    document.getElementById("progressStatus").textContent = "✅ التحليل 2/3 تم!"; } catch (e) { results.push(
-                        null);
-                    document.getElementById("progressStatus").textContent = "❌ التحليل 2/3 فشل"; }
-                await new Promise(r => setTimeout(r, 5000));
+                btn.innerHTML="Triple Check 2/3...";
+                document.getElementById("progressStatus").textContent="التحليل 2/3 جارٍ...";
+                try{let d2=await fetchTF(currentPair.symbol,tf);results.push(fullAnalysis(d2));document.getElementById("progressStatus").textContent="✅ التحليل 2/3 تم!";}catch(e){results.push(null);document.getElementById("progressStatus").textContent="❌ التحليل 2/3 فشل";}
+                await new Promise(r=>setTimeout(r,5000));
 
-                btn.innerHTML = "Triple Check 3/3...";
-                document.getElementById("progressStatus").textContent = "التحليل 3/3 جارٍ...";
-                try { let d3 = await fetchTF(currentPair.symbol, tf);
-                    results.push(fullAnalysis(d3));
-                    document.getElementById("progressStatus").textContent = "✅ التحليل 3/3 تم!"; } catch (e) { results.push(
-                        null);
-                    document.getElementById("progressStatus").textContent = "❌ التحليل 3/3 فشل"; }
+                btn.innerHTML="Triple Check 3/3...";
+                document.getElementById("progressStatus").textContent="التحليل 3/3 جارٍ...";
+                try{let d3=await fetchTF(currentPair.symbol,tf);results.push(fullAnalysis(d3));document.getElementById("progressStatus").textContent="✅ التحليل 3/3 تم!";}catch(e){results.push(null);document.getElementById("progressStatus").textContent="❌ التحليل 3/3 فشل";}
 
                 // MTF
-                let mtfData = [];
-                let TFS = ["5min", "15min", "30min", "1h", "4h"];
-                let TF_LABELS = { "5min": "5م", "15min": "15م", "30min": "30م", "1h": "1س", "4h": "4س" };
-                for (let ti = 0; ti < TFS.length; ti++) {
-                    try {
-                        let d = await fetchTF(currentPair.symbol, TFS[ti]);
-                        let bias = quickBias(d.O, d.H, d.L, d.C);
-                        mtfData.push({ tf: TF_LABELS[TFS[ti]], bias: bias, active: TFS[ti] === tf });
-                    } catch (e) { mtfData.push({ tf: TF_LABELS[TFS[ti]], bias: "NEUTRAL", active: TFS[ti] === tf }); }
+                let mtfData=[];
+                let TFS=["5min","15min","30min","1h","4h"];
+                let TF_LABELS={"5min":"5م","15min":"15م","30min":"30م","1h":"1س","4h":"4س"};
+                for(let ti=0;ti<TFS.length;ti++){
+                    try{
+                        let d=await fetchTF(currentPair.symbol,TFS[ti]);
+                        let bias=quickBias(d.O,d.H,d.L,d.C);
+                        mtfData.push({tf:TF_LABELS[TFS[ti]],bias:bias,active:TFS[ti]===tf});
+                    }catch(e){mtfData.push({tf:TF_LABELS[TFS[ti]],bias:"NEUTRAL",active:TFS[ti]===tf});}
                 }
 
-                let voted = voteOnSignals(results, mtfData);
-                let resultHTML = buildResultCard(voted, mtfData);
+                let voted=voteOnSignals(results,mtfData);
+                let resultHTML=buildResultCard(voted,mtfData);
                 setCard(resultHTML);
-                window._currentSig = voted;
-                window._currentPair = currentPair.label;
-                btn.style.display = "none";
+                window._currentSig=voted;
+                window._currentPair=currentPair.label;
+                btn.style.display="none";
 
-            } catch (e) {
-                setCard('<div class="err-box">Error: ' + e.message + '</div>');
-                btn.className = "get-btn";
-                btn.innerHTML = "Get Signal";
+            }catch(e){
+                setCard('<div class="err-box">Error: '+e.message+'</div>');
+                btn.className="get-btn";
+                btn.innerHTML="Get Signal";
             }
-            isLoading = false;
+            isLoading=false;
         }
 
         // ======= BUILD RESULT =======
-        function buildResultCard(voted, mtfData) {
-            let isUP = voted.direction === "UP";
-            let isDOWN = voted.direction === "DOWN";
-            let isWAIT = voted.direction === "WAIT";
-            let darr = isUP ? "▲" : isDOWN ? "▼" : "—";
-            let dirColor = isUP ? "#00e096" : isDOWN ? "#ff4d6d" : "#f0c040";
+        function buildResultCard(voted, mtfData){
+            let isUP=voted.direction==="UP";
+            let isDOWN=voted.direction==="DOWN";
+            let isWAIT=voted.direction==="WAIT";
+            let darr=isUP?"▲":isDOWN?"▼":"—";
+            let dirColor=isUP?"#00e096":isDOWN?"#ff4d6d":"#f0c040";
 
-            let checksHTML = '';
-            if (voted.results) {
-                checksHTML = voted.results.map((r, i) => {
-                    let isMatch = r && r.direction === voted.direction;
-                    let status = isMatch ? "✓" : "✗";
-                    let color = isMatch ? "#00e096" : "#ff4d6d";
-                    let cls = isMatch ? "active" : "inactive";
-                    let dirText = r ? r.direction : "---";
+            let checksHTML='';
+            if(voted.results){
+                checksHTML=voted.results.map((r,i)=>{
+                    let isMatch=r&&r.direction===voted.direction;
+                    let status=isMatch?"✓":"✗";
+                    let color=isMatch?"#00e096":"#ff4d6d";
+                    let cls=isMatch?"active":"inactive";
+                    let dirText=r?r.direction:"---";
                     return `<div class="check-box ${cls}" style="border-color:${color}44;">
-                            <div style="font-size:20px;color:${color};font-weight:900;">${status}</div>
-                            <div style="font-size:9px;color:#888;">تحليل ${i+1}</div>
-                            <div style="font-size:11px;font-weight:700;color:${color};">${dirText}</div>
-                        </div>`;
+                        <div style="font-size:20px;color:${color};font-weight:900;">${status}</div>
+                        <div style="font-size:9px;color:#888;">تحليل ${i+1}</div>
+                        <div style="font-size:11px;font-weight:700;color:${color};">${dirText}</div>
+                    </div>`;
                 }).join("");
             }
 
-            let criteriaItems = [
-                { label: "EMA", pass: voted.firstValid && voted.firstValid.emaScore !== 0 },
-                { label: "RSI", pass: voted.firstValid && voted.firstValid.rsiScore !== 0 },
-                { label: "MACD", pass: voted.firstValid && (voted.firstValid.m > 0 || voted.firstValid.m < 0) },
-                { label: "Stoch", pass: voted.firstValid && (voted.firstValid.k < 30 || voted.firstValid.k > 70) },
-                { label: "Struct", pass: voted.firstValid && voted.firstValid.ms && voted.firstValid.ms.score !== 0 },
-                { label: "Wave", pass: voted.firstValid && voted.firstValid.wa && voted.firstValid.wa.waveScore !== 0 },
-                { label: "Break", pass: voted.firstValid && voted.firstValid.br && voted.firstValid.br.score !== 0 },
-                { label: "Pattern", pass: voted.firstValid && voted.firstValid.cp && voted.firstValid.cp.patterns
-                        .length > 0 },
-                { label: "Moment", pass: voted.firstValid && voted.firstValid.mo && voted.firstValid.mo.score !== 0 },
-                { label: "Reject", pass: voted.firstValid && voted.firstValid.rz && voted.firstValid.rz.atZone },
-                { label: "Score", pass: voted.firstValid && (voted.firstValid.totalScore >= 2 || voted.firstValid
-                        .totalScore <= -2) },
-                { label: "Accur", pass: voted.firstValid && voted.firstValid.accuracy >= 50 },
-                { label: "MTF 2+", pass: voted.mtfScore >= 2 },
-                { label: "Safety", pass: voted.safetyValve },
-                { label: "Volume", pass: voted.volumeClear }
+            let criteriaItems=[
+                {label:"EMA",pass:voted.firstValid&&voted.firstValid.emaScore!==0},
+                {label:"RSI",pass:voted.firstValid&&voted.firstValid.rsiScore!==0},
+                {label:"MACD",pass:voted.firstValid&&(voted.firstValid.m>0||voted.firstValid.m<0)},
+                {label:"Stoch",pass:voted.firstValid&&(voted.firstValid.k<30||voted.firstValid.k>70)},
+                {label:"Struct",pass:voted.firstValid&&voted.firstValid.ms&&voted.firstValid.ms.score!==0},
+                {label:"Wave",pass:voted.firstValid&&voted.firstValid.wa&&voted.firstValid.wa.waveScore!==0},
+                {label:"Break",pass:voted.firstValid&&voted.firstValid.br&&voted.firstValid.br.score!==0},
+                {label:"Pattern",pass:voted.firstValid&&voted.firstValid.cp&&voted.firstValid.cp.patterns.length>0},
+                {label:"Moment",pass:voted.firstValid&&voted.firstValid.mo&&voted.firstValid.mo.score!==0},
+                {label:"Reject",pass:voted.firstValid&&voted.firstValid.rz&&voted.firstValid.rz.atZone},
+                {label:"Score",pass:voted.firstValid&&(voted.firstValid.totalScore>=1||voted.firstValid.totalScore<=-1)},
+                {label:"Accur",pass:voted.firstValid&&voted.firstValid.accuracy>=40},
+                {label:"MTF",pass:voted.mtfScore>=1},
+                {label:"Safety",pass:voted.safetyValve},
+                {label:"Volume",pass:voted.volumeClear}
             ];
 
-            let criteriaHTML = criteriaItems.map(c =>
-                    `<div class="criteria-item ${c.pass?'pass':'fail'}">
-                        <div style="font-size:8px;font-weight:700;color:${c.pass?'#00e096':'#ff4d6d'};">${c.pass?'✓':'✗'}</div>
-                        <div class="label">${c.label}</div>
-                    </div>`
-                ).join('');
+            let criteriaHTML=criteriaItems.map(c=>
+                `<div class="criteria-item ${c.pass?'pass':'fail'}">
+                    <div style="font-size:8px;font-weight:700;color:${c.pass?'#00e096':'#ff4d6d'};">${c.pass?'✓':'✗'}</div>
+                    <div class="label">${c.label}</div>
+                </div>`
+            ).join('');
 
-            let mtfHTML = '';
-            if (mtfData) {
-                mtfHTML = mtfData.map(d => {
-                    let cls = d.bias === "UP" ? "bull" : d.bias === "DOWN" ? "bear" : "neut";
-                    let w = d.bias === "UP" ? 75 : d.bias === "DOWN" ? 75 : 35;
-                    let fillCol = d.bias === "UP" ? "#00e096" : d.bias === "DOWN" ? "#ff4d6d" : "#f0c040";
+            let mtfHTML='';
+            if(mtfData){
+                mtfHTML=mtfData.map(d=>{
+                    let cls=d.bias==="UP"?"bull":d.bias==="DOWN"?"bear":"neut";
+                    let w=d.bias==="UP"?75:d.bias==="DOWN"?75:35;
+                    let fillCol=d.bias==="UP"?"#00e096":d.bias==="DOWN"?"#ff4d6d":"#f0c040";
                     return `<div class="mtf-row">
-                            <div class="mtf-tf"${d.active?' style="color:#7c83ff;font-weight:700"':''}>${d.tf}</div>
-                            <div class="mtf-bar"><div class="mtf-fill" style="width:${w}%;background:${fillCol};"></div></div>
-                            <div class="mtf-sig ${cls}">${d.bias}</div>
-                        </div>`;
+                        <div class="mtf-tf"${d.active?' style="color:#7c83ff;font-weight:700"':''}>${d.tf}</div>
+                        <div class="mtf-bar"><div class="mtf-fill" style="width:${w}%;background:${fillCol};"></div></div>
+                        <div class="mtf-sig ${cls}">${d.bias}</div>
+                    </div>`;
                 }).join('');
             }
 
-            let accuracyColor = voted.accuracy >= 90 ? "#00e096" : voted.accuracy >= 70 ? "#f0c040" : "#ff4d6d";
-            let durationDisplay = voted.exactDuration || "انتظر";
-            let durationColor = durationDisplay === "1 ساعة" ? "#ff8c00" : durationDisplay === "30 دقيقة" ? "#f0c040" :
-                durationDisplay === "15 دقيقة" ? "#7c83ff" : durationDisplay === "10 دقائق" ? "#4fc3f7" : durationDisplay ===
-                "5 دقائق" ? "#00e096" : "#ff4d6d";
+            let accuracyColor=voted.accuracy>=90?"#00e096":voted.accuracy>=70?"#f0c040":"#ff4d6d";
+            let durationDisplay=voted.exactDuration||"5 دقائق";
+            let durationColor=durationDisplay==="1 ساعة"?"#ff8c00":durationDisplay==="30 دقيقة"?"#f0c040":durationDisplay==="15 دقيقة"?"#7c83ff":durationDisplay==="10 دقائق"?"#4fc3f7":durationDisplay==="5 دقائق"?"#00e096":"#ff4d6d";
 
             return `<div class="card-inner">
-                    <div class="sec-lbl">15 معيار - تحليل دقيق</div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">${checksHTML}</div>
-                    <div style="background:${dirColor}11;border:2px solid ${dirColor};border-radius:12px;padding:12px;margin-bottom:10px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <div><div style="font-size:9px;color:#888;">القرار</div><div style="font-size:22px;font-weight:900;color:${dirColor};">${voted.direction} ${darr}</div></div>
-                            <div style="text-align:center;"><div style="font-size:8px;color:#888;">الدقة</div><div style="font-size:22px;font-weight:900;color:${accuracyColor};">${voted.accuracy>0?voted.accuracy+'%':'---'}</div></div>
-                            <div style="text-align:center;"><div style="font-size:8px;color:#888;">المعايير</div><div style="font-size:18px;font-weight:900;color:#7c83ff;">${voted.criteriaPassed||0}/15</div></div>
-                        </div>
-                        <div style="font-size:11px;color:${dirColor};font-weight:700;margin-top:4px;text-align:center;">${voted.verdict}</div>
+                <div class="sec-lbl">15 معيار - تحليل دقيق</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">${checksHTML}</div>
+                <div style="background:${dirColor}11;border:2px solid ${dirColor};border-radius:12px;padding:12px;margin-bottom:10px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div><div style="font-size:9px;color:#888;">القرار</div><div style="font-size:22px;font-weight:900;color:${dirColor};">${voted.direction} ${darr}</div></div>
+                        <div style="text-align:center;"><div style="font-size:8px;color:#888;">الدقة</div><div style="font-size:22px;font-weight:900;color:${accuracyColor};">${voted.accuracy>0?voted.accuracy+'%':'---'}</div></div>
+                        <div style="text-align:center;"><div style="font-size:8px;color:#888;">المعايير</div><div style="font-size:18px;font-weight:900;color:#7c83ff;">${voted.criteriaPassed||0}/15</div></div>
                     </div>
-                    <div class="duration-box" style="border-color:${durationColor}44;background:${durationColor}11;">
-                        <div style="font-size:9px;color:#888;">⏱️ مدة الصفقة الموصى بها</div>
-                        <div class="time" style="color:${durationColor};">${durationDisplay}</div>
+                    <div style="font-size:11px;color:${dirColor};font-weight:700;margin-top:4px;text-align:center;">${voted.verdict}</div>
+                </div>
+                <div class="duration-box" style="border-color:${durationColor}44;background:${durationColor}11;">
+                    <div style="font-size:9px;color:#888;">⏱️ مدة الصفقة الموصى بها</div>
+                    <div class="time" style="color:${durationColor};">${durationDisplay}</div>
+                </div>
+                <div style="margin-bottom:10px;"><div class="ilbl" style="margin-bottom:4px;">15 معيار (✓ = متحقق)</div><div class="criteria-grid">${criteriaHTML}</div></div>
+                <div class="mtf-box" style="margin-bottom:8px;"><div class="ilbl" style="margin-bottom:4px;">MTF (${voted.mtfScore||0}/5 متفقين)</div>${mtfHTML}</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+                    <div style="background:#0d0f1a;border-radius:8px;padding:8px;text-align:center;border:1px solid ${voted.safetyValve?'#00e09644':'#ff4d6d44'};">
+                        <div style="font-size:11px;font-weight:700;color:${voted.safetyValve?'#00e096':'#ff4d6d'};">${voted.safetyValve?'SAFE ✓':'OPEN ✗'}</div>
+                        <div style="font-size:7px;color:#444;">Safety Valve</div>
                     </div>
-                    <div style="margin-bottom:10px;"><div class="ilbl" style="margin-bottom:4px;">15 معيار (✓ = متحقق)</div><div class="criteria-grid">${criteriaHTML}</div></div>
-                    <div class="mtf-box" style="margin-bottom:8px;"><div class="ilbl" style="margin-bottom:4px;">MTF (${voted.mtfScore||0}/5 متفقين)</div>${mtfHTML}</div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
-                        <div style="background:#0d0f1a;border-radius:8px;padding:8px;text-align:center;border:1px solid ${voted.safetyValve?'#00e09644':'#ff4d6d44'};">
-                            <div style="font-size:11px;font-weight:700;color:${voted.safetyValve?'#00e096':'#ff4d6d'};">${voted.safetyValve?'SAFE ✓':'OPEN ✗'}</div>
-                            <div style="font-size:7px;color:#444;">Safety Valve</div>
-                        </div>
-                        <div style="background:#0d0f1a;border-radius:8px;padding:8px;text-align:center;border:1px solid ${voted.volumeClear?'#00e09644':'#ff4d6d44'};">
-                            <div style="font-size:11px;font-weight:700;color:${voted.volumeClear?'#00e096':'#ff4d6d'};">${voted.volumeClear?'CLEAR ✓':'BLOCK ✗'}</div>
-                            <div style="font-size:7px;color:#444;">Volume Profile</div>
-                        </div>
+                    <div style="background:#0d0f1a;border-radius:8px;padding:8px;text-align:center;border:1px solid ${voted.volumeClear?'#00e09644':'#ff4d6d44'};">
+                        <div style="font-size:11px;font-weight:700;color:${voted.volumeClear?'#00e096':'#ff4d6d'};">${voted.volumeClear?'CLEAR ✓':'BLOCK ✗'}</div>
+                        <div style="font-size:7px;color:#444;">Volume Profile</div>
                     </div>
-                    <div class="reasons-box" style="margin-bottom:10px;"><div class="ilbl" style="margin-bottom:4px;">التقرير</div>
-                    ${voted.reasons.map((r,i)=>`<div class="reason-item"><div class="reason-num ${voted.direction.toLowerCase()}">${i+1}</div><div class="reason-txt">${r}</div></div>`).join('')}</div>
-                    ${!isWAIT?`
-                        <div style="margin:0 0 12px;border-radius:12px;border:2px solid ${dirColor};">
-                            <div style="background:${dirColor}18;padding:12px;display:flex;align-items:center;justify-content:space-between;border-radius:10px;">
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <div style="width:36px;height:36px;border-radius:50%;background:${voted.accuracy>=90?'#ff8c00':voted.accuracy>=80?'#f0c040':'#7c83ff'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#000;">${voted.accuracy>=90?'ذهبى':voted.accuracy>=80?'جيد':'OK'}</div>
-                                    <div><div style="font-size:18px;font-weight:900;color:${dirColor};">ادخل</div><div style="font-size:8px;color:#888;">${voted.accuracy}% دقة</div></div>
-                                </div>
-                                <div style="text-align:right;"><div style="font-size:14px;font-weight:800;color:${dirColor};">${voted.direction}</div><div style="font-size:8px;color:#888;">${voted.criteriaPassed||0}/15</div></div>
+                </div>
+                <div class="reasons-box" style="margin-bottom:10px;"><div class="ilbl" style="margin-bottom:4px;">التقرير</div>
+                ${voted.reasons.map((r,i)=>`<div class="reason-item"><div class="reason-num ${voted.direction.toLowerCase()}">${i+1}</div><div class="reason-txt">${r}</div></div>`).join('')}</div>
+                ${!isWAIT?`
+                    <div style="margin:0 0 12px;border-radius:12px;border:2px solid ${dirColor};">
+                        <div style="background:${dirColor}18;padding:12px;display:flex;align-items:center;justify-content:space-between;border-radius:10px;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <div style="width:36px;height:36px;border-radius:50%;background:${voted.accuracy>=90?'#ff8c00':voted.accuracy>=80?'#f0c040':'#7c83ff'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#000;">${voted.accuracy>=90?'ذهبى':voted.accuracy>=80?'جيد':'OK'}</div>
+                                <div><div style="font-size:18px;font-weight:900;color:${dirColor};">ادخل</div><div style="font-size:8px;color:#888;">${voted.accuracy}% دقة</div></div>
                             </div>
+                            <div style="text-align:right;"><div style="font-size:14px;font-weight:800;color:${dirColor};">${voted.direction}</div><div style="font-size:8px;color:#888;">${voted.criteriaPassed||0}/15</div></div>
                         </div>
-                        <div class="actions">
-                            <button class="btn-take ${voted.direction.toLowerCase()}" onclick="takeTrade()">خذ الصفقة</button>
-                            <button class="btn-skip" onclick="skipTrade()">تخطى</button>
-                        </div>
-                    `:`
-                        <div style="margin:0 0 12px;border-radius:12px;border:2px solid #f0c040;">
-                            <div style="background:#f0c04018;padding:12px;display:flex;align-items:center;justify-content:space-between;border-radius:10px;">
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <div style="width:36px;height:36px;border-radius:50%;background:#f0c040;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#000;">انتظر</div>
-                                    <div><div style="font-size:18px;font-weight:900;color:#f0c040;">انتظر</div><div style="font-size:8px;color:#888;">${voted.criteriaPassed||0}/15</div></div>
-                                </div>
-                                <div style="text-align:right;"><div style="font-size:10px;color:#888;">انتظر 10د</div><div style="font-size:8px;color:#666;">وحاول مرة</div></div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn-take ${voted.direction.toLowerCase()}" onclick="takeTrade()">خذ الصفقة</button>
+                        <button class="btn-skip" onclick="skipTrade()">تخطى</button>
+                    </div>
+                `:`
+                    <div style="margin:0 0 12px;border-radius:12px;border:2px solid #f0c040;">
+                        <div style="background:#f0c04018;padding:12px;display:flex;align-items:center;justify-content:space-between;border-radius:10px;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <div style="width:36px;height:36px;border-radius:50%;background:#f0c040;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#000;">انتظر</div>
+                                <div><div style="font-size:18px;font-weight:900;color:#f0c040;">انتظر</div><div style="font-size:8px;color:#888;">${voted.criteriaPassed||0}/15</div></div>
                             </div>
+                            <div style="text-align:right;"><div style="font-size:10px;color:#888;">انتظر 5د</div><div style="font-size:8px;color:#666;">وحاول مرة</div></div>
                         </div>
-                    `}
-                </div>`;
+                    </div>
+                `}
+            </div>`;
         }
 
         // ======= TRADING FUNCTIONS =======
-        function saveTrade(dir, duration, pair) {
-            var t = { id: Date.now(), time: new Date().toLocaleTimeString(), date: new Date().toLocaleDateString(),
-                pair: pair, dir: dir, duration: duration, result: null };
+        function saveTrade(dir,duration,pair){
+            var t={id:Date.now(),time:new Date().toLocaleTimeString(),date:new Date().toLocaleDateString(),pair:pair,dir:dir,duration:duration,result:null};
             tradeHistory.unshift(t);
-            if (tradeHistory.length > 100) tradeHistory = tradeHistory.slice(0, 100);
-            localStorage.setItem("th", JSON.stringify(tradeHistory));
+            if(tradeHistory.length>100)tradeHistory=tradeHistory.slice(0,100);
+            localStorage.setItem("th",JSON.stringify(tradeHistory));
             return t.id;
         }
 
-        function setResult(id, result) {
-            tradeHistory = tradeHistory.map(function(t) { if (t.id === id) t.result = result; return t; });
-            localStorage.setItem("th", JSON.stringify(tradeHistory));
-            var box = document.querySelector(".success-box");
-            if (box) {
-                var c = result === "WIN" ? "#00e096" : "#ff4d6d";
-                box.innerHTML = '<div style="font-size:14px;font-weight:700;color:' + c + ';">' + (result === "WIN" ?
-                    "WIN" : "LOSS") + ' - تم التسجيل!</div><button class="new-sig-btn" onclick="resetCard()">إشارة جديدة</button>';
+        function setResult(id,result){
+            tradeHistory=tradeHistory.map(function(t){if(t.id===id)t.result=result;return t;});
+            localStorage.setItem("th",JSON.stringify(tradeHistory));
+            var box=document.querySelector(".success-box");
+            if(box){
+                var c=result==="WIN"?"#00e096":"#ff4d6d";
+                box.innerHTML='<div style="font-size:14px;font-weight:700;color:'+c+';">'+(result==="WIN"?"WIN":"LOSS")+' - تم التسجيل!</div><button class="new-sig-btn" onclick="resetCard()">إشارة جديدة</button>';
             }
         }
 
-        function takeTrade() {
-            let duration = window._currentSig && window._currentSig.exactDuration ? window._currentSig.exactDuration :
-                "غير محدد";
-            if (window._currentSig) lastTradeId = saveTrade(window._currentSig.direction, duration, window._currentPair ||
-                "");
-            var a = document.querySelector(".actions");
-            if (a) a.outerHTML = '<div class="success-box"><div class="success-text">✅ تم أخذ الصفقة!</div><div style="font-size:11px;color:#888;margin:4px 0;">⏱️ المدة: ' +
-                duration +
-                '</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;"><button onclick="setResult(lastTradeId,\'WIN\')" style="padding:10px;background:rgba(0,224,150,0.15);border:1px solid #00e09660;border-radius:8px;color:#00e096;font-weight:700;font-size:13px;cursor:pointer;">WIN</button><button onclick="setResult(lastTradeId,\'LOSS\')" style="padding:10px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d60;border-radius:8px;color:#ff4d6d;font-weight:700;font-size:13px;cursor:pointer;">LOSS</button></div></div>';
+        function takeTrade(){
+            let duration=window._currentSig&&window._currentSig.exactDuration?window._currentSig.exactDuration:"5 دقائق";
+            if(window._currentSig)lastTradeId=saveTrade(window._currentSig.direction,duration,window._currentPair||"");
+            var a=document.querySelector(".actions");
+            if(a)a.outerHTML='<div class="success-box"><div class="success-text">✅ تم أخذ الصفقة!</div><div style="font-size:11px;color:#888;margin:4px 0;">⏱️ المدة: '+duration+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;"><button onclick="setResult(lastTradeId,\'WIN\')" style="padding:10px;background:rgba(0,224,150,0.15);border:1px solid #00e09660;border-radius:8px;color:#00e096;font-weight:700;font-size:13px;cursor:pointer;">WIN</button><button onclick="setResult(lastTradeId,\'LOSS\')" style="padding:10px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d60;border-radius:8px;color:#ff4d6d;font-weight:700;font-size:13px;cursor:pointer;">LOSS</button></div></div>';
         }
 
-        function skipTrade() { resetCard(); }
+        function skipTrade(){resetCard();}
 
-        function showHistory() {
-            var done = tradeHistory.filter(function(t) { return t.result !== null; });
-            var wins = done.filter(function(t) { return t.result === "WIN"; }).length;
-            var losses = done.filter(function(t) { return t.result === "LOSS"; }).length;
-            var rate = done.length > 0 ? Math.round(wins / done.length * 100) : 0;
-            document.getElementById("hStats").innerHTML =
-                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#7c83ff;">' +
-                tradeHistory.length +
-                '</div><div style="font-size:9px;color:#444;">الإجمالي</div></div>' +
-                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#00e096;">' +
-                wins + '</div><div style="font-size:9px;color:#444;">ربح</div></div>' +
-                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#ff4d6d;">' +
-                losses + '</div><div style="font-size:9px;color:#444;">خسارة</div></div>' +
-                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:' +
-                (rate >= 65 ? "#00e096" : rate >= 50 ? "#f0c040" : "#ff4d6d") + ';">' + rate +
-                '%</div><div style="font-size:9px;color:#444;">نسبة النجاح</div></div>';
-            document.getElementById("hList").innerHTML = tradeHistory.length === 0 ?
-                '<div style="text-align:center;color:#2a2d45;padding:30px;font-size:13px;">لا توجد صفقات بعد</div>' :
-                tradeHistory.slice(0, 30).map(function(t) {
-                    var rc = t.result === "WIN" ? "#00e096" : t.result === "LOSS" ? "#ff4d6d" : "#f0c040";
-                    return '<div style="background:#10121e;border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">' +
-                        '<div><div style="font-size:13px;font-weight:700;color:#e0e0f0;">' + t.pair +
-                        '</div><div style="font-size:10px;color:#444;">' + t.date + ' ' + t.time + ' | ' + t
-                        .dir + ' | ' + t.duration + '</div></div>' +
-                        (t.result === null ?
-                            '<div style="display:flex;gap:6px;"><button onclick="setResult(' + t.id +
-                            ',\'WIN\')" style="padding:4px 8px;background:rgba(0,224,150,0.15);border:1px solid #00e096;border-radius:6px;color:#00e096;font-size:11px;font-weight:700;cursor:pointer;">WIN</button><button onclick="setResult(' +
-                            t.id +
-                            ',\'LOSS\')" style="padding:4px 8px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d;border-radius:6px;color:#ff4d6d;font-size:11px;font-weight:700;cursor:pointer;">LOSS</button></div>' :
-                            '<span style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;color:' +
-                            rc + ';background:' + rc + '22;">' + t.result + '</span>') +
+        function showHistory(){
+            var done=tradeHistory.filter(function(t){return t.result!==null;});
+            var wins=done.filter(function(t){return t.result==="WIN";}).length;
+            var losses=done.filter(function(t){return t.result==="LOSS";}).length;
+            var rate=done.length>0?Math.round(wins/done.length*100):0;
+            document.getElementById("hStats").innerHTML=
+                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#7c83ff;">'+tradeHistory.length+'</div><div style="font-size:9px;color:#444;">الإجمالي</div></div>'+
+                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#00e096;">'+wins+'</div><div style="font-size:9px;color:#444;">ربح</div></div>'+
+                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#ff4d6d;">'+losses+'</div><div style="font-size:9px;color:#444;">خسارة</div></div>'+
+                '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:'+(rate>=65?"#00e096":rate>=50?"#f0c040":"#ff4d6d")+';">'+rate+'%</div><div style="font-size:9px;color:#444;">نسبة النجاح</div></div>';
+            document.getElementById("hList").innerHTML=tradeHistory.length===0?'<div style="text-align:center;color:#2a2d45;padding:30px;font-size:13px;">لا توجد صفقات بعد</div>':
+                tradeHistory.slice(0,30).map(function(t){
+                    var rc=t.result==="WIN"?"#00e096":t.result==="LOSS"?"#ff4d6d":"#f0c040";
+                    return '<div style="background:#10121e;border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">'+
+                        '<div><div style="font-size:13px;font-weight:700;color:#e0e0f0;">'+t.pair+'</div><div style="font-size:10px;color:#444;">'+t.date+' '+t.time+' | '+t.dir+' | '+t.duration+'</div></div>'+
+                        (t.result===null?'<div style="display:flex;gap:6px;"><button onclick="setResult('+t.id+',\'WIN\')" style="padding:4px 8px;background:rgba(0,224,150,0.15);border:1px solid #00e096;border-radius:6px;color:#00e096;font-size:11px;font-weight:700;cursor:pointer;">WIN</button><button onclick="setResult('+t.id+',\'LOSS\')" style="padding:4px 8px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d;border-radius:6px;color:#ff4d6d;font-size:11px;font-weight:700;cursor:pointer;">LOSS</button></div>':'<span style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;color:'+rc+';background:'+rc+'22;">'+t.result+'</span>')+
                         '</div>';
                 }).join("");
-            document.getElementById("hPage").style.display = "block";
+            document.getElementById("hPage").style.display="block";
         }
 
-        function hideHistory() { document.getElementById("hPage").style.display = "none"; }
+        function hideHistory(){document.getElementById("hPage").style.display="none";}
     </script>
 
     <div id="hPage">
