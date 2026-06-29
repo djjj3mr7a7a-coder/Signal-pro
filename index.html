@@ -551,26 +551,26 @@ function analyze(O,H,L,C,V){
   var reasons=[];
   if(direction!=="WAIT"){
     var isUP=direction==="UP";
-    if(emaScore!==0)reasons.push(isUP?"Price above EMA20 & EMA50  confirming uptrend structure":"Price below EMA20 & EMA50  confirming downtrend structure");
-    if(r<40&&isUP)reasons.push("RSI at "+r.toFixed(0)+"  oversold zone, reversal expected upward");
-    if(r>60&&!isUP)reasons.push("RSI at "+r.toFixed(0)+"  overbought zone, reversal expected downward");
-    if(ms.score!==0)reasons.push("Market structure shows "+ms.trend+"  "+( isUP?"Higher Highs & Higher Lows":"Lower Highs & Lower Lows"));
-    if(cp.patterns.length>0)reasons.push("Candle pattern detected: "+cp.patterns[0]+"  strong "+( isUP?"bullish":"bearish")+" signal");
-    if(br.signals.length>0)reasons.push(br.signals[0]+"  key level confirmation");
+    if(emaScore!==0)reasons.push(isUP?"Price above EMA20 & EMA50 ? confirming uptrend structure":"Price below EMA20 & EMA50 ? confirming downtrend structure");
+    if(r<40&&isUP)reasons.push("RSI at "+r.toFixed(0)+" ? oversold zone, reversal expected upward");
+    if(r>60&&!isUP)reasons.push("RSI at "+r.toFixed(0)+" ? overbought zone, reversal expected downward");
+    if(ms.score!==0)reasons.push("Market structure shows "+ms.trend+" ? "+( isUP?"Higher Highs & Higher Lows":"Lower Highs & Lower Lows"));
+    if(cp.patterns.length>0)reasons.push("Candle pattern detected: "+cp.patterns[0]+" ? strong "+( isUP?"bullish":"bearish")+" signal");
+    if(br.signals.length>0)reasons.push(br.signals[0]+" ? key level confirmation");
     if(mo.score!==0)reasons.push(mo.label+" supports the "+direction+" direction");
-    if(tl.trendDir!=="NEUTRAL"&&tl.trendDir!=="CONVERGING")reasons.push("Trend channel is "+tl.trendDir+"  price following channel direction");
-    if(k<25&&isUP)reasons.push("Stochastic at "+k.toFixed(0)+"  oversold, momentum reversal forming");
-    if(k>75&&!isUP)reasons.push("Stochastic at "+k.toFixed(0)+"  overbought, momentum fading");
-    if(wa.waveBias)reasons.push("Elliott Wave: "+wa.waveBias+"  "+wa.waveType+" move in progress");
+    if(tl.trendDir!=="NEUTRAL"&&tl.trendDir!=="CONVERGING")reasons.push("Trend channel is "+tl.trendDir+" ? price following channel direction");
+    if(k<25&&isUP)reasons.push("Stochastic at "+k.toFixed(0)+" ? oversold, momentum reversal forming");
+    if(k>75&&!isUP)reasons.push("Stochastic at "+k.toFixed(0)+" ? overbought, momentum fading");
+    if(wa.waveBias)reasons.push("Elliott Wave: "+wa.waveBias+" ? "+wa.waveType+" move in progress");
     reasons=reasons.slice(0,3);
     while(reasons.length<3){
-      if(isUP)reasons.push("Price holding above Pivot ("+sr.pivot.toFixed(5)+")  bullish bias maintained");
-      else reasons.push("Price trading below Pivot ("+sr.pivot.toFixed(5)+")  bearish pressure continues");
+      if(isUP)reasons.push("Price holding above Pivot ("+sr.pivot.toFixed(5)+") ? bullish bias maintained");
+      else reasons.push("Price trading below Pivot ("+sr.pivot.toFixed(5)+") ? bearish pressure continues");
     }
   } else {
-    reasons.push("Mixed signals across timeframe  no clear directional bias");
-    reasons.push("RSI at "+r.toFixed(0)+"  neutral zone, wait for confirmation");
-    reasons.push("Price near Pivot ("+sr.pivot.toFixed(5)+")  await breakout for entry");
+    reasons.push("Mixed signals across timeframe ? no clear directional bias");
+    reasons.push("RSI at "+r.toFixed(0)+" ? neutral zone, wait for confirmation");
+    reasons.push("Price near Pivot ("+sr.pivot.toFixed(5)+") ? await breakout for entry");
   }
 
   // Duration = selected timeframe (passed from outside)
@@ -690,7 +690,7 @@ async function getSignal(){
     }
     // Add MTF reason
     if(mtfAlignment>=4&&sig.direction!=="WAIT"){
-      sig.reasons[2]=mtfAlignment+" out of 5 timeframes confirm "+sig.direction+"  strong multi-timeframe alignment";
+      sig.reasons[2]=mtfAlignment+" out of 5 timeframes confirm "+sig.direction+" ? strong multi-timeframe alignment";
     }
 
     // FINAL VERDICT
@@ -740,7 +740,7 @@ async function getSignal(){
         '<div class="ibox" style="margin-bottom:0"><div class="ilbl">MACD</div><div class="ival '+( parseFloat(sig.macd)>0?"bull":"bear")+'">'+( parseFloat(sig.macd)>0?"+":"")+parseFloat(sig.macd).toFixed(4)+'</div></div>'+
       '</div>'+
       '<div class="ibox" style="margin-bottom:8px">'+
-        '<div class="bar-row"><span class="ilbl">Signal Strength</span><span style="font-size:10px;color:#555">'+( sig.direction==="WAIT"?"WAIT  No Trade":sig.strength+"%")+'</span></div>'+
+        '<div class="bar-row"><span class="ilbl">Signal Strength</span><span style="font-size:10px;color:#555">'+( sig.direction==="WAIT"?"WAIT ? No Trade":sig.strength+"%")+'</span></div>'+
         '<div class="bar-track"><div class="bar-fill '+sig.dcls+'" style="width:'+( sig.direction==="WAIT"?0:sig.strength)+'%"></div></div>'+
         '<div class="bar-lbl"><span>Weak</span><span style="color:#555">Score: '+sig.totalScore+'</span><span>Strong</span></div>'+
       '</div>'+
