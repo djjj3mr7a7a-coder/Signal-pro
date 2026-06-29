@@ -21,9 +21,9 @@
     .logo-signal{font-size:22px;font-weight:800;background:linear-gradient(135deg,#4fc3f7,#7c83ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
     .logo-pro{font-size:11px;font-weight:700;color:#f0c040;background:rgba(240,192,64,0.12);padding:2px 7px;border-radius:5px;margin-left:6px;vertical-align:middle;}
     .selectors{display:flex;gap:8px;margin-bottom:14px;position:relative;}
-    .pair-btn{flex:1;display:flex;align-items:center;justify-content:space-between;background:#10121e;border:1px solid #1e2235;border-radius:10px;padding:10px 12px;color:#e0e0f0;font-size:13px;font-weight:600;cursor:pointer;}
+    .pair-btn{flex:1;display:flex;align-items:center;justify-content:space-between;background:#10121e;border:1px solid #1e2235;border-radius:10px;padding:10px 12px;color:#e0e0f0;font-size:13px;font-weight:600;cursor:pointer;pointer-events:auto !important;}
     .pair-dropdown{position:absolute;top:46px;left:0;right:70px;z-index:100;background:#10121e;border:1px solid #1e2235;border-radius:10px;max-height:220px;overflow-y:auto;box-shadow:0 8px 32px #000;}
-    .pair-item{padding:11px 12px;font-size:13px;cursor:pointer;color:#b0b8d8;border-bottom:1px solid #0d0f1a;}
+    .pair-item{padding:11px 12px;font-size:13px;cursor:pointer;color:#b0b8d8;border-bottom:1px solid #0d0f1a;pointer-events:auto !important;}
     .pair-item.active{color:#7c83ff;background:#1a1c2e;}
     .tf-wrap{position:relative;}
     .tf-select{background:#10121e;border:1px solid #1e2235;border-radius:10px;padding:10px 28px 10px 12px;color:#e0e0f0;font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;}
@@ -77,19 +77,19 @@
     .mtf-fill{height:100%;border-radius:100px;}
     .mtf-sig{font-size:11px;font-weight:700;width:40px;text-align:right;}
     .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
-    .btn-take{padding:13px;border:none;border-radius:10px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;}
+    .btn-take{padding:13px;border:none;border-radius:10px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;pointer-events:auto !important;}
     .btn-take.up{background:#00e096;animation:pulse 2s infinite;}
     .btn-take.down{background:#ff4d6d;animation:pulseRed 2s infinite;}
     .btn-take.wait{background:#f0c040;color:#000;}
-    .btn-skip{padding:13px;background:transparent;border:1px solid #1e2235;border-radius:10px;color:#555;font-weight:700;font-size:14px;cursor:pointer;}
+    .btn-skip{padding:13px;background:transparent;border:1px solid #1e2235;border-radius:10px;color:#555;font-weight:700;font-size:14px;cursor:pointer;pointer-events:auto !important;}
     .success-box{text-align:center;padding:14px;background:rgba(0,224,150,0.06);border-radius:10px;border:1px solid rgba(0,224,150,0.18);grid-column:1/-1;}
     .success-text{font-size:13px;color:#00e096;font-weight:600;}
-    .new-sig-btn{margin-top:8px;background:none;border:none;color:#555;font-size:12px;cursor:pointer;}
-    .get-btn{width:100%;padding:15px;background:linear-gradient(135deg,#4fc3f7,#7c83ff);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 24px rgba(124,131,255,0.28);}
+    .new-sig-btn{margin-top:8px;background:none;border:none;color:#555;font-size:12px;cursor:pointer;pointer-events:auto !important;}
+    .get-btn{width:100%;padding:15px;background:linear-gradient(135deg,#4fc3f7,#7c83ff);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 24px rgba(124,131,255,0.28);pointer-events:auto !important;}
     .get-btn.loading{background:#1e2035;cursor:not-allowed;box-shadow:none;}
     .bull{color:#00e096;} .bear{color:#ff4d6d;} .neut{color:#f0c040;}
     .nav{display:flex;justify-content:space-around;margin-top:24px;border-top:1px solid #10121e;padding-top:14px;}
-    .nav-item{text-align:center;}
+    .nav-item{text-align:center;cursor:pointer !important;pointer-events:auto !important;}
     .nav-icon{font-size:17px;margin-bottom:2px;}
     .nav-label{font-size:9px;color:#333;}
     .nav-item.active .nav-label{color:#7c83ff;font-weight:700;}
@@ -99,14 +99,66 @@
     .wave-lbl{font-size:10px;color:#444;margin-bottom:6px;}
     .wave-content{font-size:12px;color:#a0a8c8;line-height:1.6;}
     .wave-tag{display:inline-block;background:#1a1c2e;border-radius:5px;padding:2px 7px;font-size:10px;color:#7c83ff;margin:1px;}
-    button, .pair-btn, .nav-item, .d-item {
-    touch-action: manipulation !important;
-    -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
-    cursor: pointer !important;
-  }
-  * { -webkit-user-select: none; user-select: none; }
-  input, textarea { -webkit-user-select: text !important; }
-</style>
+    /* ======== IMPORTANT FIX: Enable all clicks ======== */
+    button, .pair-btn, .nav-item, .d-item, .get-btn, .btn-take, .btn-skip, .new-sig-btn, .pair-item, .tf-tab {
+      touch-action: manipulation !important;
+      -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+      cursor: pointer !important;
+      pointer-events: auto !important;
+      position: relative !important;
+      z-index: 10 !important;
+    }
+    /* Fix for dropdown items */
+    .pair-dropdown {
+      pointer-events: auto !important;
+      z-index: 9999 !important;
+    }
+    .pair-item {
+      pointer-events: auto !important;
+      z-index: 9999 !important;
+    }
+    /* Fix for history page */
+    #hPage button {
+      pointer-events: auto !important;
+      cursor: pointer !important;
+    }
+    /* Fix for nav items */
+    .nav-item {
+      pointer-events: auto !important;
+      cursor: pointer !important;
+      z-index: 20 !important;
+    }
+    /* Enable clicks on all interactive elements */
+    *[onclick], *[onclick="getSignal()"], *[onclick="toggleDd(event)"], *[onclick="showHistory()"], *[onclick="hideHistory()"], *[onclick="takeTrade()"], *[onclick="skipTrade()"], *[onclick="resetCard()"], *[onclick*="setResult("] {
+      pointer-events: auto !important;
+      cursor: pointer !important;
+    }
+    /* Override any inherited pointer-events: none */
+    .wrap, .card, .card-inner, .header, .selectors, .nav {
+      pointer-events: auto !important;
+    }
+    /* Fix for success box buttons */
+    .success-box button {
+      pointer-events: auto !important;
+      cursor: pointer !important;
+      z-index: 100 !important;
+      position: relative !important;
+    }
+    /* Remove user-select that might block clicks */
+    * { 
+      -webkit-user-select: none; 
+      user-select: none; 
+      pointer-events: auto !important;
+    }
+    input, textarea { 
+      -webkit-user-select: text !important;
+      pointer-events: auto !important;
+    }
+    /* Ensure body doesn't block clicks */
+    body {
+      pointer-events: auto !important;
+    }
+  </style>
 </head>
 <body>
 <div class="wrap">
@@ -118,12 +170,12 @@
   </div>
 
   <div class="selectors">
-    <div style="flex:1;position:relative;">
-      <button class="pair-btn" id="pairBtn" onclick="toggleDd(event)">
+    <div style="flex:1;position:relative;pointer-events:auto !important;">
+      <button class="pair-btn" id="pairBtn" onclick="toggleDd(event)" style="pointer-events:auto !important;cursor:pointer !important;">
         <span id="pairLabel">EUR/USD</span>
         <span style="color:#444;font-size:10px;">&#9660;</span>
       </button>
-      <div class="pair-dropdown" id="dd" style="display:none;"></div>
+      <div class="pair-dropdown" id="dd" style="display:none;pointer-events:auto !important;z-index:9999 !important;"></div>
     </div>
   </div>
   <input type="hidden" id="tfSelect" value="5min"/>
@@ -132,14 +184,14 @@
     <div class="idle">Press Get Signal to start</div>
   </div>
 
-  <button class="get-btn" id="getBtn" onclick="getSignal()">&#9889; Get Signal</button>
+  <button class="get-btn" id="getBtn" onclick="getSignal()" style="pointer-events:auto !important;cursor:pointer !important;">&#9889; Get Signal</button>
 
   <div class="nav">
-    <div class="nav-item"><div class="nav-icon">&#128100;</div><div class="nav-label">Profile</div></div>
-    <div class="nav-item" onclick="showHistory()" style="cursor:pointer"><div class="nav-icon">&#128336;</div><div class="nav-label">History</div></div>
-    <div class="nav-item active"><div class="nav-icon">&#128200;</div><div class="nav-label">Signals</div></div>
-    <div class="nav-item"><div class="nav-icon">&#129302;</div><div class="nav-label">AI</div></div>
-    <div class="nav-item"><div class="nav-icon">&#127911;</div><div class="nav-label">Support</div></div>
+    <div class="nav-item" onclick="alert('Profile page')" style="cursor:pointer !important;pointer-events:auto !important;"><div class="nav-icon">&#128100;</div><div class="nav-label">Profile</div></div>
+    <div class="nav-item" onclick="showHistory()" style="cursor:pointer !important;pointer-events:auto !important;"><div class="nav-icon">&#128336;</div><div class="nav-label">History</div></div>
+    <div class="nav-item active" style="cursor:pointer !important;pointer-events:auto !important;"><div class="nav-icon">&#128200;</div><div class="nav-label">Signals</div></div>
+    <div class="nav-item" onclick="alert('AI Analysis - Coming Soon!')" style="cursor:pointer !important;pointer-events:auto !important;"><div class="nav-icon">&#129302;</div><div class="nav-label">AI</div></div>
+    <div class="nav-item" onclick="alert('Support - Contact us at support@springbot.com')" style="cursor:pointer !important;pointer-events:auto !important;"><div class="nav-icon">&#127911;</div><div class="nav-label">Support</div></div>
   </div>
 </div>
 
@@ -161,7 +213,7 @@ function setResult(id,result){
   var box=document.querySelector(".success-box");
   if(box){
     var c=result==="WIN"?"#00e096":"#ff4d6d";
-    box.innerHTML='<div style="font-size:14px;font-weight:700;color:'+c+';">'+(result==="WIN"?"&#9989;":"&#10060;")+' Marked as '+result+'!</div><button class="new-sig-btn" onclick="resetCard()">Get new signal</button>';
+    box.innerHTML='<div style="font-size:14px;font-weight:700;color:'+c+';">'+(result==="WIN"?"&#9989;":"&#10060;")+' Marked as '+result+'!</div><button class="new-sig-btn" onclick="resetCard()" style="pointer-events:auto !important;cursor:pointer !important;">Get new signal</button>';
   }
 }
 
@@ -184,8 +236,8 @@ function showHistory(){
         '<div style="font-size:10px;color:#444;">'+t.date+' '+t.time+' | '+t.dir+'</div></div>'+
         (t.result===null?
           '<div style="display:flex;gap:6px;">'+
-            '<button onclick="setResult('+t.id+','WIN')" style="padding:4px 8px;background:rgba(0,224,150,0.15);border:1px solid #00e096;border-radius:6px;color:#00e096;font-size:11px;font-weight:700;cursor:pointer;">WIN</button>'+
-            '<button onclick="setResult('+t.id+','LOSS')" style="padding:4px 8px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d;border-radius:6px;color:#ff4d6d;font-size:11px;font-weight:700;cursor:pointer;">LOSS</button>'+
+            '<button onclick="setResult('+t.id+','WIN')" style="padding:4px 8px;background:rgba(0,224,150,0.15);border:1px solid #00e096;border-radius:6px;color:#00e096;font-size:11px;font-weight:700;cursor:pointer;pointer-events:auto !important;">WIN</button>'+
+            '<button onclick="setResult('+t.id+','LOSS')" style="padding:4px 8px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d;border-radius:6px;color:#ff4d6d;font-size:11px;font-weight:700;cursor:pointer;pointer-events:auto !important;">LOSS</button>'+
           '</div>':
           '<span style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;color:'+rc+';background:'+rc+'22;">'+t.result+'</span>')+
       '</div>';
@@ -216,7 +268,10 @@ PAIRS.forEach(function(p){
   const d=document.createElement("div");
   d.className="pair-item"+(p.symbol===currentPair.symbol?" active":"");
   d.innerHTML=p.label;
-  d.onclick=function(){
+  d.style.pointerEvents="auto !important";
+  d.style.cursor="pointer !important";
+  d.onclick=function(e){
+    e.stopPropagation();
     currentPair=p;
     document.getElementById("pairLabel").innerHTML=p.label;
     document.querySelectorAll(".pair-item").forEach(function(x){x.classList.remove("active");});
@@ -401,8 +456,7 @@ function momentum(C){
   return{label:"Weak Bearish Momentum",score:-1};
 }
 
-// ======= MAIN ANALYSIS =======
-
+// ======= REJECTION ZONES =======
 function rejectionZones(H,L,C){
   var n=C.length,levels=[],tolerance=0.0003;
   for(var i=5;i<n-5;i++){
@@ -428,6 +482,7 @@ function rejectionZones(H,L,C){
   return{nearZone:nearZone,nearType:nearType,nearStrength:nearStrength,atZone:atZone,score:score,label:label};
 }
 
+// ======= VOLUME PROFILE =======
 function volumeProfile(H,L,C,V){
   var n=C.length,minP=Math.min.apply(null,L),maxP=Math.max.apply(null,H),range=maxP-minP,buckets=20;
   var profile=[];
@@ -448,6 +503,7 @@ function volumeProfile(H,L,C,V){
   return{atHVN:atHVN,atLVN:atLVN,nearPOC:nearPOC,label:label};
 }
 
+// ======= MAIN ANALYSIS =======
 function analyze(O,H,L,C,V){
   var last=C[C.length-1];
   var e20=ema(C.slice(-20),20);
@@ -795,8 +851,8 @@ async function getSignal(){
         '</div>'+
       '</div>'+
       '<div class="actions">'+
-        '<button class="btn-take '+sig.dcls+'" onclick="takeTrade()">&#10003; Take</button>'+
-        '<button class="btn-skip" onclick="skipTrade()">&#10005; Skip</button>'+
+        '<button class="btn-take '+sig.dcls+'" onclick="takeTrade()" style="pointer-events:auto !important;cursor:pointer !important;">&#10003; Take</button>'+
+        '<button class="btn-skip" onclick="skipTrade()" style="pointer-events:auto !important;cursor:pointer !important;">&#10005; Skip</button>'+
       '</div>'+
       '</div>'
     );
@@ -814,8 +870,8 @@ function takeTrade(){
   if(a)a.outerHTML='<div class="success-box">'+
     '<div class="success-text">&#10003; Trade Taken!</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">'+
-      '<button onclick="setResult(lastTradeId,'WIN')" style="padding:10px;background:rgba(0,224,150,0.15);border:1px solid #00e09660;border-radius:8px;color:#00e096;font-weight:700;font-size:13px;cursor:pointer;">&#9989; WIN</button>'+
-      '<button onclick="setResult(lastTradeId,'LOSS')" style="padding:10px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d60;border-radius:8px;color:#ff4d6d;font-weight:700;font-size:13px;cursor:pointer;">&#10060; LOSS</button>'+
+      '<button onclick="setResult(lastTradeId,'WIN')" style="padding:10px;background:rgba(0,224,150,0.15);border:1px solid #00e09660;border-radius:8px;color:#00e096;font-weight:700;font-size:13px;cursor:pointer;pointer-events:auto !important;">&#9989; WIN</button>'+
+      '<button onclick="setResult(lastTradeId,'LOSS')" style="padding:10px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d60;border-radius:8px;color:#ff4d6d;font-weight:700;font-size:13px;cursor:pointer;pointer-events:auto !important;">&#10060; LOSS</button>'+
     '</div>'+
   '</div>';
 }
@@ -831,11 +887,11 @@ function resetCard(){
 <div id="hPage" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#08090f;z-index:9999;overflow-y:auto;padding:20px 16px 40px;">
   <div style="display:flex;align-items:center;justify-content:space-between;padding-top:48px;margin-bottom:20px;">
     <div style="font-size:18px;font-weight:800;color:#fff;">&#128336; Trade History</div>
-    <button onclick="hideHistory()" style="background:#10121e;border:1px solid #1e2235;border-radius:8px;padding:8px 14px;color:#7c83ff;font-size:13px;font-weight:600;cursor:pointer;">&#8592; Back</button>
+    <button onclick="hideHistory()" style="background:#10121e;border:1px solid #1e2235;border-radius:8px;padding:8px 14px;color:#7c83ff;font-size:13px;font-weight:600;cursor:pointer;pointer-events:auto !important;">&#8592; Back</button>
   </div>
   <div id="hStats" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:16px;"></div>
   <div id="hList"></div>
-  <button onclick="if(confirm('Clear all?')){localStorage.removeItem('th');tradeHistory=[];showHistory();}" style="width:100%;margin-top:12px;padding:10px;background:transparent;border:1px solid #1e2235;border-radius:8px;color:#444;font-size:11px;cursor:pointer;">&#128465; Clear All</button>
+  <button onclick="if(confirm('Clear all?')){localStorage.removeItem('th');tradeHistory=[];showHistory();}" style="width:100%;margin-top:12px;padding:10px;background:transparent;border:1px solid #1e2235;border-radius:8px;color:#444;font-size:11px;cursor:pointer;pointer-events:auto !important;">&#128465; Clear All</button>
 </div>
 </body>
 </html>
