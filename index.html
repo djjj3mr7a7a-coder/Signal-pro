@@ -21,12 +21,10 @@
     .logo-signal{font-size:22px;font-weight:800;background:linear-gradient(135deg,#4fc3f7,#7c83ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
     .logo-pro{font-size:11px;font-weight:700;color:#f0c040;background:rgba(240,192,64,0.12);padding:2px 7px;border-radius:5px;margin-left:6px;vertical-align:middle;}
     .selectors{display:flex;gap:8px;margin-bottom:14px;position:relative;}
-    .pair-btn{flex:1;display:flex;align-items:center;justify-content:space-between;background:#10121e;border:1px solid #1e2235;border-radius:10px;padding:10px 12px;color:#e0e0f0;font-size:13px;font-weight:600;}
+    .pair-btn{flex:1;display:flex;align-items:center;justify-content:space-between;background:#10121e;border:1px solid #1e2235;border-radius:10px;padding:10px 12px;color:#e0e0f0;font-size:13px;font-weight:600;cursor:pointer;pointer-events:auto;}
     .pair-dropdown{position:absolute;top:46px;left:0;right:70px;z-index:100;background:#10121e;border:1px solid #1e2235;border-radius:10px;max-height:220px;overflow-y:auto;box-shadow:0 8px 32px #000;}
-    .pair-item{padding:11px 12px;font-size:13px;color:#b0b8d8;border-bottom:1px solid #0d0f1a;}
+    .pair-item{padding:11px 12px;font-size:13px;cursor:pointer;color:#b0b8d8;border-bottom:1px solid #0d0f1a;}
     .pair-item.active{color:#7c83ff;background:#1a1c2e;}
-    .tf-wrap{position:relative;}
-    .tf-select{background:#10121e;border:1px solid #1e2235;border-radius:10px;padding:10px 28px 10px 12px;color:#e0e0f0;font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;}
     .card{background:#10121e;border:1px solid #1a1c2e;border-radius:16px;padding:18px;margin-bottom:12px;min-height:140px;display:flex;align-items:center;justify-content:center;}
     .card-inner{width:100%;animation:fadeUp 0.4s ease;}
     .idle{text-align:center;color:#2a2d45;font-size:14px;padding:20px 0;}
@@ -36,10 +34,8 @@
     .ibox{background:#0d0f1a;border-radius:10px;padding:11px 13px;margin-bottom:8px;}
     .ilbl{font-size:10px;color:#444;margin-bottom:3px;}
     .ival{font-size:15px;font-weight:700;color:#fff;}
-    .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
     .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
     .acc{color:#7c83ff!important;}
-    .bar-row{display:flex;justify-content:space-between;margin-bottom:6px;}
     .bar-track{background:#1a1c2e;border-radius:100px;height:5px;overflow:hidden;}
     .bar-fill{height:100%;border-radius:100px;transition:width 1s ease;}
     .bar-fill.up{background:linear-gradient(90deg,#4fc3f7,#00e096);}
@@ -66,9 +62,6 @@
     .sr-item{background:#0d0f1a;border-radius:8px;padding:8px 10px;text-align:center;}
     .sr-lbl{font-size:9px;color:#444;margin-bottom:3px;}
     .sr-val{font-size:11px;font-weight:700;}
-    .tf-tabs{display:flex;gap:4px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
-    .tf-tab{flex-shrink:0;padding:6px 12px;background:#10121e;border:1px solid #1e2235;border-radius:8px;font-size:11px;font-weight:600;color:#555;}
-    .tf-tab.active{background:#7c83ff;border-color:#7c83ff;color:#fff;}
     .mtf-box{background:#0d0f1a;border-radius:10px;padding:12px;margin-bottom:8px;}
     .mtf-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid #0a0c14;}
     .mtf-row:last-child{border-bottom:none;}
@@ -77,19 +70,19 @@
     .mtf-fill{height:100%;border-radius:100px;}
     .mtf-sig{font-size:11px;font-weight:700;width:40px;text-align:right;}
     .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
-    .btn-take{padding:13px;border:none;border-radius:10px;color:#fff;font-weight:700;font-size:14px;}
+    .btn-take{padding:13px;border:none;border-radius:10px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;pointer-events:auto;}
     .btn-take.up{background:#00e096;animation:pulse 2s infinite;}
     .btn-take.down{background:#ff4d6d;animation:pulseRed 2s infinite;}
     .btn-take.wait{background:#f0c040;color:#000;}
-    .btn-skip{padding:13px;background:transparent;border:1px solid #1e2235;border-radius:10px;color:#555;font-weight:700;font-size:14px;}
+    .btn-skip{padding:13px;background:transparent;border:1px solid #1e2235;border-radius:10px;color:#555;font-weight:700;font-size:14px;cursor:pointer;pointer-events:auto;}
     .success-box{text-align:center;padding:14px;background:rgba(0,224,150,0.06);border-radius:10px;border:1px solid rgba(0,224,150,0.18);grid-column:1/-1;}
     .success-text{font-size:13px;color:#00e096;font-weight:600;}
-    .new-sig-btn{margin-top:8px;background:none;border:none;color:#555;font-size:12px;}
-    .get-btn{width:100%;padding:15px;background:linear-gradient(135deg,#4fc3f7,#7c83ff);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 24px rgba(124,131,255,0.28);}
+    .new-sig-btn{margin-top:8px;background:none;border:none;color:#555;font-size:12px;cursor:pointer;}
+    .get-btn{width:100%;padding:15px;background:linear-gradient(135deg,#4fc3f7,#7c83ff);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 24px rgba(124,131,255,0.28);pointer-events:auto;}
     .get-btn.loading{background:#1e2035;cursor:not-allowed;box-shadow:none;}
     .bull{color:#00e096;} .bear{color:#ff4d6d;} .neut{color:#f0c040;}
     .nav{display:flex;justify-content:space-around;margin-top:24px;border-top:1px solid #10121e;padding-top:14px;}
-    .nav-item{text-align:center;}
+    .nav-item{text-align:center;cursor:pointer;pointer-events:auto;}
     .nav-icon{font-size:17px;margin-bottom:2px;}
     .nav-label{font-size:9px;color:#333;}
     .nav-item.active .nav-label{color:#7c83ff;font-weight:700;}
@@ -97,64 +90,17 @@
     .err-box{text-align:center;padding:24px;color:#ff4d6d;font-size:13px;line-height:1.8;}
     .wave-box{background:#0d0f1a;border-radius:10px;padding:11px 13px;margin-bottom:8px;}
     .wave-lbl{font-size:10px;color:#444;margin-bottom:6px;}
-    .wave-content{font-size:12px;color:#a0a8c8;line-height:1.6;}
     .wave-tag{display:inline-block;background:#1a1c2e;border-radius:5px;padding:2px 7px;font-size:10px;color:#7c83ff;margin:1px;}
-    
-    /* ===== الحل الجذري ===== */
-    button, .pair-btn, .nav-item, .get-btn, .btn-take, .btn-skip, .new-sig-btn, .pair-item, .tf-tab {
-      touch-action: manipulation !important;
-      -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
-      cursor: pointer !important;
-      pointer-events: auto !important;
-      position: relative !important;
-      z-index: 9999 !important;
-    }
-    
-    .pair-dropdown {
-      pointer-events: auto !important;
-      z-index: 99999 !important;
-    }
-    
-    #hPage button, #hPage * {
-      pointer-events: auto !important;
-      cursor: pointer !important;
-    }
-    
-    * {
-      -webkit-user-select: none;
-      user-select: none;
-    }
-    input, textarea {
-      -webkit-user-select: text !important;
-    }
-    
-    /* إزالة أي حجب للنقر */
-    .wrap, .card, .card-inner, .header, .selectors, .nav, body, html {
-      pointer-events: auto !important;
-    }
-    
-    /* التعديل الأهم - إجبار كل العناصر على قبول النقر */
-    * {
-      pointer-events: auto !important;
-    }
-    
-    /* العناصر المخفية مؤقتاً */
-    [style*="display:none"], [style*="display: none"] {
-      pointer-events: none !important;
-    }
-    
-    #dd[style*="display:block"], #dd[style*="display: block"] {
-      pointer-events: auto !important;
-    }
-    
-    #dd .pair-item {
-      pointer-events: auto !important;
-    }
-    
-    .success-box button {
-      pointer-events: auto !important;
-      cursor: pointer !important;
-    }
+    button,.pair-btn,.nav-item,.get-btn,.btn-take,.btn-skip,.new-sig-btn,.pair-item{cursor:pointer!important;pointer-events:auto!important;touch-action:manipulation!important}
+    .pair-dropdown{pointer-events:auto!important;z-index:99999!important}
+    #hPage button,#hPage *{pointer-events:auto!important;cursor:pointer!important}
+    *{-webkit-user-select:none;user-select:none}
+    .wrap,.card,.card-inner,.header,.selectors,.nav,body,html{pointer-events:auto!important}
+    [style*="display:none"],[style*="display: none"]{pointer-events:none!important}
+    #dd[style*="display:block"],#dd[style*="display: block"]{pointer-events:auto!important}
+    #dd .pair-item{pointer-events:auto!important}
+    .success-box button{pointer-events:auto!important;cursor:pointer!important}
+    #hPage{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#08090f;z-index:9999;overflow-y:auto;padding:20px 16px 40px;}
   </style>
 </head>
 <body>
@@ -193,16 +139,13 @@
 </div>
 
 <script>
-// ======= ربط الأحداث يدوياً =======
+// ======= ربط الأحداث =======
 document.addEventListener('DOMContentLoaded', function() {
-  // زر Get Signal
   document.getElementById('getBtn').addEventListener('click', function(e) {
     e.preventDefault();
-    e.stopPropagation();
     getSignal();
   });
 
-  // زر اختيار الزوج
   document.getElementById('pairBtn').addEventListener('click', function(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -210,7 +153,6 @@ document.addEventListener('DOMContentLoaded', function() {
     d.style.display = d.style.display === 'none' ? 'block' : 'none';
   });
 
-  // أزرار الناف
   document.getElementById('navProfile').addEventListener('click', function(e) {
     e.preventDefault();
     alert('Profile page');
@@ -228,7 +170,6 @@ document.addEventListener('DOMContentLoaded', function() {
     alert('Support - Contact us at support@springbot.com');
   });
 
-  // إغلاق القائمة عند النقر براها
   document.addEventListener('click', function() {
     document.getElementById('dd').style.display = 'none';
   });
@@ -348,7 +289,6 @@ function stoch(H,L,C,p){
   return ((C[C.length-1]-ll)/(hh-ll||0.0001))*100;
 }
 
-// ======= MARKET STRUCTURE =======
 function marketStructure(C){
   var n=C.length,ups=0,downs=0;
   for(var i=3;i<Math.min(n,25);i++){
@@ -360,7 +300,6 @@ function marketStructure(C){
   return{trend:"SIDEWAYS",score:0};
 }
 
-// ======= SUPPORT & RESISTANCE =======
 function getSR(H,L,C){
   var last=C[C.length-1];
   var res=Math.max.apply(null,H.slice(-30));
@@ -368,12 +307,9 @@ function getSR(H,L,C){
   var pivot=(H[H.length-1]+L[L.length-1]+C[C.length-1])/3;
   var r1=2*pivot-L[L.length-1];
   var s1=2*pivot-H[H.length-1];
-  var r2=pivot+(res-sup);
-  var s2=pivot-(res-sup);
-  return{res:res,sup:sup,pivot:pivot,r1:r1,s1:s1,r2:r2,s2:s2,last:last};
+  return{res:res,sup:sup,pivot:pivot,r1:r1,s1:s1};
 }
 
-// ======= TREND LINES =======
 function trendLines(C,H,L){
   var n=C.length;
   var recentHighs=[],recentLows=[];
@@ -391,88 +327,48 @@ function trendLines(C,H,L){
   return{trendDir:trendDir,hlSlope:hlSlope,llSlope:llSlope};
 }
 
-// ======= BREAKOUT & RETEST =======
 function breakoutRetest(C,H,L,sr){
   var last=C[C.length-1];
   var prev=C[C.length-2];
   var signals=[],score=0;
   if(prev<sr.r1&&last>sr.r1){signals.push("Breakout above R1");score+=3;}
   if(prev>sr.s1&&last<sr.s1){signals.push("Breakout below S1");score-=3;}
-  var atR1=Math.abs(last-sr.r1)/sr.r1<0.0015;
-  var atS1=Math.abs(last-sr.s1)/sr.s1<0.0015;
-  if(atR1&&last<sr.r1){signals.push("Retest of broken R1 (now support)");score+=2;}
-  if(atS1&&last>sr.s1){signals.push("Retest of broken S1 (now resistance)");score-=2;}
   if(last>sr.pivot){score+=1;}else{score-=1;}
   return{signals:signals,score:score};
 }
 
-// ======= CANDLE PATTERNS =======
 function candlePatterns(O,H,L,C){
   var patterns=[],score=0;
   var n=C.length-1;
   var o=O[n],h=H[n],l=L[n],c=C[n];
   var body=Math.abs(c-o),range=h-l;
-  var upper=h-Math.max(o,c),lower=Math.min(o,c)-l;
   var bull=c>o;
   if(body<range*0.1){patterns.push("Doji");}
-  if(lower>body*2.5&&upper<body*0.5){patterns.push(bull?"Bull Hammer":"Hanging Man");score+=bull?2:-1;}
-  if(upper>body*2.5&&lower<body*0.5){patterns.push(bull?"Shooting Star":"Inv Hammer");score+=bull?-2:1;}
   if(body>range*0.75){patterns.push(bull?"Marubozu Bull":"Marubozu Bear");score+=bull?2:-2;}
   if(n>0){
-    var po=O[n-1],pc=C[n-1],ph=H[n-1],pl=L[n-1];
+    var po=O[n-1],pc=C[n-1];
     if(pc<po&&c>o&&c>po&&o<pc){patterns.push("Bullish Engulfing");score+=3;}
     if(pc>po&&c<o&&c<po&&o>pc){patterns.push("Bearish Engulfing");score-=3;}
-    if(n>1){
-      var ppc=C[n-2],ppo=O[n-2];
-      if(ppc<ppo&&Math.abs(pc-po)<Math.abs(ppc-ppo)*0.3&&c>o&&c>(ppo+ppc)/2){patterns.push("Morning Star");score+=4;}
-      if(ppc>ppo&&Math.abs(pc-po)<Math.abs(ppc-ppo)*0.3&&c<o&&c<(ppo+ppc)/2){patterns.push("Evening Star");score-=4;}
-      var mid3H=Math.max(H[n-2],ph,h),mid3L=Math.min(L[n-2],pl,l);
-      if(C[n-2]>O[n-2]&&bull&&C[n-2]<h&&O[n-2]>l){patterns.push("Three White Soldiers");score+=3;}
-      if(C[n-2]<O[n-2]&&!bull&&C[n-2]>l&&O[n-2]<h){patterns.push("Three Black Crows");score-=3;}
-    }
   }
   return{patterns:patterns,score:score};
 }
 
-// ======= WAVE ANALYSIS =======
 function waveAnalysis(C){
-  var n=C.length;
-  var swings=[];
+  var n=C.length,sw=[];
   for(var i=2;i<n-2;i++){
-    if(C[i]>C[i-1]&&C[i]>C[i-2]&&C[i]>C[i+1]&&C[i]>C[i+2])swings.push({i:i,v:C[i],type:"H"});
-    if(C[i]<C[i-1]&&C[i]<C[i-2]&&C[i]<C[i+1]&&C[i]<C[i+2])swings.push({i:i,v:C[i],type:"L"});
+    if(C[i]>C[i-1]&&C[i]>C[i-2]&&C[i]>C[i+1]&&C[i]>C[i+2])sw.push({type:"H"});
+    if(C[i]<C[i-1]&&C[i]<C[i-2]&&C[i]<C[i+1]&&C[i]<C[i+2])sw.push({type:"L"});
   }
-  var waveType="Unknown";
-  var waveBias="Analyzing...";
-  var waveNum="";
-  var score=0;
-  if(swings.length>=3){
-    var s1=swings[swings.length-3];
-    var s2=swings[swings.length-2];
-    var s3=swings[swings.length-1];
-    if(s1.type==="L"&&s2.type==="H"&&s3.type==="L"&&s3.v>s1.v){
-      waveType="Impulsive";waveBias="Wave 3 UP (Strongest)";waveNum="▲ W3";score=3;
-    }
-    else if(s1.type==="H"&&s2.type==="L"&&s3.type==="H"&&s3.v<s1.v){
-      waveType="Corrective";waveBias="Wave ABC DOWN";waveNum="▼ ABC";score=-2;
-    }
-    else if(s1.type==="H"&&s2.type==="L"&&s3.type==="H"&&s3.v<s1.v&&C[n-1]<s2.v){
-      waveType="Impulsive";waveBias="Wave 3 DOWN (Bearish)";waveNum="▼ W3";score=-3;
-    }
-    else if(s1.type==="L"&&s2.type==="H"&&s3.type==="L"&&s3.v<s1.v){
-      waveType="Corrective";waveBias="Wave ABC UP";waveNum="▲ ABC";score=1;
-    }
-    else{
-      waveType=C[n-1]>C[n-10]?"Impulsive":"Corrective";
-      waveBias=waveType==="Impulsive"?"Trending UP":"Trending DOWN";
-      waveNum=waveType==="Impulsive"?"▲ W5":"▼ W4";
-      score=waveType==="Impulsive"?1:-1;
-    }
+  var wt="Unknown",wb="Analyzing...",sc=0;
+  if(sw.length>=3){
+    var s1=sw[sw.length-3],s2=sw[sw.length-2],s3=sw[sw.length-1];
+    if(s1.type==="L"&&s2.type==="H"&&s3.type==="L"){wt="Impulsive";wb="Wave 3 UP";sc=3;}
+    else if(s1.type==="H"&&s2.type==="L"&&s3.type==="H"){wt="Corrective";wb="Wave ABC DOWN";sc=-2;}
+    else{wt="Neutral";wb="Sideways";sc=0;}
   }
-  return{waveType:waveType,waveBias:waveBias,waveNum:waveNum,waveScore:score,swings:swings.length};
+  return{waveType:wt,waveBias:wb,waveScore:sc};
 }
 
-// ======= MOMENTUM =======
 function momentum(C){
   var n=C.length;
   var m5=C[n-1]-C[n-6];
@@ -483,9 +379,8 @@ function momentum(C){
   return{label:"Weak Bearish Momentum",score:-1};
 }
 
-// ======= REJECTION ZONES =======
 function rejectionZones(H,L,C){
-  var n=C.length,levels=[],tolerance=0.0003;
+  var n=C.length,levels=[],tol=0.0003;
   for(var i=5;i<n-5;i++){
     if(H[i]>H[i-1]&&H[i]>H[i-2]&&H[i]>H[i+1]&&H[i]>H[i+2])levels.push({price:H[i],type:"R"});
     if(L[i]<L[i-1]&&L[i]<L[i-2]&&L[i]<L[i+1]&&L[i]<L[i+2])levels.push({price:L[i],type:"S"});
@@ -494,22 +389,21 @@ function rejectionZones(H,L,C){
   levels.forEach(function(lv){
     var found=false;
     clusters.forEach(function(cl){
-      if(Math.abs(cl.price-lv.price)/lv.price<tolerance){cl.touches++;if(lv.type==="R")cl.rejUp++;else cl.rejDown++;found=true;}
+      if(Math.abs(cl.price-lv.price)/lv.price<tol){cl.touches++;found=true;}
     });
-    if(!found)clusters.push({price:lv.price,touches:1,rejUp:lv.type==="R"?1:0,rejDown:lv.type==="S"?1:0});
+    if(!found)clusters.push({price:lv.price,touches:1});
   });
-  var strong=clusters.filter(function(c){return c.touches>=3;}).sort(function(a,b){return b.touches-a.touches;});
-  var last=C[n-1],nearZone=null,nearType="",nearStrength=0,distPct=999;
+  var strong=clusters.filter(function(c){return c.touches>=3;});
+  var last=C[n-1],nearZone=null;
   strong.forEach(function(z){
     var d=Math.abs(last-z.price)/z.price*100;
-    if(d<0.05&&d<distPct){distPct=d;nearZone=z;nearType=z.rejDown>z.rejUp?"RESISTANCE":"SUPPORT";nearStrength=Math.min(100,z.touches*20);}
+    if(d<0.05){nearZone=z;}
   });
   var score=0,label="No rejection zone nearby",atZone=false;
-  if(nearZone){atZone=true;score=nearType==="SUPPORT"?2:-2;label=nearType+" zone ("+nearZone.touches+"x rejections) at "+nearZone.price.toFixed(5);}
-  return{nearZone:nearZone,nearType:nearType,nearStrength:nearStrength,atZone:atZone,score:score,label:label};
+  if(nearZone){atZone=true;score=2;label="Support zone ("+nearZone.touches+"x) at "+nearZone.price.toFixed(5);}
+  return{atZone:atZone,score:score,label:label};
 }
 
-// ======= VOLUME PROFILE =======
 function volumeProfile(H,L,C,V){
   var n=C.length,minP=Math.min.apply(null,L),maxP=Math.max.apply(null,H),range=maxP-minP,buckets=20;
   var profile=[];
@@ -521,21 +415,16 @@ function volumeProfile(H,L,C,V){
   var poc=profile.reduce(function(a,b){return b.volume>a.volume?b:a;});
   var avg=profile.reduce(function(a,b){return a+b.volume;},0)/buckets;
   var hvn=profile.filter(function(b){return b.volume>avg*1.5;});
-  var lvn=profile.filter(function(b){return b.volume<avg*0.4&&b.volume>0;});
   var last=C[n-1];
   var atHVN=hvn.some(function(z){return Math.abs(last-z.priceMid)/last<0.0008;});
-  var atLVN=lvn.some(function(z){return Math.abs(last-z.priceMid)/last<0.0008;});
   var nearPOC=Math.abs(last-poc.priceMid)/last<0.0005;
-  var label=atLVN?"Price in LVN - EXPLOSION ZONE!":atHVN?"Price in HVN - Institutional zone":nearPOC?"Near POC "+poc.priceMid.toFixed(5)+" - battleground":"POC: "+poc.priceMid.toFixed(5);
-  return{atHVN:atHVN,atLVN:atLVN,nearPOC:nearPOC,label:label};
+  return{atHVN:atHVN,nearPOC:nearPOC,label:atHVN?"HVN":nearPOC?"Near POC":"Clear"};
 }
 
-// ======= MAIN ANALYSIS =======
 function analyze(O,H,L,C,V){
   var last=C[C.length-1];
   var e20=ema(C.slice(-20),20);
   var e50=ema(C.slice(-50),50);
-  var e200=ema(C,200);
   var r=rsi(C);
   var m=macd(C);
   var k=stoch(H,L,C,14);
@@ -617,26 +506,20 @@ function analyze(O,H,L,C,V){
   var reasons=[];
   if(direction!=="WAIT"){
     var isUP=direction==="UP";
-    if(emaScore!==0)reasons.push(isUP?"Price above EMA20 & EMA50 ✅ confirming uptrend structure":"Price below EMA20 & EMA50 ✅ confirming downtrend structure");
-    if(r<40&&isUP)reasons.push("RSI at "+r.toFixed(0)+" ✅ oversold zone, reversal expected upward");
-    if(r>60&&!isUP)reasons.push("RSI at "+r.toFixed(0)+" ✅ overbought zone, reversal expected downward");
-    if(ms.score!==0)reasons.push("Market structure shows "+ms.trend+" ✅ "+( isUP?"Higher Highs & Higher Lows":"Lower Highs & Lower Lows"));
-    if(cp.patterns.length>0)reasons.push("Candle pattern detected: "+cp.patterns[0]+" ✅ strong "+( isUP?"bullish":"bearish")+" signal");
-    if(br.signals.length>0)reasons.push(br.signals[0]+" ✅ key level confirmation");
-    if(mo.score!==0)reasons.push(mo.label+" supports the "+direction+" direction");
-    if(tl.trendDir!=="NEUTRAL"&&tl.trendDir!=="CONVERGING")reasons.push("Trend channel is "+tl.trendDir+" ✅ price following channel direction");
-    if(k<25&&isUP)reasons.push("Stochastic at "+k.toFixed(0)+" ✅ oversold, momentum reversal forming");
-    if(k>75&&!isUP)reasons.push("Stochastic at "+k.toFixed(0)+" ✅ overbought, momentum fading");
-    if(wa.waveBias)reasons.push("Elliott Wave: "+wa.waveBias+" ✅ "+wa.waveType+" move in progress");
+    if(emaScore!==0)reasons.push(isUP?"Price above EMA20 & EMA50 ✅":"Price below EMA20 & EMA50 ✅");
+    if(r<40&&isUP)reasons.push("RSI at "+r.toFixed(0)+" ✅ oversold");
+    if(r>60&&!isUP)reasons.push("RSI at "+r.toFixed(0)+" ✅ overbought");
+    if(ms.score!==0)reasons.push("Market structure: "+ms.trend);
+    if(cp.patterns.length>0)reasons.push("Pattern: "+cp.patterns[0]);
     reasons=reasons.slice(0,3);
     while(reasons.length<3){
-      if(isUP)reasons.push("Price holding above Pivot ("+sr.pivot.toFixed(5)+") ✅ bullish bias maintained");
-      else reasons.push("Price trading below Pivot ("+sr.pivot.toFixed(5)+") ✅ bearish pressure continues");
+      if(isUP)reasons.push("Bullish bias maintained");
+      else reasons.push("Bearish pressure continues");
     }
   } else {
-    reasons.push("Mixed signals across timeframe ❌ no clear directional bias");
-    reasons.push("RSI at "+r.toFixed(0)+" ❌ neutral zone, wait for confirmation");
-    reasons.push("Price near Pivot ("+sr.pivot.toFixed(5)+") ❌ await breakout for entry");
+    reasons.push("Mixed signals - wait for confirmation");
+    reasons.push("RSI at "+r.toFixed(0)+" - neutral");
+    reasons.push("No clear direction");
   }
 
   var duration="";
@@ -645,26 +528,33 @@ function analyze(O,H,L,C,V){
     reasons:reasons,sr:sr,last:last.toFixed(5),duration:duration,
     rsi:r.toFixed(1),macd:m.toFixed(5),stoch:k.toFixed(0),
     e20:e20.toFixed(5),e50:e50.toFixed(5),
-    patterns:cp.patterns,ms:ms,wa:wa,tl:tl,waveBias:wa.waveBias,waveNum:wa.waveNum,waveType:wa.waveType,
+    patterns:cp.patterns,ms:ms,wa:wa,tl:tl,waveBias:wa.waveBias,waveType:wa.waveType,
     emaScore:emaScore,totalScore:totalScore,liquidityOk:liquidityOk,liquidityScore:liquidityScore,mcsDetails:mcsDetails,rz:rz,vp:vp};
 }
 
+// ======= FETCH - مع محاولة بديلة =======
 async function fetchTF(symbol,interval){
   var url="https://api.twelvedata.com/time_series?symbol="+symbol+"&interval="+interval+"&outputsize=100&apikey=fbaf04b411c7458f923c05ef24bcc878";
-  var res=await fetch(url);
-  if(!res.ok)throw new Error("Network error");
-  var text=await res.text();
-  var data=JSON.parse(text);
-  if(data.status==="error"||!data.values)throw new Error(data.message||"No data");
-  var vals=data.values.reverse();
-  vals=vals.slice(0,-1);
-  return{
-    O:vals.map(function(v){return parseFloat(v.open);}),
-    H:vals.map(function(v){return parseFloat(v.high);}),
-    L:vals.map(function(v){return parseFloat(v.low);}),
-    C:vals.map(function(v){return parseFloat(v.close);}),
-    V:vals.map(function(v){return parseFloat(v.volume||0);})
-  };
+  
+  // محاولة 1: باستخدام fetch العادي
+  try {
+    var res=await fetch(url);
+    if(!res.ok)throw new Error("HTTP "+res.status);
+    var data=await res.json();
+    if(data.status==="error"||!data.values)throw new Error(data.message||"No data");
+    var vals=data.values.reverse();
+    vals=vals.slice(0,-1);
+    return{
+      O:vals.map(function(v){return parseFloat(v.open);}),
+      H:vals.map(function(v){return parseFloat(v.high);}),
+      L:vals.map(function(v){return parseFloat(v.low);}),
+      C:vals.map(function(v){return parseFloat(v.close);}),
+      V:vals.map(function(v){return parseFloat(v.volume||0);})
+    };
+  } catch(e) {
+    console.log("Fetch error:", e.message);
+    throw new Error("Network error - Please check your internet connection and try again");
+  }
 }
 
 function quickBias(O,H,L,C){
@@ -747,7 +637,7 @@ async function getSignal(){
       sig.strength=Math.min(98,sig.strength+Math.round(mtfAlignment*2));
     }
     if(mtfAlignment>=4&&sig.direction!=="WAIT"){
-      sig.reasons[2]=mtfAlignment+" out of 5 timeframes confirm "+sig.direction+" ✅ strong multi-timeframe alignment";
+      sig.reasons[2]=mtfAlignment+" out of 5 timeframes confirm "+sig.direction+" ✅";
     }
 
     var verdict="AVOID",verdictDir="",verdictTime="",verdictColor="#ff4d6d";
