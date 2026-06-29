@@ -532,26 +532,28 @@ function analyze(O,H,L,C,V){
     emaScore:emaScore,totalScore:totalScore,liquidityOk:liquidityOk,liquidityScore:liquidityScore,mcsDetails:mcsDetails,rz:rz,vp:vp};
 }
 
-// ======= FETCH - مع محاولة بديلة =======
-async function fetchTF(symbol,interval){
-  var url="https://api.twelvedata.com/time_series?symbol="+symbol+"&interval="+interval+"&outputsize=100&apikey=fbaf04b411c7458f923c05ef24bcc878";
+// ======= FETCH - مع الـ API الجديد =======
+async function fetchTF(symbol, interval) {
+  // ===== المفتاح الجديد =====
+  var API_KEY = "9c77f26dc59c4df99779c269f663e68e";
   
-  // محاولة 1: باستخدام fetch العادي
+  var url = "https://api.twelvedata.com/time_series?symbol=" + symbol + "&interval=" + interval + "&outputsize=100&apikey=" + API_KEY;
+  
   try {
-    var res=await fetch(url);
-    if(!res.ok)throw new Error("HTTP "+res.status);
-    var data=await res.json();
-    if(data.status==="error"||!data.values)throw new Error(data.message||"No data");
-    var vals=data.values.reverse();
-    vals=vals.slice(0,-1);
-    return{
-      O:vals.map(function(v){return parseFloat(v.open);}),
-      H:vals.map(function(v){return parseFloat(v.high);}),
-      L:vals.map(function(v){return parseFloat(v.low);}),
-      C:vals.map(function(v){return parseFloat(v.close);}),
-      V:vals.map(function(v){return parseFloat(v.volume||0);})
+    var res = await fetch(url);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    var data = await res.json();
+    if (data.status === "error" || !data.values) throw new Error(data.message || "No data");
+    var vals = data.values.reverse();
+    vals = vals.slice(0, -1);
+    return {
+      O: vals.map(function(v) { return parseFloat(v.open); }),
+      H: vals.map(function(v) { return parseFloat(v.high); }),
+      L: vals.map(function(v) { return parseFloat(v.low); }),
+      C: vals.map(function(v) { return parseFloat(v.close); }),
+      V: vals.map(function(v) { return parseFloat(v.volume || 0); })
     };
-  } catch(e) {
+  } catch (e) {
     console.log("Fetch error:", e.message);
     throw new Error("Network error - Please check your internet connection and try again");
   }
