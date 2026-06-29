@@ -668,7 +668,7 @@
 
         .criteria-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
             gap: 4px;
             margin-bottom: 10px;
         }
@@ -687,9 +687,6 @@
         .criteria-item.fail {
             border-color: #ff4d6d44;
             background: rgba(255, 77, 109, 0.05);
-        }
-        .criteria-item .icon {
-            font-size: 14px;
         }
         .criteria-item .label {
             color: #666;
@@ -746,7 +743,7 @@
             <div>
                 <span class="logo-signal">SpriNg</span>
                 <span class="logo-pro">PRO</span>
-                <span class="logo-badge">⚡ 15 Criteria</span>
+                <span class="logo-badge">15 CRITERIA</span>
             </div>
         </div>
 
@@ -757,7 +754,7 @@
                     <span style="color:#444;font-size:10px;">▼ <span class="pair-count" id="pairCount"></span></span>
                 </button>
                 <div class="pair-dropdown" id="dd" style="pointer-events:auto !important;z-index:99999 !important;">
-                    <input class="pair-search" id="pairSearch" type="text" placeholder="🔍 Search pair..." oninput="filterPairs()">
+                    <input class="pair-search" id="pairSearch" type="text" placeholder="Search pair..." oninput="filterPairs()">
                     <div class="pair-grid" id="pairGrid"></div>
                 </div>
             </div>
@@ -765,10 +762,10 @@
         <input type="hidden" id="tfSelect" value="5min"/>
 
         <div class="card" id="card">
-            <div class="idle">🔬 15-Criteria Analysis<br><span style="font-size:11px;color:#333;">دقة 95% مضمونة</span></div>
+            <div class="idle">15-Criteria Analysis<br><span style="font-size:11px;color:#333;">95% Accuracy</span></div>
         </div>
 
-        <button class="get-btn" id="getBtn" onclick="getSignal()" style="pointer-events:auto !important;cursor:pointer !important;">⚡ Get Signal</button>
+        <button class="get-btn" id="getBtn" onclick="getSignal()" style="pointer-events:auto !important;cursor:pointer !important;">Get Signal</button>
 
         <div class="nav">
             <div class="nav-item" onclick="alert('Profile page')" style="cursor:pointer !important;pointer-events:auto !important;">
@@ -795,7 +792,7 @@
     </div>
 
     <script>
-        // ======= قائمة الأزواج =======
+        // ======= PAIRS LIST =======
         const PAIRS = [
             { label: "EUR/USD", symbol: "EUR/USD" }, { label: "GBP/USD", symbol: "GBP/USD" },
             { label: "USD/JPY", symbol: "USD/JPY" }, { label: "AUD/USD", symbol: "AUD/USD" },
@@ -817,7 +814,7 @@
         let lastTradeId = null;
         let tradeHistory = JSON.parse(localStorage.getItem("th") || "[]");
 
-        // ======= بناء القائمة =======
+        // ======= DROPDOWN =======
         const dd = document.getElementById("dd");
         const pairGrid = document.getElementById("pairGrid");
 
@@ -853,7 +850,6 @@
 
         renderPairs();
 
-        // ======= دالة الإصلاح =======
         function fixAllSilent() {
             document.querySelectorAll('*').forEach(el => {
                 const style = window.getComputedStyle(el);
@@ -889,7 +885,6 @@
             setTimeout(fixAllSilent, 300);
         });
 
-        // ======= دوال القائمة =======
         function toggleDd(e) {
             e.stopPropagation();
             const d = document.getElementById("dd");
@@ -935,17 +930,17 @@
 
         function resetCard() {
             setCard(
-                '<div class="idle">🔬 15-Criteria Analysis<br><span style="font-size:11px;color:#333;">دقة 95% مضمونة</span></div>'
+                '<div class="idle">15-Criteria Analysis<br><span style="font-size:11px;color:#333;">95% Accuracy</span></div>'
                 );
             const btn = document.getElementById("getBtn");
             btn.style.display = "flex";
             btn.className = "get-btn";
-            btn.innerHTML = "⚡ Get Signal";
+            btn.innerHTML = "Get Signal";
             isLoading = false;
             setTimeout(fixAllSilent, 100);
         }
 
-        // ======= INDICATORS (12 معيار) =======
+        // ======= INDICATORS =======
         function ema(data, p) {
             var k = 2 / (p + 1),
                 e = data[0];
@@ -1072,10 +1067,10 @@
             var n = C.length;
             var m5 = C[n - 1] - C[n - 6];
             var m10 = C[n - 1] - C[n - 11];
-            if (m5 > 0 && m10 > 0) return { label: "Strong Bullish Momentum", score: 2 };
-            if (m5 < 0 && m10 < 0) return { label: "Strong Bearish Momentum", score: -2 };
-            if (m5 > 0) return { label: "Weak Bullish Momentum", score: 1 };
-            return { label: "Weak Bearish Momentum", score: -1 };
+            if (m5 > 0 && m10 > 0) return { label: "Strong Bullish", score: 2 };
+            if (m5 < 0 && m10 < 0) return { label: "Strong Bearish", score: -2 };
+            if (m5 > 0) return { label: "Weak Bullish", score: 1 };
+            return { label: "Weak Bearish", score: -1 };
         }
 
         function rejectionZones(H, L, C) {
@@ -1111,7 +1106,7 @@
                 atZone = false;
             if (nearZone) { atZone = true;
                 score = 2;
-                label = "Support zone (" + nearZone.touches + "x rejections) at " + nearZone.price.toFixed(5); }
+                label = "Support zone (" + nearZone.touches + "x) at " + nearZone.price.toFixed(5); }
             return { nearType: nearType, atZone: atZone, score: score, label: label };
         }
 
@@ -1131,17 +1126,14 @@
             var poc = profile.reduce(function(a, b) { return b.volume > a.volume ? b : a; });
             var avg = profile.reduce(function(a, b) { return a + b.volume; }, 0) / buckets;
             var hvn = profile.filter(function(b) { return b.volume > avg * 1.5; });
-            var lvn = profile.filter(function(b) { return b.volume < avg * 0.4 && b.volume > 0; });
             var last = C[n - 1];
             var atHVN = hvn.some(function(z) { return Math.abs(last - z.priceMid) / last < 0.0008; });
-            var atLVN = lvn.some(function(z) { return Math.abs(last - z.priceMid) / last < 0.0008; });
             var nearPOC = Math.abs(last - poc.priceMid) / last < 0.0005;
-            var label = atLVN ? "LVN - Explosion!" : atHVN ? "HVN - Institutional" :
-                nearPOC ? "Near POC " + poc.priceMid.toFixed(5) : "POC: " + poc.priceMid.toFixed(5);
-            return { atHVN: atHVN, atLVN: atLVN, nearPOC: nearPOC, label: label };
+            var label = atHVN ? "HVN - Institutional" : nearPOC ? "Near POC" : "Clear";
+            return { atHVN: atHVN, nearPOC: nearPOC, label: label };
         }
 
-        // ======= التحليل الكامل بكل المعايير =======
+        // ======= FULL ANALYSIS =======
         function fullAnalysis(data) {
             var O = data.O,
                 H = data.H,
@@ -1164,7 +1156,6 @@
             var vp = volumeProfile(H, L, C, V);
             var atrValue = atr(H, L, C, 14);
 
-            // ======= المعايير الـ 12 الأساسية =======
             var totalScore = 0;
             var emaScore = (last > e20 && e20 > e50) ? 2 : (last < e20 && e20 < e50) ? -2 : 0;
             totalScore += emaScore;
@@ -1180,11 +1171,6 @@
             totalScore += cp.score;
             totalScore += mo.score;
             totalScore += rz.score;
-
-            // ======= المعايير الإضافية (MTF, Safety Valve, Volume) =======
-            // 1. MTF Alignment - هتتحسب برا
-            // 2. Safety Valve - هتتحسب برا
-            // 3. Volume Profile - موجود في vp
 
             var conflicts = 0;
             if (rz.atZone && totalScore < 0) conflicts++;
@@ -1204,22 +1190,19 @@
             var reasons = [];
             if (direction !== "WAIT") {
                 var isUP = direction === "UP";
-                if (emaScore !== 0) reasons.push(isUP ? "✅ EMA20 & EMA50 فوق السعر" : "✅ EMA20 & EMA50 تحت السعر");
-                if (r < 40 && isUP) reasons.push("✅ RSI " + r.toFixed(0) + " - منطقة تشبع بيعي");
-                if (r > 60 && !isUP) reasons.push("✅ RSI " + r.toFixed(0) + " - منطقة تشبع شرائي");
-                if (ms.score !== 0) reasons.push("✅ هيكل السوق: " + ms.trend);
-                if (cp.patterns.length > 0) reasons.push("✅ نمط شمعة: " + cp.patterns[0]);
-                if (mo.score !== 0) reasons.push("✅ " + mo.label);
-                if (wa.waveScore !== 0) reasons.push("✅ " + wa.waveBias);
-                if (br.score !== 0) reasons.push("✅ " + br.signals[0] || "اختراق مستوى");
+                if (emaScore !== 0) reasons.push(isUP ? "Price above EMA20 & EMA50" : "Price below EMA20 & EMA50");
+                if (r < 40 && isUP) reasons.push("RSI " + r.toFixed(0) + " - Oversold");
+                if (r > 60 && !isUP) reasons.push("RSI " + r.toFixed(0) + " - Overbought");
+                if (ms.score !== 0) reasons.push("Structure: " + ms.trend);
+                if (cp.patterns.length > 0) reasons.push("Pattern: " + cp.patterns[0]);
                 reasons = reasons.slice(0, 4);
                 while (reasons.length < 3) {
-                    reasons.push(isUP ? "✅ الاتجاه الصاعد مستمر" : "✅ الاتجاه الهابط مستمر");
+                    reasons.push(isUP ? "Bullish bias" : "Bearish bias");
                 }
             } else {
-                reasons.push("❌ إشارات متضاربة - انتظر");
-                reasons.push("❌ RSI " + r.toFixed(0) + " - منطقة محايدة");
-                reasons.push("❌ لا يوجد اتجاه واضح");
+                reasons.push("Mixed signals - Wait");
+                reasons.push("RSI " + r.toFixed(0) + " - Neutral");
+                reasons.push("No clear direction");
             }
 
             return {
@@ -1242,11 +1225,9 @@
                 totalScore: totalScore,
                 liquidityOk: true,
                 liquidityScore: 75,
-                mcsDetails: "Ready",
                 rz: rz,
                 vp: vp,
                 atr: atrValue,
-                // المعايير الإضافية
                 emaScore: emaScore,
                 rsiScore: rsiScore,
                 m: m,
@@ -1286,7 +1267,7 @@
             return results;
         }
 
-        // ======= نظام التصويت مع المعايير الـ 15 =======
+        // ======= VOTING SYSTEM =======
         function voteOnSignals(results, mtfData) {
             let valid = results.filter(r => r !== null);
             if (valid.length < 2) {
@@ -1294,8 +1275,8 @@
                     direction: "WAIT",
                     accuracy: 0,
                     strength: 0,
-                    verdict: "❌ بيانات غير كافية",
-                    reasons: ["لم نتمكن من الحصول على 3 تحاليل"],
+                    verdict: "Insufficient data",
+                    reasons: ["Could not get 3 analyses"],
                     upVotes: 0,
                     downVotes: 0,
                     waitVotes: 0,
@@ -1312,7 +1293,7 @@
             let downVotes = valid.filter(r => r.direction === "DOWN").length;
             let waitVotes = valid.filter(r => r.direction === "WAIT").length;
 
-            // ======= المعيار 1: MTF 3+ =======
+            // MTF Score
             let mtfScore = 0;
             if (mtfData) {
                 let upCount = mtfData.filter(d => d.bias === "UP").length;
@@ -1320,30 +1301,28 @@
                 mtfScore = Math.max(upCount, downCount);
             }
 
-            // ======= المعيار 2: Safety Valve =======
+            // Safety Valve
             let firstValid = valid[0] || {};
             let safetyValve = false;
             if (firstValid) {
                 let c = firstValid;
-                // 4 شروط لـ Safety Valve
-                let cond1 = Math.abs(c.totalScore || 0) >= 3; // قوة الإشارة
-                let cond2 = (c.rsi < 40 || c.rsi > 60); // RSI في منطقة متطرفة
-                let cond3 = Math.abs(c.m || 0) > 0.0001; // MACD له اتجاه
-                let cond4 = Math.abs(c.k - 50) > 15; // Stochastic بعيد عن المنتصف
+                let cond1 = Math.abs(c.totalScore || 0) >= 3;
+                let cond2 = (c.rsi < 40 || c.rsi > 60);
+                let cond3 = Math.abs(c.m || 0) > 0.0001;
+                let cond4 = Math.abs(c.k - 50) > 15;
                 safetyValve = cond1 && cond2 && cond3 && cond4;
             }
 
-            // ======= المعيار 3: Volume Clear (مش في HVN أو POC) =======
+            // Volume Clear
             let volumeClear = false;
             if (firstValid && firstValid.vp) {
                 volumeClear = !firstValid.vp.atHVN && !firstValid.vp.nearPOC;
             }
 
-            // ======= حساب عدد المعايير المتحققة =======
+            // Criteria count
             let criteriaPassed = 0;
             let criteriaTotal = 15;
 
-            // المعايير الـ 12 الأساسية
             if (firstValid) {
                 if (firstValid.emaScore !== 0) criteriaPassed++;
                 if (firstValid.rsiScore !== 0) criteriaPassed++;
@@ -1358,66 +1337,55 @@
                 if (firstValid.totalScore >= 3 || firstValid.totalScore <= -3) criteriaPassed++;
                 if (firstValid.accuracy >= 70) criteriaPassed++;
             }
-
-            // المعايير الإضافية
             if (mtfScore >= 3) criteriaPassed++;
             if (safetyValve) criteriaPassed++;
             if (volumeClear) criteriaPassed++;
 
-            // ======= القرار النهائي =======
+            // Final decision
             let finalDirection = "WAIT";
             let finalAccuracy = 0;
             let finalStrength = 0;
             let verdict = "";
             let reasons = [];
 
-            // 3/3 متطابقين + المعايير الإضافية
             if ((upVotes === 3 || downVotes === 3) && mtfScore >= 3 && safetyValve && volumeClear) {
                 finalDirection = upVotes === 3 ? "UP" : "DOWN";
                 finalAccuracy = 95;
                 finalStrength = 95;
-                verdict = "🔥 إشارة ذهبية - 15/15 معيار!";
-                reasons.push(`✔️ 3 تحاليل متطابقة (${finalDirection})`);
-                reasons.push(`✔️ MTF: ${mtfScore}/5 متفقين`);
-                reasons.push(`✔️ Safety Valve: مفعل ✅`);
-                reasons.push(`✔️ Volume: خارج HVN و POC ✅`);
-            }
-            // 3/3 متطابقين + 2 من 3 معايير إضافية
-            else if ((upVotes === 3 || downVotes === 3) && mtfScore >= 2 && safetyValve) {
+                verdict = "GOLD SIGNAL - 15/15";
+                reasons.push("3 analyses match: " + finalDirection);
+                reasons.push("MTF: " + mtfScore + "/5 aligned");
+                reasons.push("Safety Valve: ACTIVE");
+                reasons.push("Volume: CLEAR");
+            } else if ((upVotes === 3 || downVotes === 3) && mtfScore >= 2 && safetyValve) {
                 finalDirection = upVotes === 3 ? "UP" : "DOWN";
                 finalAccuracy = 88;
                 finalStrength = 88;
-                verdict = "⭐ إشارة قوية جداً - 14/15";
-                reasons.push(`✔️ 3 تحاليل متطابقة (${finalDirection})`);
-                reasons.push(`✔️ MTF: ${mtfScore}/5 متفقين`);
-                reasons.push(`✔️ Safety Valve: مفعل ✅`);
-                if (!volumeClear) reasons.push(`⚠️ السعر في منطقة HVN أو POC`);
-            }
-            // 2/3 متطابقين + المعايير الإضافية
-            else if ((upVotes === 2 || downVotes === 2) && mtfScore >= 3 && safetyValve) {
+                verdict = "STRONG SIGNAL - 14/15";
+                reasons.push("3 analyses match: " + finalDirection);
+                reasons.push("MTF: " + mtfScore + "/5 aligned");
+                reasons.push("Safety Valve: ACTIVE");
+            } else if ((upVotes === 2 || downVotes === 2) && mtfScore >= 3 && safetyValve) {
                 finalDirection = upVotes === 2 ? "UP" : "DOWN";
                 finalAccuracy = 80;
                 finalStrength = 80;
-                verdict = "⭐ إشارة جيدة - ادخل بحذر";
-                reasons.push(`✔️ 2 من 3 تحاليل متطابقة (${finalDirection})`);
-                reasons.push(`✔️ MTF: ${mtfScore}/5 متفقين`);
-                reasons.push(`⚠️ تحليل واحد مختلف - راقب السوق`);
-            }
-            // مختلفين تماماً
-            else {
+                verdict = "GOOD SIGNAL - Trade with caution";
+                reasons.push("2/3 analyses match: " + finalDirection);
+                reasons.push("MTF: " + mtfScore + "/5 aligned");
+                reasons.push("One analysis differed");
+            } else {
                 finalDirection = "WAIT";
                 finalAccuracy = 0;
                 finalStrength = 0;
-                verdict = "⏳ انتظر - المعايير غير مكتملة";
-                reasons.push(`❌ التحاليل: UP:${upVotes} DOWN:${downVotes} WAIT:${waitVotes}`);
-                reasons.push(`❌ MTF: ${mtfScore}/5 فقط متفقين`);
-                if (!safetyValve) reasons.push(`❌ Safety Valve: غير مفعل`);
-                if (!volumeClear) reasons.push(`❌ السعر في منطقة HVN أو POC`);
-                reasons.push(`💡 انتظر 10 دقائق وحاول مرة أخرى`);
+                verdict = "WAIT - Criteria not met";
+                reasons.push("Analyses: UP:" + upVotes + " DOWN:" + downVotes + " WAIT:" + waitVotes);
+                reasons.push("MTF: " + mtfScore + "/5 only");
+                if (!safetyValve) reasons.push("Safety Valve: INACTIVE");
+                if (!volumeClear) reasons.push("Volume: HVN or POC");
+                reasons.push("Wait 10 minutes and retry");
             }
 
-            // إضافة عدد المعايير
-            reasons.push(`📊 ${criteriaPassed}/${criteriaTotal} معيار متحقق`);
+            reasons.push(criteriaPassed + "/" + criteriaTotal + " criteria met");
 
             return {
                 direction: finalDirection,
@@ -1438,7 +1406,7 @@
             };
         }
 
-        // ======= جلب البيانات =======
+        // ======= FETCH DATA =======
         async function fetchTF(symbol, interval) {
             var url = "https://api.twelvedata.com/time_series?symbol=" + symbol + "&interval=" + interval +
                 "&outputsize=100&apikey=fbaf04b411c7458f923c05ef24bcc878";
@@ -1477,22 +1445,22 @@
             return "NEUTRAL";
         }
 
-        // ======= دالة GET SIGNAL الرئيسية =======
+        // ======= GET SIGNAL MAIN =======
         async function getSignal() {
             if (isLoading) return;
             isLoading = true;
 
             let btn = document.getElementById("getBtn");
             btn.className = "get-btn loading";
-            btn.innerHTML = "⏳ Triple Check 1/3...";
+            btn.innerHTML = "Triple Check 1/3...";
             dd.style.display = "none";
 
             setCard(`
                 <div style="text-align:center;width:100%;padding:20px 0">
                     <div class="spinner"></div>
-                    <div class="analyzing">🔄 جاري التحليل المتكرر 3 مرات</div>
-                    <div style="color:#7c83ff;font-size:13px;margin-top:8px;">📊 15 معيار للدقة 95%</div>
-                    <div style="color:#333;font-size:11px;margin-top:4px;" id="progressStatus">⏳ التحليل 1/3 جارٍ...</div>
+                    <div class="analyzing">Triple Check Analysis</div>
+                    <div style="color:#7c83ff;font-size:13px;margin-top:8px;">15 Criteria for 95% Accuracy</div>
+                    <div style="color:#333;font-size:11px;margin-top:4px;" id="progressStatus">Analysis 1/3 in progress...</div>
                 </div>
             `);
 
@@ -1500,48 +1468,47 @@
                 let results = [];
                 let tf = document.getElementById("tfSelect").value;
 
-                // تحليل 1
-                btn.innerHTML = "⏳ Triple Check 1/3...";
-                document.getElementById("progressStatus").textContent = "⏳ التحليل 1/3 جارٍ...";
+                // Analysis 1
+                btn.innerHTML = "Triple Check 1/3...";
+                document.getElementById("progressStatus").textContent = "Analysis 1/3 in progress...";
                 try {
                     let data1 = await fetchTF(currentPair.symbol, tf);
                     let sig1 = fullAnalysis(data1);
                     results.push(sig1);
-                    document.getElementById("progressStatus").textContent = "✅ التحليل 1/3 تم!";
+                    document.getElementById("progressStatus").textContent = "Analysis 1/3 complete!";
                 } catch (e) { results.push(null);
-                    document.getElementById("progressStatus").textContent = "❌ التحليل 1/3 فشل"; }
+                    document.getElementById("progressStatus").textContent = "Analysis 1/3 failed"; }
 
                 await new Promise(r => setTimeout(r, 5000));
 
-                // تحليل 2
-                btn.innerHTML = "⏳ Triple Check 2/3...";
-                document.getElementById("progressStatus").textContent = "⏳ التحليل 2/3 جارٍ...";
+                // Analysis 2
+                btn.innerHTML = "Triple Check 2/3...";
+                document.getElementById("progressStatus").textContent = "Analysis 2/3 in progress...";
                 try {
                     let data2 = await fetchTF(currentPair.symbol, tf);
                     let sig2 = fullAnalysis(data2);
                     results.push(sig2);
-                    document.getElementById("progressStatus").textContent = "✅ التحليل 2/3 تم!";
+                    document.getElementById("progressStatus").textContent = "Analysis 2/3 complete!";
                 } catch (e) { results.push(null);
-                    document.getElementById("progressStatus").textContent = "❌ التحليل 2/3 فشل"; }
+                    document.getElementById("progressStatus").textContent = "Analysis 2/3 failed"; }
 
                 await new Promise(r => setTimeout(r, 5000));
 
-                // تحليل 3
-                btn.innerHTML = "⏳ Triple Check 3/3...";
-                document.getElementById("progressStatus").textContent = "⏳ التحليل 3/3 جارٍ...";
+                // Analysis 3
+                btn.innerHTML = "Triple Check 3/3...";
+                document.getElementById("progressStatus").textContent = "Analysis 3/3 in progress...";
                 try {
                     let data3 = await fetchTF(currentPair.symbol, tf);
                     let sig3 = fullAnalysis(data3);
                     results.push(sig3);
-                    document.getElementById("progressStatus").textContent = "✅ التحليل 3/3 تم!";
+                    document.getElementById("progressStatus").textContent = "Analysis 3/3 complete!";
                 } catch (e) { results.push(null);
-                    document.getElementById("progressStatus").textContent = "❌ التحليل 3/3 فشل"; }
+                    document.getElementById("progressStatus").textContent = "Analysis 3/3 failed"; }
 
-                // ======= حساب MTF =======
+                // MTF Calculation
                 let mtfData = [];
                 let TFS = ["5min", "15min", "30min", "1h", "4h"];
                 let TF_LABELS = { "5min": "5M", "15min": "15M", "30min": "30M", "1h": "1H", "4h": "4H" };
-                let tf = document.getElementById("tfSelect").value;
 
                 for (let ti = 0; ti < TFS.length; ti++) {
                     try {
@@ -1553,14 +1520,14 @@
                     }
                 }
 
-                // التصويت
-                btn.innerHTML = "📊 جاري التصويت...";
-                document.getElementById("progressStatus").textContent = "📊 جاري التصويت على 15 معيار...";
+                // Voting
+                btn.innerHTML = "Voting...";
+                document.getElementById("progressStatus").textContent = "Voting on 15 criteria...";
 
                 let voted = voteOnSignals(results, mtfData);
 
-                // بناء النتيجة
-                btn.innerHTML = "📈 عرض النتيجة...";
+                // Build result
+                btn.innerHTML = "Displaying result...";
                 let resultHTML = buildResultCard(voted, mtfData);
                 setCard(resultHTML);
 
@@ -1571,15 +1538,15 @@
                 setTimeout(fixAllSilent, 200);
 
             } catch (e) {
-                setCard(`<div class="err-box">❌ ${e.message}</div>`);
+                setCard('<div class="err-box">Error: ' + e.message + '</div>');
                 btn.className = "get-btn";
-                btn.innerHTML = "⚡ Get Signal";
+                btn.innerHTML = "Get Signal";
             }
 
             isLoading = false;
         }
 
-        // ======= بناء بطاقة النتيجة =======
+        // ======= BUILD RESULT CARD =======
         function buildResultCard(voted, mtfData) {
             let isUP = voted.direction === "UP";
             let isDOWN = voted.direction === "DOWN";
@@ -1587,53 +1554,49 @@
             let darr = isUP ? "▲" : isDOWN ? "▼" : "—";
             let dirColor = isUP ? "#00e096" : isDOWN ? "#ff4d6d" : "#f0c040";
 
-            // التحاليل الثلاثة
+            // Three checks
             let checksHTML = '';
             if (voted.results) {
                 checksHTML = voted.results.map((r, i) => {
-                    let status = r ? (r.direction === voted.direction ? "✅" : "❌") : "⏳";
-                    let color = r ? (r.direction === voted.direction ? "#00e096" : "#ff4d6d") : "#444";
-                    let cls = r ? (r.direction === voted.direction ? "active" : "inactive") : "pending";
+                    let isMatch = r && r.direction === voted.direction;
+                    let status = isMatch ? "✓" : "✗";
+                    let color = isMatch ? "#00e096" : "#ff4d6d";
+                    let cls = isMatch ? "active" : "inactive";
                     let dirText = r ? r.direction : "---";
                     return `
                         <div class="check-box ${cls}" style="border-color:${color}44;">
-                            <div style="font-size:20px;">${status}</div>
-                            <div style="font-size:9px;color:#888;">تحليل ${i+1}</div>
+                            <div style="font-size:20px;color:${color};font-weight:900;">${status}</div>
+                            <div style="font-size:9px;color:#888;">Analysis ${i+1}</div>
                             <div style="font-size:11px;font-weight:700;color:${color};">${dirText}</div>
                         </div>
                     `;
                 }).join("");
             }
 
-            // ======= المعايير الـ 15 =======
+            // 15 Criteria
             let criteriaItems = [
-                { icon: "📊", label: "EMA", pass: voted.firstValid && voted.firstValid.emaScore !== 0 },
-                { icon: "📈", label: "RSI", pass: voted.firstValid && voted.firstValid.rsiScore !== 0 },
-                { icon: "📉", label: "MACD", pass: voted.firstValid && (voted.firstValid.m > 0 || voted.firstValid.m < 0) },
-                { icon: "🔄", label: "Stoch", pass: voted.firstValid && (voted.firstValid.k < 30 || voted.firstValid.k > 70) },
-                { icon: "🏗️", label: "Structure", pass: voted.firstValid && voted.firstValid.ms && voted.firstValid.ms.score !==
-                        0 },
-                { icon: "🌊", label: "Wave", pass: voted.firstValid && voted.firstValid.wa && voted.firstValid.wa.waveScore !==
-                        0 },
-                { icon: "🚀", label: "Breakout", pass: voted.firstValid && voted.firstValid.br && voted.firstValid.br.score !==
-                        0 },
-                { icon: "🕯️", label: "Patterns", pass: voted.firstValid && voted.firstValid.cp && voted.firstValid.cp.patterns
-                        .length > 0 },
-                { icon: "💨", label: "Momentum", pass: voted.firstValid && voted.firstValid.mo && voted.firstValid.mo.score !==
-                        0 },
-                { icon: "🛡️", label: "Rejection", pass: voted.firstValid && voted.firstValid.rz && voted.firstValid.rz.atZone },
-                { icon: "⚡", label: "Total Score", pass: voted.firstValid && (voted.firstValid.totalScore >= 3 || voted
-                        .firstValid.totalScore <= -3) },
-                { icon: "🎯", label: "Accuracy", pass: voted.firstValid && voted.firstValid.accuracy >= 70 },
-                { icon: "⏱️", label: "MTF 3+", pass: voted.mtfScore >= 3 },
-                { icon: "🔒", label: "Safety Valve", pass: voted.safetyValve },
-                { icon: "📦", label: "Volume Clear", pass: voted.volumeClear }
+                { label: "EMA", pass: voted.firstValid && voted.firstValid.emaScore !== 0 },
+                { label: "RSI", pass: voted.firstValid && voted.firstValid.rsiScore !== 0 },
+                { label: "MACD", pass: voted.firstValid && (voted.firstValid.m > 0 || voted.firstValid.m < 0) },
+                { label: "Stoch", pass: voted.firstValid && (voted.firstValid.k < 30 || voted.firstValid.k > 70) },
+                { label: "Struct", pass: voted.firstValid && voted.firstValid.ms && voted.firstValid.ms.score !== 0 },
+                { label: "Wave", pass: voted.firstValid && voted.firstValid.wa && voted.firstValid.wa.waveScore !== 0 },
+                { label: "Break", pass: voted.firstValid && voted.firstValid.br && voted.firstValid.br.score !== 0 },
+                { label: "Pattern", pass: voted.firstValid && voted.firstValid.cp && voted.firstValid.cp.patterns.length > 0 },
+                { label: "Moment", pass: voted.firstValid && voted.firstValid.mo && voted.firstValid.mo.score !== 0 },
+                { label: "Reject", pass: voted.firstValid && voted.firstValid.rz && voted.firstValid.rz.atZone },
+                { label: "Score", pass: voted.firstValid && (voted.firstValid.totalScore >= 3 || voted.firstValid.totalScore <= -3) },
+                { label: "Accur", pass: voted.firstValid && voted.firstValid.accuracy >= 70 },
+                { label: "MTF 3+", pass: voted.mtfScore >= 3 },
+                { label: "Safety", pass: voted.safetyValve },
+                { label: "Volume", pass: voted.volumeClear }
             ];
 
             let criteriaHTML = criteriaItems.map(c => `
                 <div class="criteria-item ${c.pass ? 'pass' : 'fail'}">
-                    <div class="icon">${c.icon}</div>
-                    <div style="font-size:7px;color:${c.pass ? '#00e096' : '#ff4d6d'};font-weight:700;">${c.pass ? '✅' : '❌'}</div>
+                    <div style="font-size:8px;font-weight:700;color:${c.pass ? '#00e096' : '#ff4d6d'};">
+                        ${c.pass ? '✓' : '✗'}
+                    </div>
                     <div class="label">${c.label}</div>
                 </div>
             `).join('');
@@ -1655,42 +1618,41 @@
                 }).join('');
             }
 
-            // الدقة
             let accuracyColor = voted.accuracy >= 90 ? "#00e096" : voted.accuracy >= 70 ? "#f0c040" : "#ff4d6d";
 
             return `
                 <div class="card-inner">
-                    <div class="sec-lbl">🔬 15-Criteria Analysis</div>
+                    <div class="sec-lbl">15 Criteria Analysis</div>
 
-                    <!-- التحاليل الثلاثة -->
+                    <!-- Three checks -->
                     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
                         ${checksHTML}
                     </div>
 
-                    <!-- نتيجة التصويت -->
+                    <!-- Result -->
                     <div style="background:${dirColor}11;border:2px solid ${dirColor};border-radius:12px;padding:12px;margin-bottom:10px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <div>
-                                <div style="font-size:9px;color:#888;">القرار النهائي</div>
+                                <div style="font-size:9px;color:#888;">Decision</div>
                                 <div style="font-size:22px;font-weight:900;color:${dirColor};">${voted.direction} ${darr}</div>
                             </div>
                             <div style="text-align:center;">
-                                <div style="font-size:8px;color:#888;">الدقة</div>
+                                <div style="font-size:8px;color:#888;">Accuracy</div>
                                 <div style="font-size:22px;font-weight:900;color:${accuracyColor};">${voted.accuracy > 0 ? voted.accuracy + '%' : '---'}</div>
                             </div>
                             <div style="text-align:center;">
-                                <div style="font-size:8px;color:#888;">المعايير</div>
+                                <div style="font-size:8px;color:#888;">Criteria</div>
                                 <div style="font-size:18px;font-weight:900;color:#7c83ff;">${voted.criteriaPassed || 0}/${voted.criteriaTotal || 15}</div>
                             </div>
                         </div>
-                        <div style="font-size:12px;color:${dirColor};font-weight:700;margin-top:4px;text-align:center;">
+                        <div style="font-size:11px;color:${dirColor};font-weight:700;margin-top:4px;text-align:center;">
                             ${voted.verdict}
                         </div>
                     </div>
 
-                    <!-- المعايير الـ 15 -->
+                    <!-- 15 Criteria -->
                     <div style="margin-bottom:10px;">
-                        <div class="ilbl" style="margin-bottom:4px;">📋 المعايير الـ 15</div>
+                        <div class="ilbl" style="margin-bottom:4px;">15 Criteria (✓ = PASS)</div>
                         <div class="criteria-grid">
                             ${criteriaHTML}
                         </div>
@@ -1698,31 +1660,29 @@
 
                     <!-- MTF -->
                     <div class="mtf-box" style="margin-bottom:8px;">
-                        <div class="ilbl" style="margin-bottom:4px;">⏱️ Multi-Timeframe (${voted.mtfScore || 0}/5 متفقين)</div>
+                        <div class="ilbl" style="margin-bottom:4px;">MTF (${voted.mtfScore || 0}/5 aligned)</div>
                         ${mtfHTML}
                     </div>
 
                     <!-- Safety Valve & Volume -->
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
                         <div style="background:#0d0f1a;border-radius:8px;padding:8px;text-align:center;border:1px solid ${voted.safetyValve ? '#00e09644' : '#ff4d6d44'};">
-                            <div style="font-size:16px;">${voted.safetyValve ? '🔒' : '🔓'}</div>
-                            <div style="font-size:9px;color:${voted.safetyValve ? '#00e096' : '#ff4d6d'};font-weight:700;">
-                                ${voted.safetyValve ? 'SAFE ✅' : 'BLOCKED ❌'}
+                            <div style="font-size:11px;font-weight:700;color:${voted.safetyValve ? '#00e096' : '#ff4d6d'};">
+                                ${voted.safetyValve ? 'SAFE ✓' : 'OPEN ✗'}
                             </div>
                             <div style="font-size:7px;color:#444;">Safety Valve</div>
                         </div>
                         <div style="background:#0d0f1a;border-radius:8px;padding:8px;text-align:center;border:1px solid ${voted.volumeClear ? '#00e09644' : '#ff4d6d44'};">
-                            <div style="font-size:16px;">${voted.volumeClear ? '📦' : '⚠️'}</div>
-                            <div style="font-size:9px;color:${voted.volumeClear ? '#00e096' : '#ff4d6d'};font-weight:700;">
-                                ${voted.volumeClear ? 'CLEAR ✅' : 'HVN/POC ❌'}
+                            <div style="font-size:11px;font-weight:700;color:${voted.volumeClear ? '#00e096' : '#ff4d6d'};">
+                                ${voted.volumeClear ? 'CLEAR ✓' : 'BLOCK ✗'}
                             </div>
                             <div style="font-size:7px;color:#444;">Volume Profile</div>
                         </div>
                     </div>
 
-                    <!-- الأسباب -->
+                    <!-- Reasons -->
                     <div class="reasons-box" style="margin-bottom:10px;">
-                        <div class="ilbl" style="margin-bottom:4px;">📋 التقرير</div>
+                        <div class="ilbl" style="margin-bottom:4px;">Report</div>
                         ${voted.reasons.map((r, i) => `
                             <div class="reason-item">
                                 <div class="reason-num ${voted.direction.toLowerCase()}">${i+1}</div>
@@ -1731,40 +1691,42 @@
                         `).join('')}
                     </div>
 
-                    <!-- أزرار التداول -->
+                    <!-- Trade buttons -->
                     ${!isWAIT ? `
                         <div style="margin:0 0 12px;border-radius:12px;border:2px solid ${dirColor};">
                             <div style="background:${dirColor}18;padding:12px;display:flex;align-items:center;justify-content:space-between;border-radius:10px;">
                                 <div style="display:flex;align-items:center;gap:8px;">
-                                    <div style="width:36px;height:36px;border-radius:50%;background:${dirColor};display:flex;align-items:center;justify-content:center;font-size:16px;">✅</div>
+                                    <div style="width:36px;height:36px;border-radius:50%;background:${voted.accuracy >= 90 ? '#ff8c00' : voted.accuracy >= 80 ? '#f0c040' : '#7c83ff'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#000;">
+                                        ${voted.accuracy >= 90 ? 'GOLD' : voted.accuracy >= 80 ? 'GOOD' : 'OK'}
+                                    </div>
                                     <div>
                                         <div style="font-size:18px;font-weight:900;color:${dirColor};">GO</div>
-                                        <div style="font-size:8px;color:#888;">دقة ${voted.accuracy}%</div>
+                                        <div style="font-size:8px;color:#888;">${voted.accuracy}% accuracy</div>
                                     </div>
                                 </div>
                                 <div style="text-align:right;">
                                     <div style="font-size:16px;font-weight:800;color:${dirColor};">${voted.direction}</div>
-                                    <div style="font-size:8px;color:#888;">${voted.criteriaPassed || 0}/${voted.criteriaTotal || 15} معيار</div>
+                                    <div style="font-size:8px;color:#888;">${voted.criteriaPassed || 0}/15</div>
                                 </div>
                             </div>
                         </div>
                         <div class="actions">
-                            <button class="btn-take ${voted.direction.toLowerCase()}" onclick="takeTrade()" style="pointer-events:auto !important;cursor:pointer !important;">✅ Take</button>
-                            <button class="btn-skip" onclick="skipTrade()" style="pointer-events:auto !important;cursor:pointer !important;">❌ Skip</button>
+                            <button class="btn-take ${voted.direction.toLowerCase()}" onclick="takeTrade()" style="pointer-events:auto !important;cursor:pointer !important;">Take</button>
+                            <button class="btn-skip" onclick="skipTrade()" style="pointer-events:auto !important;cursor:pointer !important;">Skip</button>
                         </div>
                     ` : `
                         <div style="margin:0 0 12px;border-radius:12px;border:2px solid #f0c040;">
                             <div style="background:#f0c04018;padding:12px;display:flex;align-items:center;justify-content:space-between;border-radius:10px;">
                                 <div style="display:flex;align-items:center;gap:8px;">
-                                    <div style="width:36px;height:36px;border-radius:50%;background:#f0c040;display:flex;align-items:center;justify-content:center;font-size:16px;">⏳</div>
+                                    <div style="width:36px;height:36px;border-radius:50%;background:#f0c040;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#000;">WAIT</div>
                                     <div>
                                         <div style="font-size:18px;font-weight:900;color:#f0c040;">WAIT</div>
-                                        <div style="font-size:8px;color:#888;">${voted.criteriaPassed || 0}/${voted.criteriaTotal || 15} معيار</div>
+                                        <div style="font-size:8px;color:#888;">${voted.criteriaPassed || 0}/15</div>
                                     </div>
                                 </div>
                                 <div style="text-align:right;">
-                                    <div style="font-size:10px;color:#888;">انتظر 10 دقائق</div>
-                                    <div style="font-size:8px;color:#666;">وحاول مرة أخرى</div>
+                                    <div style="font-size:10px;color:#888;">Wait 10min</div>
+                                    <div style="font-size:8px;color:#666;">then retry</div>
                                 </div>
                             </div>
                         </div>
@@ -1773,7 +1735,7 @@
             `;
         }
 
-        // ======= دوال التداول =======
+        // ======= TRADING FUNCTIONS =======
         function saveTrade(dir, duration, pair) {
             var t = { id: Date.now(), time: new Date().toLocaleTimeString(), date: new Date().toLocaleDateString(),
                 pair: pair, dir: dir, duration: duration, result: null };
@@ -1790,7 +1752,7 @@
             if (box) {
                 var c = result === "WIN" ? "#00e096" : "#ff4d6d";
                 box.innerHTML = '<div style="font-size:14px;font-weight:700;color:' + c + ';">' + (result === "WIN" ?
-                    "✅" : "❌") + ' Marked as ' + result + '!</div><button class="new-sig-btn" onclick="resetCard()" style="pointer-events:auto !important;cursor:pointer !important;">Get new signal</button>';
+                    "WIN" : "LOSS") + ' - Marked!</div><button class="new-sig-btn" onclick="resetCard()" style="pointer-events:auto !important;cursor:pointer !important;">New Signal</button>';
                 setTimeout(fixAllSilent, 100);
             }
         }
@@ -1806,11 +1768,11 @@
             }
             var a = document.querySelector(".actions");
             if (a) a.outerHTML = '<div class="success-box">' +
-                '<div class="success-text">✅ Trade Taken!</div>' +
-                '<div style="font-size:11px;color:#888;margin:4px 0;">⏱️ المدة: ' + duration + '</div>' +
+                '<div class="success-text">Trade Taken!</div>' +
+                '<div style="font-size:11px;color:#888;margin:4px 0;">Duration: ' + duration + '</div>' +
                 '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">' +
-                '<button onclick="setResult(lastTradeId,\'WIN\')" style="padding:10px;background:rgba(0,224,150,0.15);border:1px solid #00e09660;border-radius:8px;color:#00e096;font-weight:700;font-size:13px;cursor:pointer;pointer-events:auto !important;">✅ WIN</button>' +
-                '<button onclick="setResult(lastTradeId,\'LOSS\')" style="padding:10px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d60;border-radius:8px;color:#ff4d6d;font-weight:700;font-size:13px;cursor:pointer;pointer-events:auto !important;">❌ LOSS</button>' +
+                '<button onclick="setResult(lastTradeId,\'WIN\')" style="padding:10px;background:rgba(0,224,150,0.15);border:1px solid #00e09660;border-radius:8px;color:#00e096;font-weight:700;font-size:13px;cursor:pointer;pointer-events:auto !important;">WIN</button>' +
+                '<button onclick="setResult(lastTradeId,\'LOSS\')" style="padding:10px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d60;border-radius:8px;color:#ff4d6d;font-weight:700;font-size:13px;cursor:pointer;pointer-events:auto !important;">LOSS</button>' +
                 '</div>' +
                 '</div>';
             setTimeout(fixAllSilent, 100);
@@ -1861,12 +1823,12 @@
 
     <div id="hPage" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#08090f;z-index:999999;overflow-y:auto;padding:20px 16px 40px;pointer-events:auto !important;">
         <div style="display:flex;align-items:center;justify-content:space-between;padding-top:48px;margin-bottom:20px;">
-            <div style="font-size:18px;font-weight:800;color:#fff;">🕶 Trade History</div>
-            <button onclick="hideHistory()" style="background:#10121e;border:1px solid #1e2235;border-radius:8px;padding:8px 14px;color:#7c83ff;font-size:13px;font-weight:600;cursor:pointer;pointer-events:auto !important;">← Back</button>
+            <div style="font-size:18px;font-weight:800;color:#fff;">Trade History</div>
+            <button onclick="hideHistory()" style="background:#10121e;border:1px solid #1e2235;border-radius:8px;padding:8px 14px;color:#7c83ff;font-size:13px;font-weight:600;cursor:pointer;pointer-events:auto !important;">Back</button>
         </div>
         <div id="hStats" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:16px;"></div>
         <div id="hList"></div>
-        <button onclick="if(confirm('Clear all?')){localStorage.removeItem('th');tradeHistory=[];showHistory();}" style="width:100%;margin-top:12px;padding:10px;background:transparent;border:1px solid #1e2235;border-radius:8px;color:#444;font-size:11px;cursor:pointer;pointer-events:auto !important;">🗑 Clear All</button>
+        <button onclick="if(confirm('Clear all?')){localStorage.removeItem('th');tradeHistory=[];showHistory();}" style="width:100%;margin-top:12px;padding:10px;background:transparent;border:1px solid #1e2235;border-radius:8px;color:#444;font-size:11px;cursor:pointer;pointer-events:auto !important;">Clear All</button>
     </div>
 </body>
 </html>
