@@ -734,6 +734,20 @@
             background: #7c83ff44;
             border-radius: 10px;
         }
+
+        .duration-box {
+            background: #0d0f1a;
+            border-radius: 8px;
+            padding: 8px 12px;
+            text-align: center;
+            border: 1px solid #7c83ff44;
+            margin-bottom: 8px;
+        }
+        .duration-box .time {
+            font-size: 20px;
+            font-weight: 900;
+            color: #7c83ff;
+        }
     </style>
 </head>
 <body>
@@ -1267,6 +1281,34 @@
             return results;
         }
 
+        // ======= دالة حساب المدة الصريحة =======
+        function getExactDuration(accuracy, mtfScore, safetyValve, volumeClear, totalScore) {
+            // GOLD: 15/15 → 1 ساعة
+            if (accuracy >= 95 && mtfScore >= 4 && safetyValve && volumeClear && totalScore >= 8) {
+                return "1 ساعة";
+            }
+            // STRONG: 14/15 → 30 دقيقة
+            else if (accuracy >= 88 && mtfScore >= 3 && safetyValve && totalScore >= 6) {
+                return "30 دقيقة";
+            }
+            // GOOD: 13/15 → 15 دقيقة
+            else if (accuracy >= 80 && mtfScore >= 2 && safetyValve && totalScore >= 4) {
+                return "15 دقيقة";
+            }
+            // GOOD: 12/15 → 10 دقائق
+            else if (accuracy >= 75 && mtfScore >= 2 && totalScore >= 3) {
+                return "10 دقائق";
+            }
+            // WAIT → 5 دقائق (تجريبي)
+            else if (accuracy >= 0 && totalScore > 0) {
+                return "5 دقائق";
+            }
+            // أي حاجة تانية → انتظر
+            else {
+                return "انتظر";
+            }
+        }
+
         // ======= VOTING SYSTEM =======
         function voteOnSignals(results, mtfData) {
             let valid = results.filter(r => r !== null);
@@ -1285,7 +1327,8 @@
                     safetyValve: false,
                     volumeClear: false,
                     criteriaPassed: 0,
-                    criteriaTotal: 15
+                    criteriaTotal: 15,
+                    exactDuration: "انتظر"
                 };
             }
 
@@ -1387,6 +1430,15 @@
 
             reasons.push(criteriaPassed + "/" + criteriaTotal + " criteria met");
 
+            // ======= حساب المدة الصريحة =======
+            let exactDuration = getExactDuration(
+                finalAccuracy,
+                mtfScore,
+                safetyValve,
+                volumeClear,
+                firstValid ? firstValid.totalScore || 0 : 0
+            );
+
             return {
                 direction: finalDirection,
                 accuracy: finalAccuracy,
@@ -1402,7 +1454,8 @@
                 safetyValve: safetyValve,
                 volumeClear: volumeClear,
                 criteriaPassed: criteriaPassed,
-                criteriaTotal: criteriaTotal
+                criteriaTotal: criteriaTotal,
+                exactDuration: exactDuration
             };
         }
 
@@ -1508,7 +1561,7 @@
                 // MTF Calculation
                 let mtfData = [];
                 let TFS = ["5min", "15min", "30min", "1h", "4h"];
-                let TF_LABELS = { "5min": "5M", "15min": "15M", "30min": "30M", "1h": "1H", "4h": "4H" };
+                let TF_LABELS = { "5min": "5م", "15min": "15م", "30min": "30م", "1h": "1س", "4h": "4س" };
 
                 for (let ti = 0; ti < TFS.length; ti++) {
                     try {
@@ -1566,7 +1619,7 @@
                     return `
                         <div class="check-box ${cls}" style="border-color:${color}44;">
                             <div style="font-size:20px;color:${color};font-weight:900;">${status}</div>
-                            <div style="font-size:9px;color:#888;">Analysis ${i+1}</div>
+                            <div style="font-size:9px;color:#888;">تحليل ${i+1}</div>
                             <div style="font-size:11px;font-weight:700;color:${color};">${dirText}</div>
                         </div>
                     `;
@@ -1620,9 +1673,17 @@
 
             let accuracyColor = voted.accuracy >= 90 ? "#00e096" : voted.accuracy >= 70 ? "#f0c040" : "#ff4d6d";
 
+            // ======= المدة الصريحة =======
+            let durationDisplay = voted.exactDuration || "انتظر";
+            let durationColor = durationDisplay === "1 ساعة" ? "#ff8c00" :
+                durationDisplay === "30 دقيقة" ? "#f0c040" :
+                durationDisplay === "15 دقيقة" ? "#7c83ff" :
+                durationDisplay === "10 دقائق" ? "#4fc3f7" :
+                durationDisplay === "5 دقائق" ? "#00e096" : "#ff4d6d";
+
             return `
                 <div class="card-inner">
-                    <div class="sec-lbl">15 Criteria Analysis</div>
+                    <div class="sec-lbl">15 معيار - تحليل دقيق</div>
 
                     <!-- Three checks -->
                     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
@@ -1633,15 +1694,15 @@
                     <div style="background:${dirColor}11;border:2px solid ${dirColor};border-radius:12px;padding:12px;margin-bottom:10px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <div>
-                                <div style="font-size:9px;color:#888;">Decision</div>
+                                <div style="font-size:9px;color:#888;">القرار</div>
                                 <div style="font-size:22px;font-weight:900;color:${dirColor};">${voted.direction} ${darr}</div>
                             </div>
                             <div style="text-align:center;">
-                                <div style="font-size:8px;color:#888;">Accuracy</div>
+                                <div style="font-size:8px;color:#888;">الدقة</div>
                                 <div style="font-size:22px;font-weight:900;color:${accuracyColor};">${voted.accuracy > 0 ? voted.accuracy + '%' : '---'}</div>
                             </div>
                             <div style="text-align:center;">
-                                <div style="font-size:8px;color:#888;">Criteria</div>
+                                <div style="font-size:8px;color:#888;">المعايير</div>
                                 <div style="font-size:18px;font-weight:900;color:#7c83ff;">${voted.criteriaPassed || 0}/${voted.criteriaTotal || 15}</div>
                             </div>
                         </div>
@@ -1650,9 +1711,15 @@
                         </div>
                     </div>
 
+                    <!-- ======= DURATION BOX ======= -->
+                    <div class="duration-box" style="border-color:${durationColor}44;background:${durationColor}11;">
+                        <div style="font-size:9px;color:#888;">⏱️ مدة الصفقة الموصى بها</div>
+                        <div class="time" style="color:${durationColor};">${durationDisplay}</div>
+                    </div>
+
                     <!-- 15 Criteria -->
                     <div style="margin-bottom:10px;">
-                        <div class="ilbl" style="margin-bottom:4px;">15 Criteria (✓ = PASS)</div>
+                        <div class="ilbl" style="margin-bottom:4px;">15 معيار (✓ = متحقق)</div>
                         <div class="criteria-grid">
                             ${criteriaHTML}
                         </div>
@@ -1660,7 +1727,7 @@
 
                     <!-- MTF -->
                     <div class="mtf-box" style="margin-bottom:8px;">
-                        <div class="ilbl" style="margin-bottom:4px;">MTF (${voted.mtfScore || 0}/5 aligned)</div>
+                        <div class="ilbl" style="margin-bottom:4px;">MTF (${voted.mtfScore || 0}/5 متفقين)</div>
                         ${mtfHTML}
                     </div>
 
@@ -1682,7 +1749,7 @@
 
                     <!-- Reasons -->
                     <div class="reasons-box" style="margin-bottom:10px;">
-                        <div class="ilbl" style="margin-bottom:4px;">Report</div>
+                        <div class="ilbl" style="margin-bottom:4px;">التقرير</div>
                         ${voted.reasons.map((r, i) => `
                             <div class="reason-item">
                                 <div class="reason-num ${voted.direction.toLowerCase()}">${i+1}</div>
@@ -1697,36 +1764,36 @@
                             <div style="background:${dirColor}18;padding:12px;display:flex;align-items:center;justify-content:space-between;border-radius:10px;">
                                 <div style="display:flex;align-items:center;gap:8px;">
                                     <div style="width:36px;height:36px;border-radius:50%;background:${voted.accuracy >= 90 ? '#ff8c00' : voted.accuracy >= 80 ? '#f0c040' : '#7c83ff'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#000;">
-                                        ${voted.accuracy >= 90 ? 'GOLD' : voted.accuracy >= 80 ? 'GOOD' : 'OK'}
+                                        ${voted.accuracy >= 90 ? 'ذهبى' : voted.accuracy >= 80 ? 'جيد' : 'OK'}
                                     </div>
                                     <div>
-                                        <div style="font-size:18px;font-weight:900;color:${dirColor};">GO</div>
-                                        <div style="font-size:8px;color:#888;">${voted.accuracy}% accuracy</div>
+                                        <div style="font-size:18px;font-weight:900;color:${dirColor};">ادخل</div>
+                                        <div style="font-size:8px;color:#888;">${voted.accuracy}% دقة</div>
                                     </div>
                                 </div>
                                 <div style="text-align:right;">
-                                    <div style="font-size:16px;font-weight:800;color:${dirColor};">${voted.direction}</div>
+                                    <div style="font-size:14px;font-weight:800;color:${dirColor};">${voted.direction}</div>
                                     <div style="font-size:8px;color:#888;">${voted.criteriaPassed || 0}/15</div>
                                 </div>
                             </div>
                         </div>
                         <div class="actions">
-                            <button class="btn-take ${voted.direction.toLowerCase()}" onclick="takeTrade()" style="pointer-events:auto !important;cursor:pointer !important;">Take</button>
-                            <button class="btn-skip" onclick="skipTrade()" style="pointer-events:auto !important;cursor:pointer !important;">Skip</button>
+                            <button class="btn-take ${voted.direction.toLowerCase()}" onclick="takeTrade()" style="pointer-events:auto !important;cursor:pointer !important;">خذ الصفقة</button>
+                            <button class="btn-skip" onclick="skipTrade()" style="pointer-events:auto !important;cursor:pointer !important;">تخطى</button>
                         </div>
                     ` : `
                         <div style="margin:0 0 12px;border-radius:12px;border:2px solid #f0c040;">
                             <div style="background:#f0c04018;padding:12px;display:flex;align-items:center;justify-content:space-between;border-radius:10px;">
                                 <div style="display:flex;align-items:center;gap:8px;">
-                                    <div style="width:36px;height:36px;border-radius:50%;background:#f0c040;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#000;">WAIT</div>
+                                    <div style="width:36px;height:36px;border-radius:50%;background:#f0c040;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#000;">انتظر</div>
                                     <div>
-                                        <div style="font-size:18px;font-weight:900;color:#f0c040;">WAIT</div>
+                                        <div style="font-size:18px;font-weight:900;color:#f0c040;">انتظر</div>
                                         <div style="font-size:8px;color:#888;">${voted.criteriaPassed || 0}/15</div>
                                     </div>
                                 </div>
                                 <div style="text-align:right;">
-                                    <div style="font-size:10px;color:#888;">Wait 10min</div>
-                                    <div style="font-size:8px;color:#666;">then retry</div>
+                                    <div style="font-size:10px;color:#888;">انتظر 10د</div>
+                                    <div style="font-size:8px;color:#666;">وحاول مرة</div>
                                 </div>
                             </div>
                         </div>
@@ -1752,24 +1819,22 @@
             if (box) {
                 var c = result === "WIN" ? "#00e096" : "#ff4d6d";
                 box.innerHTML = '<div style="font-size:14px;font-weight:700;color:' + c + ';">' + (result === "WIN" ?
-                    "WIN" : "LOSS") + ' - Marked!</div><button class="new-sig-btn" onclick="resetCard()" style="pointer-events:auto !important;cursor:pointer !important;">New Signal</button>';
+                    "WIN" : "LOSS") + ' - تم التسجيل!</div><button class="new-sig-btn" onclick="resetCard()" style="pointer-events:auto !important;cursor:pointer !important;">إشارة جديدة</button>';
                 setTimeout(fixAllSilent, 100);
             }
         }
 
         function takeTrade() {
-            let duration = "15-30 min";
-            if (window._currentSig && window._currentSig.accuracy >= 90) duration = "1-4 hours";
-            else if (window._currentSig && window._currentSig.accuracy >= 80) duration = "15-30 min";
-            else duration = "5-10 min";
+            let duration = window._currentSig && window._currentSig.exactDuration ? window._currentSig.exactDuration :
+                "غير محدد";
 
             if (window._currentSig) {
                 lastTradeId = saveTrade(window._currentSig.direction, duration, window._currentPair || "");
             }
             var a = document.querySelector(".actions");
             if (a) a.outerHTML = '<div class="success-box">' +
-                '<div class="success-text">Trade Taken!</div>' +
-                '<div style="font-size:11px;color:#888;margin:4px 0;">Duration: ' + duration + '</div>' +
+                '<div class="success-text">✅ تم أخذ الصفقة!</div>' +
+                '<div style="font-size:11px;color:#888;margin:4px 0;">⏱️ المدة: ' + duration + '</div>' +
                 '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">' +
                 '<button onclick="setResult(lastTradeId,\'WIN\')" style="padding:10px;background:rgba(0,224,150,0.15);border:1px solid #00e09660;border-radius:8px;color:#00e096;font-weight:700;font-size:13px;cursor:pointer;pointer-events:auto !important;">WIN</button>' +
                 '<button onclick="setResult(lastTradeId,\'LOSS\')" style="padding:10px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d60;border-radius:8px;color:#ff4d6d;font-weight:700;font-size:13px;cursor:pointer;pointer-events:auto !important;">LOSS</button>' +
@@ -1788,23 +1853,23 @@
             document.getElementById("hStats").innerHTML =
                 '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#7c83ff;">' +
                 tradeHistory.length +
-                '</div><div style="font-size:9px;color:#444;">TOTAL</div></div>' +
+                '</div><div style="font-size:9px;color:#444;">الإجمالي</div></div>' +
                 '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#00e096;">' +
-                wins + '</div><div style="font-size:9px;color:#444;">WINS</div></div>' +
+                wins + '</div><div style="font-size:9px;color:#444;">ربح</div></div>' +
                 '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#ff4d6d;">' +
-                losses + '</div><div style="font-size:9px;color:#444;">LOSSES</div></div>' +
+                losses + '</div><div style="font-size:9px;color:#444;">خسارة</div></div>' +
                 '<div style="background:#10121e;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:' +
                 (rate >= 65 ? "#00e096" : rate >= 50 ? "#f0c040" : "#ff4d6d") + ';">' + rate +
-                '%</div><div style="font-size:9px;color:#444;">WIN RATE</div></div>';
+                '%</div><div style="font-size:9px;color:#444;">نسبة النجاح</div></div>';
             document.getElementById("hList").innerHTML = tradeHistory.length === 0 ?
-                '<div style="text-align:center;color:#2a2d45;padding:30px;font-size:13px;">No trades yet</div>' :
+                '<div style="text-align:center;color:#2a2d45;padding:30px;font-size:13px;">لا توجد صفقات بعد</div>' :
                 tradeHistory.slice(0, 30).map(function(t) {
                     var rc = t.result === "WIN" ? "#00e096" : t.result === "LOSS" ? "#ff4d6d" : "#f0c040";
                     return '<div style="background:#10121e;border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">' +
                         '<div><div style="font-size:13px;font-weight:700;color:#e0e0f0;">' + t.pair +
                         '</div>' +
                         '<div style="font-size:10px;color:#444;">' + t.date + ' ' + t.time + ' | ' + t.dir +
-                        '</div></div>' +
+                        ' | ' + t.duration + '</div></div>' +
                         (t.result === null ?
                             '<div style="display:flex;gap:6px;">' +
                             '<button onclick="setResult(' + t.id + ',\'WIN\')" style="padding:4px 8px;background:rgba(0,224,150,0.15);border:1px solid #00e096;border-radius:6px;color:#00e096;font-size:11px;font-weight:700;cursor:pointer;pointer-events:auto !important;">WIN</button>' +
@@ -1823,12 +1888,12 @@
 
     <div id="hPage" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#08090f;z-index:999999;overflow-y:auto;padding:20px 16px 40px;pointer-events:auto !important;">
         <div style="display:flex;align-items:center;justify-content:space-between;padding-top:48px;margin-bottom:20px;">
-            <div style="font-size:18px;font-weight:800;color:#fff;">Trade History</div>
-            <button onclick="hideHistory()" style="background:#10121e;border:1px solid #1e2235;border-radius:8px;padding:8px 14px;color:#7c83ff;font-size:13px;font-weight:600;cursor:pointer;pointer-events:auto !important;">Back</button>
+            <div style="font-size:18px;font-weight:800;color:#fff;">📊 تاريخ الصفقات</div>
+            <button onclick="hideHistory()" style="background:#10121e;border:1px solid #1e2235;border-radius:8px;padding:8px 14px;color:#7c83ff;font-size:13px;font-weight:600;cursor:pointer;pointer-events:auto !important;">رجوع</button>
         </div>
         <div id="hStats" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:16px;"></div>
         <div id="hList"></div>
-        <button onclick="if(confirm('Clear all?')){localStorage.removeItem('th');tradeHistory=[];showHistory();}" style="width:100%;margin-top:12px;padding:10px;background:transparent;border:1px solid #1e2235;border-radius:8px;color:#444;font-size:11px;cursor:pointer;pointer-events:auto !important;">Clear All</button>
+        <button onclick="if(confirm('مسح الكل؟')){localStorage.removeItem('th');tradeHistory=[];showHistory();}" style="width:100%;margin-top:12px;padding:10px;background:transparent;border:1px solid #1e2235;border-radius:8px;color:#444;font-size:11px;cursor:pointer;pointer-events:auto !important;">🗑 مسح الكل</button>
     </div>
 </body>
 </html>
