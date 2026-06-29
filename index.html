@@ -21,9 +21,9 @@
     .logo-signal{font-size:22px;font-weight:800;background:linear-gradient(135deg,#4fc3f7,#7c83ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
     .logo-pro{font-size:11px;font-weight:700;color:#f0c040;background:rgba(240,192,64,0.12);padding:2px 7px;border-radius:5px;margin-left:6px;vertical-align:middle;}
     .selectors{display:flex;gap:8px;margin-bottom:14px;position:relative;}
-    .pair-btn{flex:1;display:flex;align-items:center;justify-content:space-between;background:#10121e;border:1px solid #1e2235;border-radius:10px;padding:10px 12px;color:#e0e0f0;font-size:13px;font-weight:600;cursor:pointer;pointer-events:auto;}
+    .pair-btn{flex:1;display:flex;align-items:center;justify-content:space-between;background:#10121e;border:1px solid #1e2235;border-radius:10px;padding:10px 12px;color:#e0e0f0;font-size:13px;font-weight:600;}
     .pair-dropdown{position:absolute;top:46px;left:0;right:70px;z-index:100;background:#10121e;border:1px solid #1e2235;border-radius:10px;max-height:220px;overflow-y:auto;box-shadow:0 8px 32px #000;}
-    .pair-item{padding:11px 12px;font-size:13px;cursor:pointer;color:#b0b8d8;border-bottom:1px solid #0d0f1a;pointer-events:auto;}
+    .pair-item{padding:11px 12px;font-size:13px;color:#b0b8d8;border-bottom:1px solid #0d0f1a;}
     .pair-item.active{color:#7c83ff;background:#1a1c2e;}
     .tf-wrap{position:relative;}
     .tf-select{background:#10121e;border:1px solid #1e2235;border-radius:10px;padding:10px 28px 10px 12px;color:#e0e0f0;font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;}
@@ -67,7 +67,7 @@
     .sr-lbl{font-size:9px;color:#444;margin-bottom:3px;}
     .sr-val{font-size:11px;font-weight:700;}
     .tf-tabs{display:flex;gap:4px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
-    .tf-tab{flex-shrink:0;padding:6px 12px;background:#10121e;border:1px solid #1e2235;border-radius:8px;font-size:11px;font-weight:600;color:#555;cursor:pointer;}
+    .tf-tab{flex-shrink:0;padding:6px 12px;background:#10121e;border:1px solid #1e2235;border-radius:8px;font-size:11px;font-weight:600;color:#555;}
     .tf-tab.active{background:#7c83ff;border-color:#7c83ff;color:#fff;}
     .mtf-box{background:#0d0f1a;border-radius:10px;padding:12px;margin-bottom:8px;}
     .mtf-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid #0a0c14;}
@@ -77,19 +77,19 @@
     .mtf-fill{height:100%;border-radius:100px;}
     .mtf-sig{font-size:11px;font-weight:700;width:40px;text-align:right;}
     .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
-    .btn-take{padding:13px;border:none;border-radius:10px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;pointer-events:auto;}
+    .btn-take{padding:13px;border:none;border-radius:10px;color:#fff;font-weight:700;font-size:14px;}
     .btn-take.up{background:#00e096;animation:pulse 2s infinite;}
     .btn-take.down{background:#ff4d6d;animation:pulseRed 2s infinite;}
     .btn-take.wait{background:#f0c040;color:#000;}
-    .btn-skip{padding:13px;background:transparent;border:1px solid #1e2235;border-radius:10px;color:#555;font-weight:700;font-size:14px;cursor:pointer;pointer-events:auto;}
+    .btn-skip{padding:13px;background:transparent;border:1px solid #1e2235;border-radius:10px;color:#555;font-weight:700;font-size:14px;}
     .success-box{text-align:center;padding:14px;background:rgba(0,224,150,0.06);border-radius:10px;border:1px solid rgba(0,224,150,0.18);grid-column:1/-1;}
     .success-text{font-size:13px;color:#00e096;font-weight:600;}
-    .new-sig-btn{margin-top:8px;background:none;border:none;color:#555;font-size:12px;cursor:pointer;pointer-events:auto;}
-    .get-btn{width:100%;padding:15px;background:linear-gradient(135deg,#4fc3f7,#7c83ff);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 24px rgba(124,131,255,0.28);pointer-events:auto;}
+    .new-sig-btn{margin-top:8px;background:none;border:none;color:#555;font-size:12px;}
+    .get-btn{width:100%;padding:15px;background:linear-gradient(135deg,#4fc3f7,#7c83ff);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 24px rgba(124,131,255,0.28);}
     .get-btn.loading{background:#1e2035;cursor:not-allowed;box-shadow:none;}
     .bull{color:#00e096;} .bear{color:#ff4d6d;} .neut{color:#f0c040;}
     .nav{display:flex;justify-content:space-around;margin-top:24px;border-top:1px solid #10121e;padding-top:14px;}
-    .nav-item{text-align:center;cursor:pointer;pointer-events:auto;}
+    .nav-item{text-align:center;}
     .nav-icon{font-size:17px;margin-bottom:2px;}
     .nav-label{font-size:9px;color:#333;}
     .nav-item.active .nav-label{color:#7c83ff;font-weight:700;}
@@ -99,38 +99,61 @@
     .wave-lbl{font-size:10px;color:#444;margin-bottom:6px;}
     .wave-content{font-size:12px;color:#a0a8c8;line-height:1.6;}
     .wave-tag{display:inline-block;background:#1a1c2e;border-radius:5px;padding:2px 7px;font-size:10px;color:#7c83ff;margin:1px;}
-    button, .pair-btn, .nav-item, .d-item, .get-btn, .btn-take, .btn-skip, .new-sig-btn {
+    
+    /* ===== الحل الجذري ===== */
+    button, .pair-btn, .nav-item, .get-btn, .btn-take, .btn-skip, .new-sig-btn, .pair-item, .tf-tab {
       touch-action: manipulation !important;
       -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
       cursor: pointer !important;
       pointer-events: auto !important;
+      position: relative !important;
+      z-index: 9999 !important;
     }
-    .pair-dropdown, .pair-item {
+    
+    .pair-dropdown {
       pointer-events: auto !important;
+      z-index: 99999 !important;
     }
-    #hPage button {
+    
+    #hPage button, #hPage * {
       pointer-events: auto !important;
       cursor: pointer !important;
     }
-    * { -webkit-user-select: none; user-select: none; }
-    input, textarea { -webkit-user-select: text !important; }
+    
+    * {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    input, textarea {
+      -webkit-user-select: text !important;
+    }
+    
+    /* إزالة أي حجب للنقر */
     .wrap, .card, .card-inner, .header, .selectors, .nav, body, html {
       pointer-events: auto !important;
     }
-    /* Fix for success box buttons */
-    .success-box button {
+    
+    /* التعديل الأهم - إجبار كل العناصر على قبول النقر */
+    * {
       pointer-events: auto !important;
-      cursor: pointer !important;
     }
-    /* Fix for any hidden overlays */
+    
+    /* العناصر المخفية مؤقتاً */
     [style*="display:none"], [style*="display: none"] {
       pointer-events: none !important;
     }
+    
     #dd[style*="display:block"], #dd[style*="display: block"] {
       pointer-events: auto !important;
     }
+    
     #dd .pair-item {
       pointer-events: auto !important;
+    }
+    
+    .success-box button {
+      pointer-events: auto !important;
+      cursor: pointer !important;
     }
   </style>
 </head>
@@ -145,7 +168,7 @@
 
   <div class="selectors">
     <div style="flex:1;position:relative;">
-      <button class="pair-btn" id="pairBtn" onclick="toggleDd(event)">
+      <button class="pair-btn" id="pairBtn">
         <span id="pairLabel">EUR/USD</span>
         <span style="color:#444;font-size:10px;">▼</span>
       </button>
@@ -158,18 +181,60 @@
     <div class="idle">Press Get Signal to start</div>
   </div>
 
-  <button class="get-btn" id="getBtn" onclick="getSignal()">⚡ Get Signal</button>
+  <button class="get-btn" id="getBtn">⚡ Get Signal</button>
 
   <div class="nav">
-    <div class="nav-item" onclick="alert('Profile page')"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
-    <div class="nav-item" onclick="showHistory()"><div class="nav-icon">🕶</div><div class="nav-label">History</div></div>
+    <div class="nav-item" id="navProfile"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
+    <div class="nav-item" id="navHistory"><div class="nav-icon">🕶</div><div class="nav-label">History</div></div>
     <div class="nav-item active"><div class="nav-icon">📈</div><div class="nav-label">Signals</div></div>
-    <div class="nav-item" onclick="alert('AI Analysis - Coming Soon!')"><div class="nav-icon">🧠</div><div class="nav-label">AI</div></div>
-    <div class="nav-item" onclick="alert('Support - Contact us at support@springbot.com')"><div class="nav-icon">🎧</div><div class="nav-label">Support</div></div>
+    <div class="nav-item" id="navAI"><div class="nav-icon">🧠</div><div class="nav-label">AI</div></div>
+    <div class="nav-item" id="navSupport"><div class="nav-icon">🎧</div><div class="nav-label">Support</div></div>
   </div>
 </div>
 
 <script>
+// ======= ربط الأحداث يدوياً =======
+document.addEventListener('DOMContentLoaded', function() {
+  // زر Get Signal
+  document.getElementById('getBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    getSignal();
+  });
+
+  // زر اختيار الزوج
+  document.getElementById('pairBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var d = document.getElementById('dd');
+    d.style.display = d.style.display === 'none' ? 'block' : 'none';
+  });
+
+  // أزرار الناف
+  document.getElementById('navProfile').addEventListener('click', function(e) {
+    e.preventDefault();
+    alert('Profile page');
+  });
+  document.getElementById('navHistory').addEventListener('click', function(e) {
+    e.preventDefault();
+    showHistory();
+  });
+  document.getElementById('navAI').addEventListener('click', function(e) {
+    e.preventDefault();
+    alert('AI Analysis - Coming Soon!');
+  });
+  document.getElementById('navSupport').addEventListener('click', function(e) {
+    e.preventDefault();
+    alert('Support - Contact us at support@springbot.com');
+  });
+
+  // إغلاق القائمة عند النقر براها
+  document.addEventListener('click', function() {
+    document.getElementById('dd').style.display = 'none';
+  });
+});
+
+// ======= باقي الكود =======
 var tradeHistory=JSON.parse(localStorage.getItem("th")||"[]");
 var lastTradeId=null;
 
@@ -210,8 +275,8 @@ function showHistory(){
         '<div style="font-size:10px;color:#444;">'+t.date+' '+t.time+' | '+t.dir+'</div></div>'+
         (t.result===null?
           '<div style="display:flex;gap:6px;">'+
-            '<button onclick="setResult('+t.id+',\'WIN\')" style="padding:4px 8px;background:rgba(0,224,150,0.15);border:1px solid #00e096;border-radius:6px;color:#00e096;font-size:11px;font-weight:700;cursor:pointer;pointer-events:auto;">WIN</button>'+
-            '<button onclick="setResult('+t.id+',\'LOSS\')" style="padding:4px 8px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d;border-radius:6px;color:#ff4d6d;font-size:11px;font-weight:700;cursor:pointer;pointer-events:auto;">LOSS</button>'+
+            '<button onclick="setResult('+t.id+',\'WIN\')" style="padding:4px 8px;background:rgba(0,224,150,0.15);border:1px solid #00e096;border-radius:6px;color:#00e096;font-size:11px;font-weight:700;cursor:pointer;">WIN</button>'+
+            '<button onclick="setResult('+t.id+',\'LOSS\')" style="padding:4px 8px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d;border-radius:6px;color:#ff4d6d;font-size:11px;font-weight:700;cursor:pointer;">LOSS</button>'+
           '</div>':
           '<span style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;color:'+rc+';background:'+rc+'22;">'+t.result+'</span>')+
       '</div>';
@@ -242,23 +307,18 @@ PAIRS.forEach(function(p){
   const d=document.createElement("div");
   d.className="pair-item"+(p.symbol===currentPair.symbol?" active":"");
   d.innerHTML=p.label;
-  d.style.pointerEvents="auto";
-  d.onclick=function(e){
+  d.addEventListener('click', function(e) {
     e.stopPropagation();
     currentPair=p;
     document.getElementById("pairLabel").innerHTML=p.label;
     document.querySelectorAll(".pair-item").forEach(function(x){x.classList.remove("active");});
-    d.classList.add("active");dd.style.display="none";resetCard();
-  };
+    this.classList.add("active");
+    dd.style.display="none";
+    resetCard();
+  });
   dd.appendChild(d);
 });
-function toggleDd(e){
-  e.stopPropagation();
-  var d=document.getElementById("dd");
-  d.style.display=d.style.display==="none"?"block":"none";
-}
-document.getElementById("pairBtn").onclick=function(e){e.stopPropagation();dd.style.display=dd.style.display==="none"?"block":"none";};
-document.addEventListener("click",function(){dd.style.display="none";});
+
 function setCard(h){document.getElementById("card").innerHTML=h;}
 
 // ======= INDICATORS =======
@@ -374,16 +434,14 @@ function candlePatterns(O,H,L,C){
   return{patterns:patterns,score:score};
 }
 
-// ======= WAVE ANALYSIS (Elliott - Impulsive vs Corrective) =======
+// ======= WAVE ANALYSIS =======
 function waveAnalysis(C){
   var n=C.length;
-  // Detect swing points
   var swings=[];
   for(var i=2;i<n-2;i++){
     if(C[i]>C[i-1]&&C[i]>C[i-2]&&C[i]>C[i+1]&&C[i]>C[i+2])swings.push({i:i,v:C[i],type:"H"});
     if(C[i]<C[i-1]&&C[i]<C[i-2]&&C[i]<C[i+1]&&C[i]<C[i+2])swings.push({i:i,v:C[i],type:"L"});
   }
-  // Determine wave type from last 3 swings
   var waveType="Unknown";
   var waveBias="Analyzing...";
   var waveNum="";
@@ -392,19 +450,15 @@ function waveAnalysis(C){
     var s1=swings[swings.length-3];
     var s2=swings[swings.length-2];
     var s3=swings[swings.length-1];
-    // Impulsive UP: L -> H -> higher L -> higher H
     if(s1.type==="L"&&s2.type==="H"&&s3.type==="L"&&s3.v>s1.v){
       waveType="Impulsive";waveBias="Wave 3 UP (Strongest)";waveNum="▲ W3";score=3;
     }
-    // Corrective DOWN after up move
     else if(s1.type==="H"&&s2.type==="L"&&s3.type==="H"&&s3.v<s1.v){
       waveType="Corrective";waveBias="Wave ABC DOWN";waveNum="▼ ABC";score=-2;
     }
-    // Impulsive DOWN
     else if(s1.type==="H"&&s2.type==="L"&&s3.type==="H"&&s3.v<s1.v&&C[n-1]<s2.v){
       waveType="Impulsive";waveBias="Wave 3 DOWN (Bearish)";waveNum="▼ W3";score=-3;
     }
-    // Corrective UP (retracement)
     else if(s1.type==="L"&&s2.type==="H"&&s3.type==="L"&&s3.v<s1.v){
       waveType="Corrective";waveBias="Wave ABC UP";waveNum="▲ ABC";score=1;
     }
@@ -429,8 +483,7 @@ function momentum(C){
   return{label:"Weak Bearish Momentum",score:-1};
 }
 
-// ======= MAIN ANALYSIS =======
-
+// ======= REJECTION ZONES =======
 function rejectionZones(H,L,C){
   var n=C.length,levels=[],tolerance=0.0003;
   for(var i=5;i<n-5;i++){
@@ -456,6 +509,7 @@ function rejectionZones(H,L,C){
   return{nearZone:nearZone,nearType:nearType,nearStrength:nearStrength,atZone:atZone,score:score,label:label};
 }
 
+// ======= VOLUME PROFILE =======
 function volumeProfile(H,L,C,V){
   var n=C.length,minP=Math.min.apply(null,L),maxP=Math.max.apply(null,H),range=maxP-minP,buckets=20;
   var profile=[];
@@ -476,6 +530,7 @@ function volumeProfile(H,L,C,V){
   return{atHVN:atHVN,atLVN:atLVN,nearPOC:nearPOC,label:label};
 }
 
+// ======= MAIN ANALYSIS =======
 function analyze(O,H,L,C,V){
   var last=C[C.length-1];
   var e20=ema(C.slice(-20),20);
@@ -507,7 +562,6 @@ function analyze(O,H,L,C,V){
   var mcsDetails="Candles:"+cndCons+"/5 | Body:"+(strongCnd?"Strong":"Weak")+" | Clear:"+(clearEma?"Yes":"No")+" | Accel:"+(momAcc?"Yes":"No");
   var totalScore=0;
 
-  // EMA
   var emaScore=0;
   if(last>e20&&e20>e50)emaScore=2;
   else if(last<e20&&e20<e50)emaScore=-2;
@@ -515,39 +569,24 @@ function analyze(O,H,L,C,V){
   else emaScore=-1;
   totalScore+=emaScore;
 
-  // RSI
   var rsiScore=0;
   if(r<25)rsiScore=3;else if(r<35)rsiScore=2;else if(r<45)rsiScore=1;
   else if(r>75)rsiScore=-3;else if(r>65)rsiScore=-2;else if(r>55)rsiScore=-1;
   totalScore+=rsiScore;
 
-  // MACD
   totalScore+=m>0?1:-1;
-
-  // Stoch
   if(k<20)totalScore+=2;else if(k>80)totalScore-=2;
-
-  // Market structure
   totalScore+=ms.score;
   totalScore+=wa.waveScore||0;
-
-  // Breakout/Retest
   totalScore+=br.score;
-
-  // Candles
   totalScore+=cp.score;
-
-  // Momentum
   totalScore+=mo.score;
-
-  // Trend line
   if(tl.trendDir==="UP_CHANNEL")totalScore+=1;
   else if(tl.trendDir==="DOWN_CHANNEL")totalScore-=1;
   totalScore+=rz.score;
   if(vp.atLVN)totalScore+=(totalScore>0?2:-2);
   if(vp.nearPOC)totalScore=Math.round(totalScore*0.7);
 
-  // Conflict detection - if major indicators disagree, force WAIT
   var emaUp=last>e20&&e20>e50;
   var emaDown=last<e20&&e20<e50;
   var rsiUp=r<50;
@@ -575,7 +614,6 @@ function analyze(O,H,L,C,V){
   if(direction==="WAIT")accuracy=0;
   var strength=Math.min(98,50+absScore*5);
 
-  // Generate 3 reasons
   var reasons=[];
   if(direction!=="WAIT"){
     var isUP=direction==="UP";
@@ -601,8 +639,7 @@ function analyze(O,H,L,C,V){
     reasons.push("Price near Pivot ("+sr.pivot.toFixed(5)+") ❌ await breakout for entry");
   }
 
-  // Duration = selected timeframe (passed from outside)
-  var duration="";// will be set after analyze() call
+  var duration="";
 
   return{direction:direction,dcls:dcls,accuracy:Math.round(accuracy),strength:Math.round(strength),
     reasons:reasons,sr:sr,last:last.toFixed(5),duration:duration,
@@ -655,14 +692,12 @@ async function getSignal(){
   setCard('<div style="text-align:center;width:100%;padding:20px 0"><div class="spinner"></div><div class="analyzing">Scanning 5 timeframes...</div><div style="color:#333;font-size:11px;margin-top:6px">Please wait ~5 seconds</div></div>');
   var tf=document.getElementById("tfSelect").value;
   try{
-    // Fetch main TF first, then others sequentially
     var TFS=["5min","15min","30min","1h","4h"];
     var TF_LABELS={"5min":"5M","15min":"15M","30min":"30M","1h":"1H","4h":"4H"};
     var mainIdx=TFS.indexOf(tf);
     var main=await fetchTF(currentPair.symbol,tf);
     if(!main)throw new Error("Failed to fetch main timeframe");
     var O=main.O,H=main.H,L=main.L,C=main.C;
-    // Fetch other TFs with small delays to avoid rate limit
     var results=[];
     for(var ti=0;ti<TFS.length;ti++){
       if(ti===mainIdx){results.push(main);}
@@ -676,8 +711,6 @@ async function getSignal(){
     }
     var sig=analyze(O,H,L,C,main.V||[]);
 
-
-    // MTF alignment
     var mtfData=[];
     var alignedUP=0,alignedDOWN=0;
     TFS.forEach(function(t,i){
@@ -691,7 +724,6 @@ async function getSignal(){
     var mtfAlignment=Math.max(alignedUP,alignedDOWN);
     var mtfDir=alignedUP>alignedDOWN?"UP":alignedDOWN>alignedUP?"DOWN":"NEUTRAL";
 
-    // Pick best TF = the one with most aligned direction
     var bestTF=tf;
     var bestCount=0;
     TFS.forEach(function(t,i){
@@ -707,21 +739,17 @@ async function getSignal(){
     var tfDurMap2={"5min":"5 min","15min":"15 min","1h":"1 hour","4h":"4 hours"};
     sig.duration=sig.direction==="WAIT"?"No Entry":tfDurMap2[bestTF]||"5 min";
 
-    // Override with WAIT if MTF disagrees with signal
     if(mtfDir!=="NEUTRAL"&&mtfDir!==sig.direction&&sig.direction!=="WAIT"){
       sig.direction="WAIT";sig.dcls="wait";sig.duration="No Entry";
     }
-    // Boost confidence if MTF agrees
     if(mtfDir===sig.direction&&sig.direction!=="WAIT"){
       sig.accuracy=Math.min(96,sig.accuracy+Math.round(mtfAlignment*2));
       sig.strength=Math.min(98,sig.strength+Math.round(mtfAlignment*2));
     }
-    // Add MTF reason
     if(mtfAlignment>=4&&sig.direction!=="WAIT"){
       sig.reasons[2]=mtfAlignment+" out of 5 timeframes confirm "+sig.direction+" ✅ strong multi-timeframe alignment";
     }
 
-    // FINAL VERDICT
     var verdict="AVOID",verdictDir="",verdictTime="",verdictColor="#ff4d6d";
     if(sig.direction!=="WAIT"){
       var vs=0;
@@ -736,7 +764,6 @@ async function getSignal(){
     var darr=isUP?"▲":sig.direction==="DOWN"?"▼":"—";
     var tfLabel=tf.replace("min"," min").replace("1h","1H").replace("4h","4H");
 
-    // MTF rows HTML
     var mtfHTML=mtfData.map(function(d){
       var cls=d.bias==="UP"?"bull":d.bias==="DOWN"?"bear":"neut";
       var w=d.bias==="UP"?75:d.bias==="DOWN"?75:35;
@@ -842,8 +869,8 @@ function takeTrade(){
   if(a)a.outerHTML='<div class="success-box">'+
     '<div class="success-text">✅ Trade Taken!</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">'+
-      '<button onclick="setResult(lastTradeId,\'WIN\')" style="padding:10px;background:rgba(0,224,150,0.15);border:1px solid #00e09660;border-radius:8px;color:#00e096;font-weight:700;font-size:13px;cursor:pointer;pointer-events:auto;">✅ WIN</button>'+
-      '<button onclick="setResult(lastTradeId,\'LOSS\')" style="padding:10px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d60;border-radius:8px;color:#ff4d6d;font-weight:700;font-size:13px;cursor:pointer;pointer-events:auto;">❌ LOSS</button>'+
+      '<button onclick="setResult(lastTradeId,\'WIN\')" style="padding:10px;background:rgba(0,224,150,0.15);border:1px solid #00e09660;border-radius:8px;color:#00e096;font-weight:700;font-size:13px;cursor:pointer;">✅ WIN</button>'+
+      '<button onclick="setResult(lastTradeId,\'LOSS\')" style="padding:10px;background:rgba(255,77,109,0.15);border:1px solid #ff4d6d60;border-radius:8px;color:#ff4d6d;font-weight:700;font-size:13px;cursor:pointer;">❌ LOSS</button>'+
     '</div>'+
   '</div>';
 }
@@ -859,11 +886,11 @@ function resetCard(){
 <div id="hPage" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#08090f;z-index:9999;overflow-y:auto;padding:20px 16px 40px;">
   <div style="display:flex;align-items:center;justify-content:space-between;padding-top:48px;margin-bottom:20px;">
     <div style="font-size:18px;font-weight:800;color:#fff;">🕶 Trade History</div>
-    <button onclick="hideHistory()" style="background:#10121e;border:1px solid #1e2235;border-radius:8px;padding:8px 14px;color:#7c83ff;font-size:13px;font-weight:600;cursor:pointer;pointer-events:auto;">← Back</button>
+    <button onclick="hideHistory()" style="background:#10121e;border:1px solid #1e2235;border-radius:8px;padding:8px 14px;color:#7c83ff;font-size:13px;font-weight:600;cursor:pointer;">← Back</button>
   </div>
   <div id="hStats" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:16px;"></div>
   <div id="hList"></div>
-  <button onclick="if(confirm('Clear all?')){localStorage.removeItem('th');tradeHistory=[];showHistory();}" style="width:100%;margin-top:12px;padding:10px;background:transparent;border:1px solid #1e2235;border-radius:8px;color:#444;font-size:11px;cursor:pointer;pointer-events:auto;">🗑 Clear All</button>
+  <button onclick="if(confirm('Clear all?')){localStorage.removeItem('th');tradeHistory=[];showHistory();}" style="width:100%;margin-top:12px;padding:10px;background:transparent;border:1px solid #1e2235;border-radius:8px;color:#444;font-size:11px;cursor:pointer;">🗑 Clear All</button>
 </div>
 </body>
 </html>
