@@ -30,7 +30,7 @@ const PAIRS = [
   "USD/MXN","USD/SGD"
 ];
 
-const POLYGON_KEY = "qRpBREla7_HBFde0KNo90i9l5HflxWcn";
+const POLYGON_KEY = "YOUR_POLYGON_KEY_HERE";
 
 // ── Indicators ──────────────────────────────────────────────
 function calcEma(d, p) {
@@ -311,6 +311,7 @@ function App(){
   const [history,setHistory]=useState(loadH);
   const [lastId,setLastId]=useState(null);
   const [taken,setTaken]=useState(false);
+  const [pairIdx,setPairIdx]=useState(0);
 
   const dc=sig?.direction==="UP"?C.up:sig?.direction==="DOWN"?C.down:C.wait;
 
@@ -351,12 +352,74 @@ function App(){
     setLoading(false);
   },[pair]);
 
+  const skipToNext=useCallback(async()=>{
+    // Try next pairs until we find GO or run out
+    setSig(null);setVerdict(null);setErr("");
+    const startIdx=PAIRS.indexOf(pair);
+    for(let i=1;i<PAIRS.length;i++){
+      const nextPair=PAIRS[(startIdx+i)%PAIRS.length];
+      setPair(nextPair);
+      setLoading(true);
+      try{
+        const main=await fetchTF(nextPair,"5min");
+        const tfs=[["5min","5M"],["15min","15M"],["1h","1H"]];
+        const mtfArr=[];let up=0,dn=0;
+        for(const [tf,lbl] of tfs){
+          try{
+            if(tf!=="5min")await new Promise(r=>setTimeout(r,250));
+            const d=tf==="5min"?main:await fetchTF(nextPair,tf);
+            const b=quickBias(d.O,d.H,d.L,d.C);
+            mtfArr.push({lbl,bias:b,active:tf==="5min"});
+            if(b==="UP")up++;else if(b==="DOWN")dn++;
+          }catch{mtfArr.push({lbl,bias:"N/A",active:tf==="5min"});}
+        }
+        setMtf(mtfArr);
+        const align=Math.max(up,dn);
+        const mtfDir=up>dn?"UP":dn>up?"DOWN":"NEUTRAL";
+        const result=analyze(main.O,main.H,main.L,main.C,main.V);
+        if(mtfDir!=="NEUTRAL"&&mtfDir!==result.direction&&result.direction!=="WAIT"){
+          result.direction="WAIT";result.dcls="wait";result.duration="No Entry";
+        }
+        if(mtfDir===result.direction&&result.direction!=="WAIT"){
+          result.accuracy=Math.min(96,result.accuracy+align*2);
+        }
+        const stcOk=result.stc.allPassed;
+        const mtfOk=align>=2;
+        const confOk=result.accuracy>=80;
+        const isGo=result.direction!=="WAIT"&&stcOk&&mtfOk&&confOk;
+        const v={label:isGo?"GO":"AVOID",dir:result.direction,time:result.duration,color:result.direction==="UP"?C.up:C.down};
+        setVerdict(v);setSig(result);setLoading(false);
+        if(isGo)return; // Found GO - stop scanning
+      }catch(e){setErr(e.message);}
+    }
+    setLoading(false);
+  },[pair]);
+
   const takeTrade=()=>{
     if(!sig)return;
     const id=Date.now();
-    const t={id,pair,dir:sig.direction,dur:sig.duration,time:new Date().toLocaleTimeString(),date:new Date().toLocaleDateString(),result:null,accuracy:sig.accuracy};
+    const durationMs={"5 min":5*60*1000,"15 min":15*60*1000,"30 min":30*60*1000,"1 hour":60*60*1000}[sig.duration]||5*60*1000;
+    const t={id,pair,dir:sig.direction,dur:sig.duration,time:new Date().toLocaleTimeString(),date:new Date().toLocaleDateString(),result:null,accuracy:sig.accuracy,entryPrice:parseFloat(sig.last),expiryTime:Date.now()+durationMs};
     const h=[t,...history].slice(0,100);
     setHistory(h);saveH(h);setLastId(id);setTaken(true);
+    // Auto-track result after duration
+    const durationMs2={"5 min":5*60*1000,"15 min":15*60*1000,"30 min":30*60*1000,"1 hour":60*60*1000}[sig.duration]||5*60*1000;
+    const entryP=parseFloat(sig.last);
+    const tradeDir=sig.direction;
+    const tradePair=pair;
+    setTimeout(async()=>{
+      try{
+        const data=await fetchTF(tradePair,"5min");
+        const exitPrice=data.C[data.C.length-1];
+        const autoResult=tradeDir==="UP"?(exitPrice>entryP?"WIN":"LOSS"):(exitPrice<entryP?"WIN":"LOSS");
+        setHistory(prev=>{
+          const updated=prev.map(tr=>tr.id===id&&tr.result===null?{...tr,result:autoResult,exitPrice,auto:true}:tr);
+          saveH(updated);
+          return updated;
+        });
+        setTaken(false);setSig(null);
+      }catch(e){console.log("Auto-track failed:",e);}
+    },durationMs2);
   };
 
   const markResult=(result)=>{
@@ -606,7 +669,7 @@ function App(){
               {!taken?(
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
                   <button onClick={takeTrade} style={{padding:13,border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",background:sig.direction==="UP"?C.up:C.down,animation:sig.direction==="UP"?"pulseG 2s infinite":"pulseR 2s infinite"}}>✓ Take</button>
-                  <button onClick={()=>setSig(null)} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.dim,fontWeight:700,fontSize:14,cursor:"pointer"}}>✕ Skip</button>
+                  <button onClick={skipToNext} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.dim,fontWeight:700,fontSize:14,cursor:"pointer"}}>⏭ Next</button>
                 </div>
               ):(
                 <div style={{background:"rgba(0,224,150,0.06)",border:"1px solid rgba(0,224,150,0.18)",borderRadius:10,padding:14,textAlign:"center"}}>
