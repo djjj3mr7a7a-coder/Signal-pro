@@ -20,7 +20,7 @@ body{background:#08090f;color:#e0e0f0;font-family:-apple-system,BlinkMacSystemFo
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useCallback } = React;
+const { useState, useCallback, useEffect } = React;
 
 const PAIRS = [
   "EUR/USD","USD/JPY","AUD/USD","EUR/GBP","EUR/JPY","GBP/JPY","AUD/JPY",
@@ -29,7 +29,7 @@ const PAIRS = [
 
 const POLYGON_KEY = "qRpBREla7_HBFde0KNo90i9l5HflxWcn";
 
-// ?? Indicators ??????????????????????????????????????????????
+// 📊 Indicators 
 function calcEma(d, p) {
   const k = 2/(p+1); let e = d[0];
   for (let i=1;i<d.length;i++) e = d[i]*k + e*(1-k);
@@ -52,7 +52,7 @@ function calcAtr(H,L,C,p=14) {
   return tr.slice(-p).reduce((a,b)=>a+b,0)/p;
 }
 
-// ?? Market Structure ?????????????????????????????????????????
+// 🗺️ Market Structure 
 function marketStr(C) {
   let u=0,d=0;
   for (let i=3;i<Math.min(C.length,25);i++) {
@@ -64,7 +64,7 @@ function marketStr(C) {
   return {trend:"SIDEWAYS",score:0};
 }
 
-// ?? Candle Patterns ??????????????????????????????????????????
+// 🕯️ Candle Patterns 
 function candleP(O,H,L,C) {
   const n=C.length-1,o=O[n],h=H[n],l=L[n],c=C[n];
   const body=Math.abs(c-o),range=h-l,bull=c>o;
@@ -87,7 +87,7 @@ function candleP(O,H,L,C) {
   return {patterns:p,score:s};
 }
 
-// ?? Rejection Zones ??????????????????????????????????????????
+// 🎯 Rejection Zones 
 function rejZones(H,L,C) {
   const n=C.length,levels=[],tol=0.0003;
   for(let i=5;i<n-5;i++){
@@ -110,7 +110,7 @@ function rejZones(H,L,C) {
   return {nearZone:nz,nearType:nt,nearStrength:ns,atZone,score,label:atZone?`${nt} zone (${nz.touches}x) at ${nz.price.toFixed(5)}`:"No rejection zone nearby"};
 }
 
-// ?? Volume Profile ???????????????????????????????????????????
+// 📊 Volume Profile 
 function volProfile(H,L,C,V) {
   const n=C.length,minP=Math.min(...L),maxP=Math.max(...H),range=maxP-minP,buckets=20;
   const prof=Array.from({length:buckets},(_,b)=>({mid:minP+(b+0.5)*range/buckets,vol:0}));
@@ -128,9 +128,8 @@ function volProfile(H,L,C,V) {
   return {atHVN,atLVN,nearPOC,label};
 }
 
-// ?? Smart Triple Check ????????????????????????????????????????
+// 🛡️ Smart Triple Check 
 function smartTripleCheck(O,H,L,C,rz,vp,sig) {
-  // CHECK 1: Momentum Consistency (MCS)
   const n=C.length;
   let lu=0,ld=0;
   for(let i=n-5;i<n;i++){lu+=(C[i]>C[i-1]?1:0);ld+=(C[i]<C[i-1]?1:0);}
@@ -143,12 +142,10 @@ function smartTripleCheck(O,H,L,C,rz,vp,sig) {
   if(cndCons>=3)mcs++;if(strongCnd)mcs++;if(clearEma)mcs++;if(momAcc)mcs++;
   const check1=mcs>=3;
 
-  // CHECK 2: Structure Confluence (Rejection Zone + Volume)
   const rzOk=!rz.atZone||(rz.nearType==="SUPPORT"&&sig==="UP")||(rz.nearType==="RESISTANCE"&&sig==="DOWN");
   const vpOk=!vp.atHVN&&!vp.nearPOC;
   const check2=rzOk&&vpOk;
 
-  // CHECK 3: Multi-Signal Agreement (RSI + MACD + Price vs EMA)
   const rsiV=calcRsi(C);
   const macdV=calcMacd(C);
   const e20=calcEma(C.slice(-20),20),e50=calcEma(C.slice(-50),50);
@@ -175,7 +172,7 @@ function smartTripleCheck(O,H,L,C,rz,vp,sig) {
   };
 }
 
-// ?? Main Analysis ????????????????????????????????????????????
+// 🧠 Main Analysis 
 function analyze(O,H,L,C,V) {
   const n=C.length,last=C[n-1];
   const e20=calcEma(C.slice(-20),20),e50=calcEma(C.slice(-50),50);
@@ -206,7 +203,6 @@ function analyze(O,H,L,C,V) {
     dcls=total>0?"up":"down";
   }
 
-  // Smart Triple Check
   const stc=smartTripleCheck(O,H,L,C,rz,vp,direction);
   if(direction!=="WAIT"&&!stc.allPassed){direction="WAIT";dcls="wait";}
 
@@ -228,15 +224,15 @@ function analyze(O,H,L,C,V) {
   if(direction!=="WAIT"){
     const up=direction==="UP";
     if(up&&last>e20||!up&&last<e20) reasons.push(`Price ${up?"above":"below"} EMA20 & EMA50`);
-    if(r<40&&up) reasons.push(`RSI ${r.toFixed(0)}  oversold reversal`);
-    if(r>60&&!up) reasons.push(`RSI ${r.toFixed(0)}  overbought reversal`);
-    if(ms.score!==0) reasons.push(`${ms.trend}  ${up?"HH/HL":"LH/LL"} confirmed`);
-    if(cp.patterns.length>0) reasons.push(`${cp.patterns[0]}  ${up?"bullish":"bearish"} pattern`);
+    if(r<40&&up) reasons.push(`RSI ${r.toFixed(0)} • oversold reversal`);
+    if(r>60&&!up) reasons.push(`RSI ${r.toFixed(0)} • overbought reversal`);
+    if(ms.score!==0) reasons.push(`${ms.trend} • ${up?"HH/HL":"LH/LL"} confirmed`);
+    if(cp.patterns.length>0) reasons.push(`${cp.patterns[0]} • ${up?"bullish":"bearish"} pattern`);
     if(rz.atZone) reasons.push(`${rz.nearType} zone ${rz.nearZone.touches}x confirmed`);
-    if(vp.atLVN) reasons.push("LVN  explosive move zone");
+    if(vp.atLVN) reasons.push("LVN • explosive move zone");
     while(reasons.length<3) reasons.push(`${up?"Bullish":"Bearish"} momentum aligned`);
   } else {
-    reasons.push("Mixed signals  no clear bias");
+    reasons.push("Mixed signals • no clear bias");
     reasons.push(`Smart Triple Check: ${stc.passed}/3 checks passed`);
     reasons.push("Wait for stronger confirmation");
   }
@@ -275,7 +271,7 @@ function quickBias(O,H,L,C){
 function loadH(){try{return JSON.parse(localStorage.getItem("sbh")||"[]");}catch{return[];}}
 function saveH(h){try{localStorage.setItem("sbh",JSON.stringify(h));}catch{}}
 
-// ?? Colors ???????????????????????????????????????????????????
+// 🎨 Colors 
 const C={
   bg:"#08090f",card:"#10121e",box:"#0d0f1a",border:"#1e2235",
   text:"#e0e0f0",dim:"#444",dim2:"#2a2d45",
@@ -283,7 +279,7 @@ const C={
   accentB:"#4fc3f7"
 };
 
-// ?? Styles ???????????????????????????????????????????????????
+// 📐 Styles 
 const S={
   app:{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"-apple-system,BlinkMacSystemFont,sans-serif",display:"flex",justifyContent:"center"},
   wrap:{width:"100%",maxWidth:400,padding:"0 16px 60px"},
@@ -308,7 +304,6 @@ function App(){
   const [history,setHistory]=useState(loadH);
   const [lastId,setLastId]=useState(null);
   const [taken,setTaken]=useState(false);
-  const [pairIdx,setPairIdx]=useState(0);
 
   const dc=sig?.direction==="UP"?C.up:sig?.direction==="DOWN"?C.down:C.wait;
 
@@ -336,9 +331,8 @@ function App(){
       }
       if(mtfDir===result.direction&&result.direction!=="WAIT"){
         result.accuracy=Math.min(96,result.accuracy+align*2);
-        if(align>=3)result.reasons[2]=`${align}/3 timeframes aligned  strong confirmation`;
+        if(align>=3)result.reasons[2] = `${align}/3 timeframes aligned • strong confirmation`;
       }
-      // Final verdict
       const stcOk=result.stc.allPassed;
       const mtfOk=align>=2;
       const confOk=result.accuracy>=80;
@@ -349,48 +343,17 @@ function App(){
     setLoading(false);
   },[pair]);
 
-  const skipToNext=useCallback(async()=>{
-    // Try next pairs until we find GO or run out
-    setSig(null);setVerdict(null);setErr("");
+  // تحديث تلقائي للإشارة عند تغيير الزوج
+  useEffect(() => {
+    if(pair) getSignal();
+  }, [pair, getSignal]);
+
+  // تعديل ذكي لدالة الانتقال للزوج التالي لمنع التكرار
+  const skipToNext=() => {
     const startIdx=PAIRS.indexOf(pair);
-    for(let i=1;i<PAIRS.length;i++){
-      const nextPair=PAIRS[(startIdx+i)%PAIRS.length];
-      setPair(nextPair);
-      setLoading(true);
-      try{
-        const main=await fetchTF(nextPair,"5min");
-        const tfs=[["5min","5M"],["15min","15M"],["1h","1H"]];
-        const mtfArr=[];let up=0,dn=0;
-        for(const [tf,lbl] of tfs){
-          try{
-            if(tf!=="5min")await new Promise(r=>setTimeout(r,250));
-            const d=tf==="5min"?main:await fetchTF(nextPair,tf);
-            const b=quickBias(d.O,d.H,d.L,d.C);
-            mtfArr.push({lbl,bias:b,active:tf==="5min"});
-            if(b==="UP")up++;else if(b==="DOWN")dn++;
-          }catch{mtfArr.push({lbl,bias:"N/A",active:tf==="5min"});}
-        }
-        setMtf(mtfArr);
-        const align=Math.max(up,dn);
-        const mtfDir=up>dn?"UP":dn>up?"DOWN":"NEUTRAL";
-        const result=analyze(main.O,main.H,main.L,main.C,main.V);
-        if(mtfDir!=="NEUTRAL"&&mtfDir!==result.direction&&result.direction!=="WAIT"){
-          result.direction="WAIT";result.dcls="wait";result.duration="No Entry";
-        }
-        if(mtfDir===result.direction&&result.direction!=="WAIT"){
-          result.accuracy=Math.min(96,result.accuracy+align*2);
-        }
-        const stcOk=result.stc.allPassed;
-        const mtfOk=align>=2;
-        const confOk=result.accuracy>=80;
-        const isGo=result.direction!=="WAIT"&&stcOk&&mtfOk&&confOk;
-        const v={label:isGo?"GO":"AVOID",dir:result.direction,time:result.duration,color:result.direction==="UP"?C.up:C.down};
-        setVerdict(v);setSig(result);setLoading(false);
-        if(isGo)return; // Found GO - stop scanning
-      }catch(e){setErr(e.message);}
-    }
-    setLoading(false);
-  },[pair]);
+    const nextPair=PAIRS[(startIdx+1)%PAIRS.length];
+    setPair(nextPair);
+  };
 
   const takeTrade=()=>{
     if(!sig)return;
@@ -399,7 +362,7 @@ function App(){
     const t={id,pair,dir:sig.direction,dur:sig.duration,time:new Date().toLocaleTimeString(),date:new Date().toLocaleDateString(),result:null,accuracy:sig.accuracy,entryPrice:parseFloat(sig.last),expiryTime:Date.now()+durationMs};
     const h=[t,...history].slice(0,100);
     setHistory(h);saveH(h);setLastId(id);setTaken(true);
-    // Auto-track result after duration
+    
     const durationMs2={"5 min":5*60*1000,"15 min":15*60*1000,"30 min":30*60*1000,"1 hour":60*60*1000}[sig.duration]||5*60*1000;
     const entryP=parseFloat(sig.last);
     const tradeDir=sig.direction;
@@ -434,13 +397,12 @@ function App(){
   const losses=done.filter(t=>t.result==="LOSS").length;
   const rate=done.length>0?Math.round(wins/done.length*100):0;
 
-  // ?? History Page ?????????????????????????????????????????
   if(page==="history") return(
     <div style={S.app}>
       <div style={S.wrap}>
         <div style={{...S.hdr}}>
-          <div style={{fontSize:18,fontWeight:800,color:C.text}}>?? Trade History</div>
-          <button onClick={()=>setPage("signals")} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"8px 14px",color:C.accent,fontSize:13,fontWeight:600,cursor:"pointer"}}>? Back</button>
+          <div style={{fontSize:18,fontWeight:800,color:C.text}}>📊 Trade History</div>
+          <button onClick={()=>setPage("signals")} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"8px 14px",color:C.accent,fontSize:13,fontWeight:600,cursor:"pointer"}}>Back</button>
         </div>
         <div style={{...S.g4,marginBottom:16}}>
           {[{n:history.length,l:"TOTAL",c:C.accent},{n:wins,l:"WINS",c:C.up},{n:losses,l:"LOSSES",c:C.down},{n:`${rate}%`,l:"WIN RATE",c:rate>=65?C.up:rate>=50?C.wait:C.down}].map(x=>(
@@ -468,12 +430,11 @@ function App(){
             </div>
           ))
         }
-        {history.length>0&&<button onClick={()=>{if(window.confirm("Clear all trade history?")){const h=[];setHistory(h);saveH(h);}}} style={{width:"100%",marginTop:12,padding:10,background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.dim,fontSize:11,cursor:"pointer"}}>??? Clear All History</button>}
+        {history.length>0&&<button onClick={()=>{if(window.confirm("Clear all trade history?")){const h=[];setHistory(h);saveH(h);}}} style={{width:"100%",marginTop:12,padding:10,background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.dim,fontSize:11,cursor:"pointer"}}>Clear All History</button>}
       </div>
     </div>
   );
 
-  // ?? Signals Page ?????????????????????????????????????????
   return(
     <div style={S.app}>
       <style>{`
@@ -534,7 +495,7 @@ function App(){
         <div style={{background:C.card,border:`1px solid #1a1c2e`,borderRadius:16,padding:18,marginBottom:12,minHeight:100}}>
           {!sig&&!loading&&!err&&<div style={{textAlign:"center",color:C.dim2,fontSize:14,padding:"20px 0"}}>Press Get Signal to start</div>}
           {loading&&<div style={{textAlign:"center",padding:"20px 0"}}><div style={{width:36,height:36,border:`3px solid ${C.border}`,borderTop:`3px solid ${C.accent}`,borderRadius:"50%",animation:"spin 0.8s linear infinite",margin:"0 auto 10px"}}/><div style={{color:C.dim,fontSize:12}}>Analyzing 3 timeframes...</div></div>}
-          {err&&<div style={{textAlign:"center",color:C.down,fontSize:13,padding:"20px 0"}}>? {err}</div>}
+          {err&&<div style={{textAlign:"center",color:C.down,fontSize:13,padding:"20px 0"}}>• {err}</div>}
 
           {sig&&!loading&&(
             <div style={{animation:"fadeUp 0.4s ease"}}>
@@ -592,10 +553,10 @@ function App(){
                 <div>{sig.cp.patterns.length>0?sig.cp.patterns.map(p=><span key={p} style={{background:"#1a1c2e",borderRadius:5,padding:"2px 7px",fontSize:10,color:C.accent,marginRight:3}}>{p}</span>):<span style={{fontSize:10,color:"#333"}}>No pattern detected</span>}</div>
               </div>
 
-              {/* ??? SMART TRIPLE CHECK ???????????????????????? */}
+              {/* SMART TRIPLE CHECK */}
               <div style={{...S.ibox,border:`1px solid ${sig.stc.allPassed?"rgba(0,224,150,0.25)":"rgba(255,77,109,0.25)"}`,marginBottom:8}}>
                 <div style={{...S.row,marginBottom:8}}>
-                  <span style={{...S.lbl,color:sig.stc.allPassed?C.up:C.down}}>? Smart Triple Check</span>
+                  <span style={{...S.lbl,color:sig.stc.allPassed?C.up:C.down}}>🛡️ Smart Triple Check</span>
                   <span style={{fontSize:12,fontWeight:700,color:sig.stc.allPassed?C.up:C.down}}>{sig.stc.passed}/3 {sig.stc.allPassed?"PASSED":"FAILED"}</span>
                 </div>
                 {[
@@ -612,12 +573,11 @@ function App(){
                   </div>
                 ))}
               </div>
-              {/* ??????????????????????????????????????????????? */}
 
               {/* Rejection Zone */}
               <div style={{...S.ibox,marginBottom:8}}>
                 <div style={S.row}>
-                  <span style={S.lbl}>? Rejection Zone</span>
+                  <span style={S.lbl}>🎯 Rejection Zone</span>
                   <span style={{fontSize:11,fontWeight:700,color:sig.rz.atZone?(sig.rz.nearType==="SUPPORT"?C.up:C.down):"#444"}}>{sig.rz.atZone?`${sig.rz.nearType} (${sig.rz.nearZone.touches}x)`:"NONE NEARBY"}</span>
                 </div>
                 <div style={{fontSize:11,color:"#666",marginTop:3}}>{sig.rz.label}</div>
@@ -626,7 +586,7 @@ function App(){
               {/* Volume Profile */}
               <div style={{...S.ibox,marginBottom:8}}>
                 <div style={S.row}>
-                  <span style={S.lbl}>?? Volume Profile</span>
+                  <span style={S.lbl}>📊 Volume Profile</span>
                   <span style={{fontSize:11,fontWeight:700,color:sig.vp.atLVN?C.wait:sig.vp.atHVN?C.accent:"#444"}}>{sig.vp.atLVN?"EXPLOSION ZONE":sig.vp.atHVN?"HVN":sig.vp.nearPOC?"NEAR POC":"CLEAR"}</span>
                 </div>
                 <div style={{fontSize:11,color:"#666",marginTop:3}}>{sig.vp.label}</div>
@@ -637,7 +597,7 @@ function App(){
                 <div>
                   <div style={S.lbl}>Signal</div>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    <span style={{fontSize:24}}>{sig.direction==="UP"?"?":sig.direction==="DOWN"?"?":""}</span>
+                    <span style={{fontSize:24}}>{sig.direction==="UP"?"🟢":sig.direction==="DOWN"?"🔴":"🟡"}</span>
                     <span style={{fontSize:26,fontWeight:900,color:dc}}>{sig.direction}</span>
                   </div>
                 </div>
@@ -649,7 +609,7 @@ function App(){
 
               {/* Reasons */}
               <div style={{...S.ibox,marginBottom:12}}>
-                <div style={{...S.lbl,marginBottom:8}}>? Top 3 Reasons</div>
+                <div style={{...S.lbl,marginBottom:8}}>💡 Top 3 Reasons</div>
                 {sig.reasons.map((r,i)=>(
                   <div key={i} style={{display:"flex",gap:8,marginBottom:7,alignItems:"flex-start"}}>
                     <div style={{width:18,height:18,borderRadius:"50%",background:`${dc}22`,color:dc,fontSize:10,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{i+1}</div>
@@ -685,7 +645,7 @@ function App(){
                 </div>
               ):(
                 <div style={{background:"rgba(0,224,150,0.06)",border:"1px solid rgba(0,224,150,0.18)",borderRadius:10,padding:14,textAlign:"center"}}>
-                  <div style={{fontSize:13,color:C.up,fontWeight:600,marginBottom:10}}>? Mark result:</div>
+                  <div style={{fontSize:13,color:C.up,fontWeight:600,marginBottom:10}}>Mark result:</div>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
                     <button onClick={()=>markResult("WIN")} style={{padding:10,background:"rgba(0,224,150,0.15)",border:`1px solid ${C.up}60`,borderRadius:8,color:C.up,fontWeight:700,fontSize:13,cursor:"pointer"}}>WIN</button>
                     <button onClick={()=>markResult("LOSS")} style={{padding:10,background:"rgba(255,77,109,0.15)",border:`1px solid ${C.down}60`,borderRadius:8,color:C.down,fontWeight:700,fontSize:13,cursor:"pointer"}}>LOSS</button>
@@ -699,13 +659,13 @@ function App(){
         {/* Get Signal Button */}
         {!loading&&!sig&&(
           <button onClick={getSignal} style={{width:"100%",padding:15,background:`linear-gradient(135deg,${C.accentB},${C.accent})`,border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",boxShadow:`0 4px 24px ${C.accent}44`}}>
-            ? Get Signal
+            Get Signal
           </button>
         )}
 
         {/* Nav */}
         <div style={{display:"flex",justifyContent:"space-around",marginTop:24,borderTop:`1px solid ${C.card}`,paddingTop:14}}>
-          {[{ic:"P",lb:"Profile"},{ic:"H",lb:"History",action:()=>setPage("history")},{ic:"S",lb:"Signals"},{ic:"A",lb:"AI"},{ic:"X",lb:"Support"}].map((x,i)=>(
+          {[{ic:"👤",lb:"Profile"},{ic:"📊",lb:"History",action:()=>setPage("history")},{ic:"📶",lb:"Signals"},{ic:"🤖",lb:"AI"},{ic:"💬",lb:"Support"}].map((x,i)=>(
             <div key={x.lb} onClick={x.action} style={{textAlign:"center",cursor:x.action?"pointer":"default",opacity:x.lb==="Signals"||x.lb==="History"?1:0.25}}>
               <div style={{fontSize:17,marginBottom:2}}>{x.ic}</div>
               <div style={{fontSize:9,color:x.lb==="Signals"?C.accent:"#333",fontWeight:x.lb==="Signals"?700:400}}>{x.lb}</div>
@@ -717,7 +677,6 @@ function App(){
     </div>
   );
 }
-
 
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
 </script>
