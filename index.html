@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="SpriNg Bot"/>
 <meta name="theme-color" content="#06070c"/>
-<title>SpriNg Bot</title>
+<title>SpriNg Bot – Twelve Data</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
@@ -37,10 +37,18 @@ body::before {
 const { useState, useCallback } = React;
 
 const PAIRS = [
-  "EUR/USD","USD/JPY","AUD/USD","EUR/GBP","EUR/JPY","GBP/JPY","AUD/JPY","AUD/CAD"
+  "EUR/USD","USD/JPY","AUD/USD","EUR/GBP","EUR/JPY","GBP/JPY","AUD/JPY",
+  "AUD/CAD"
 ];
 
-// 📊 Indicators 
+// ============================================================
+// 🔑 TWELVE DATA API KEY
+// ============================================================
+const TWELVE_KEY = "30a1cd1a62274ed29c7fb8d8e41c1f00";
+
+// ============================================================
+// INDICATORS (نفس الكود القديم)
+// ============================================================
 function calcEma(d, p) {
   const k = 2/(p+1); let e = d[0];
   for (let i=1;i<d.length;i++) e = d[i]*k + e*(1-k);
@@ -63,19 +71,17 @@ function calcAtr(H,L,C,p=14) {
   return tr.slice(-p).reduce((a,b)=>a+b,0)/p;
 }
 
-// 📈 Market Structure
 function marketStr(C) {
   let u=0,d=0;
   for (let i=3;i<Math.min(C.length,25);i++) {
     if(C[i]>C[i-1]&&C[i-1]>C[i-2]&&C[i-2]>C[i-3])u++;
-    if(C[i]<C[i-1]&&C[i]<C[i-2]&&C[i-2]<C[i-3])d++;
+    if(C[i]<C[i-1]&&C[i-1]<C[i-2]&&C[i-2]<C[i-3])d++;
   }
   if(u>d+1) return {trend:"UPTREND",score:2};
   if(d>u+1) return {trend:"DOWNTREND",score:-2};
   return {trend:"SIDEWAYS",score:0};
 }
 
-// 🕯️ Candle Patterns
 function candleP(O,H,L,C) {
   const n=C.length-1,o=O[n],h=H[n],l=L[n],c=C[n];
   const body=Math.abs(c-o),range=h-l,bull=c>o;
@@ -98,7 +104,6 @@ function candleP(O,H,L,C) {
   return {patterns:p,score:s};
 }
 
-// 🎯 Rejection Zones
 function rejZones(H,L,C) {
   const n=C.length,levels=[],tol=0.0003;
   for(let i=5;i<n-5;i++){
@@ -121,7 +126,6 @@ function rejZones(H,L,C) {
   return {nearZone:nz,nearType:nt,nearStrength:ns,atZone,score,label:atZone?`${nt} zone (${nz.touches}x) at ${nz.price.toFixed(5)}`:"No rejection zone nearby"};
 }
 
-// 📊 Volume Profile
 function volProfile(H,L,C,V) {
   const n=C.length,minP=Math.min(...L),maxP=Math.max(...H),range=maxP-minP,buckets=20;
   const prof=Array.from({length:buckets},(_,b)=>({mid:minP+(b+0.5)*range/buckets,vol:0}));
@@ -139,7 +143,6 @@ function volProfile(H,L,C,V) {
   return {atHVN,atLVN,nearPOC,label};
 }
 
-// 🛡️ Smart Triple Check
 function smartTripleCheck(O,H,L,C,rz,vp,sig) {
   const n=C.length;
   let lu=0,ld=0;
@@ -153,13 +156,13 @@ function smartTripleCheck(O,H,L,C,rz,vp,sig) {
   if(cndCons>=3)mcs++;if(strongCnd)mcs++;if(clearEma)mcs++;if(momAcc)mcs++;
   const check1=mcs>=3;
 
-  const rzOk=!rz.atZone||(rz.nearType==="SUPPORT"&&sig==="UP")||(rz.nearType==="RESISTANCE"&&sig==="DOWN")||(sig==="WAIT");
-  const vpOk=vp.atLVN || (!vp.atHVN); 
+  const rzOk=!rz.atZone||(rz.nearType==="SUPPORT"&&sig==="UP")||(rz.nearType==="RESISTANCE"&&sig==="DOWN");
+  const vpOk=vp.atLVN || (!vp.atHVN);
   const check2=rzOk&&vpOk;
 
   const rsiV=calcRsi(C);
   const macdV=calcMacd(C);
-  const e20=calcEma(C.slice(-20),20);
+  const e20=calcEma(C.slice(-20),20),e50=calcEma(C.slice(-50),50);
   const last=C[n-1];
   let agree=0;
   if(sig==="UP"){
@@ -183,7 +186,6 @@ function smartTripleCheck(O,H,L,C,rz,vp,sig) {
   };
 }
 
-// 🧠 Main Analysis
 function analyze(O,H,L,C,V) {
   const n=C.length,last=C[n-1];
   const e20=calcEma(C.slice(-20),20),e50=calcEma(C.slice(-50),50);
@@ -253,70 +255,41 @@ function analyze(O,H,L,C,V) {
   };
 }
 
-// 🌐 دالة جلب البيانات المحدثة بالكامل مع معالجة ذكية للـ CORS Proxies والـ Fallbacks
+// ============================================================
+// ✅🐍 TWELVE DATA FETCH
+// ============================================================
 async function fetchTF(symbol, interval) {
-  const mapYahoo = {"5min":"5m", "15min":"15m", "30min":"30m", "1h":"1h", "4h":"4h"};
-  const tf = mapYahoo[interval] || "5m";
-  
-  const cleanSymbol = symbol.replace("/", "").toUpperCase();
-  const ticker = `${cleanSymbol}=X`;
-  
-  const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${tf}&range=5d`;
-  
-  // البريدجات البديلة لضمان جلب البيانات بنسبة 100% بدون حظر أو خطأ
-  const proxyEndpoints = [
-    `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
-    `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`
-  ];
-  
-  for (let i = 0; i < proxyEndpoints.length; i++) {
-    try {
-      const response = await fetch(proxyEndpoints[i]);
-      if (!response.ok) continue;
-      
-      const resData = await response.json();
-      
-      // الكشف التلقائي عن صياغة البريدج وفك محتويات الـ JSON بناءً عليه
-      let rawContents;
-      if (resData.contents) {
-        rawContents = typeof resData.contents === 'string' ? JSON.parse(resData.contents) : resData.contents;
-      } else {
-        rawContents = resData;
-      }
-      
-      if (!rawContents || !rawContents.chart || !rawContents.chart.result) continue;
-      
-      const resultBlock = rawContents.chart.result[0];
-      if (!resultBlock || !resultBlock.timestamp) continue;
-      
-      const quotes = resultBlock.indicators.quote[0];
-      const timestamps = resultBlock.timestamp;
-      
-      const O = [], H = [], L = [], C = [], V = [];
-      for (let j = 0; j < timestamps.length; j++) {
-        if (quotes.open[j] != null && quotes.high[j] != null && quotes.low[j] != null && quotes.close[j] != null) {
-          O.push(quotes.open[j]);
-          H.push(quotes.high[j]);
-          L.push(quotes.low[j]);
-          C.push(quotes.close[j]);
-          V.push(quotes.volume[j] || 0);
-        }
-      }
-      
-      if (C.length > 0) {
-        return {
-          O: O.slice(-100),
-          H: H.slice(-100),
-          L: L.slice(-100),
-          C: C.slice(-100),
-          V: V.slice(-100)
-        };
-      }
-    } catch (err) {
-      console.warn(`Proxy channel ${i + 1} experienced a glitch, switching to fallback channel...`);
-    }
+  const map = {
+    "5min": "5min",
+    "15min": "15min",
+    "30min": "30min",
+    "1h": "1h",
+    "4h": "4h"
+  };
+  const inter = map[interval] || "5min";
+
+  const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${inter}&outputsize=100&apikey=${TWELVE_KEY}`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (data.status === "error") {
+    throw new Error(data.message || "Twelve Data error");
   }
-  throw new Error("Data stream interrupted. Please refresh or try again.");
+
+  if (!data.values || data.values.length === 0) {
+    throw new Error("No data returned from Twelve Data");
+  }
+
+  const vals = data.values.reverse().slice(0, -1);
+
+  return {
+    O: vals.map(v => parseFloat(v.open)),
+    H: vals.map(v => parseFloat(v.high)),
+    L: vals.map(v => parseFloat(v.low)),
+    C: vals.map(v => parseFloat(v.close)),
+    V: vals.map(v => parseFloat(v.volume || 0))
+  };
 }
 
 function quickBias(O,H,L,C){
@@ -331,7 +304,9 @@ function quickBias(O,H,L,C){
 function loadH(){try{return JSON.parse(localStorage.getItem("sbh")||"[]");}catch{return[];}}
 function saveH(h){try{localStorage.setItem("sbh",JSON.stringify(h));}catch{}}
 
-// 🎨 Colors
+// ============================================================
+// COLORS & STYLES
+// ============================================================
 const C={
   bg:"transparent",card:"rgba(16, 18, 30, 0.85)",box:"rgba(13, 15, 26, 0.7)",border:"#1e2235",
   text:"#e0e0f0",dim:"#707898",dim2:"#444a68",
@@ -339,7 +314,6 @@ const C={
   accentB:"#4fc3f7"
 };
 
-// 📐 Styles
 const S={
   app:{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"-apple-system,BlinkMacSystemFont,sans-serif",display:"flex",justifyContent:"center",position:"relative"},
   wrap:{width:"100%",maxWidth:400,padding:"0 16px 80px"},
@@ -353,6 +327,9 @@ const S={
   footer:{position:"absolute",bottom:55,left:0,right:0,textAlign:"center",fontSize:10,color:"#525a7a",letterSpacing:"1px",fontWeight:500,pointerEvents:"none"}
 };
 
+// ============================================================
+// MAIN APP
+// ============================================================
 function App(){
   const [pair,setPair]=useState("EUR/USD");
   const [showDD,setShowDD]=useState(false);
@@ -490,9 +467,9 @@ function App(){
   if(page==="history") return(
     <div style={S.app}>
       <div style={S.wrap}>
-        <div style={{...S.hdr, flexDirection:"row", justify_content:"space-between", padding:"40px 0 20px"}}>
-          <div style={{fontSize:18,fontWeight:800,color:C.text}}>📂 Trade History</div>
-          <button onClick={()=>setPage("signals")} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"8px 14px",color:C.accent,fontSize:13,fontWeight:600,cursor:"pointer"}}>⬅️ Back</button>
+        <div style={{...S.hdr, flexDirection:"row", justifyContent:"space-between", padding:"40px 0 20px"}}>
+          <div style={{fontSize:18,fontWeight:800,color:C.text}}>📊 Trade History</div>
+          <button onClick={()=>setPage("signals")} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"8px 14px",color:C.accent,fontSize:13,fontWeight:600,cursor:"pointer"}}>← Back</button>
         </div>
         <div style={{...S.g4,marginBottom:16}}>
           {[{n:history.length,l:"TOTAL",c:C.accent},{n:wins,l:"WINS",c:C.up},{n:losses,l:"LOSSES",c:C.down},{n:`${rate}%`,l:"WIN RATE",c:rate>=65?C.up:rate>=50?C.wait:C.down}].map(x=>(
@@ -520,7 +497,7 @@ function App(){
             </div>
           ))
         }
-        {history.length>0&&<button onClick={()=>{if(window.confirm("Clear all trade history?")){const h=[];setHistory(h);saveH(h);}}} style={{width:"100%",marginTop:12,padding:10,background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.dim,fontSize:11,cursor:"pointer"}}>🧹 Clear All History</button>}
+        {history.length>0&&<button onClick={()=>{if(window.confirm("Clear all trade history?")){const h=[];setHistory(h);saveH(h);}}} style={{width:"100%",marginTop:12,padding:10,background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.dim,fontSize:11,cursor:"pointer"}}>🗑 Clear All History</button>}
       </div>
       <div style={S.footer}>MADE BY: ABDALLAH MAHER</div>
     </div>
@@ -572,7 +549,7 @@ function App(){
         <div style={{background:C.card,border:`1px solid #1a1c2e`,backdropFilter:"blur(10px)",borderRadius:16,padding:18,marginBottom:12,minHeight:100, boxShadow:"0 8px 32px rgba(0,0,0,0.25)"}}>
           {!sig&&!loading&&!err&&<div style={{textAlign:"center",color:C.dim,fontSize:14,padding:"30px 0",fontWeight:500}}>Press <span style={{color:C.accent}}>Get Signal</span> to scan the market</div>}
           {loading&&<div style={{textAlign:"center",padding:"20px 0"}}><div style={{width:36,height:36,border:`3px solid ${C.border}`,borderTop:`3px solid ${C.accent}`,borderRadius:"50%",animation:"spin 0.8s linear infinite",margin:"0 auto 10px"}}/><div style={{color:C.dim,fontSize:12}}>Analyzing market vectors...</div></div>}
-          {err&&<div style={{textAlign:"center",color:C.down,fontSize:13,padding:"20px 0"}}>⚠️ {err}</div>}
+          {err&&<div style={{textAlign:"center",color:C.down,fontSize:13,padding:"20px 0"}}>❌ {err}</div>}
 
           {sig&&!loading&&(
             <div style={{animation:"fadeUp 0.4s ease"}}>
@@ -633,7 +610,7 @@ function App(){
               {/* SMART TRIPLE CHECK */}
               <div style={{...S.ibox,border:`1px solid ${sig.stc.allPassed?"rgba(0,224,150,0.25)":"rgba(255,77,109,0.25)"}`,marginBottom:8}}>
                 <div style={{...S.row,marginBottom:8}}>
-                  <span style={{...S.lbl,color:sig.stc.allPassed?C.up:C.down}}>🛡️ SMART TRIPLE CHECK</span>
+                  <span style={{...S.lbl,color:sig.stc.allPassed?C.up:C.down}}>🧠 SMART TRIPLE CHECK</span>
                   <span style={{fontSize:12,fontWeight:700,color:sig.stc.allPassed?C.up:C.down}}>{sig.stc.passed}/3 {sig.stc.allPassed?"PASSED":"FAILED"}</span>
                 </div>
                 {[
@@ -644,7 +621,7 @@ function App(){
                   <div key={ch.n} style={{display:"flex",alignItems:"flex-start",gap:8,marginBottom:6,background:"rgba(10,12,20,0.5)",borderRadius:8,padding:"8px 10px"}}>
                     <div style={{width:20,height:20,borderRadius:"50%",background:ch.ok?"rgba(0,224,150,0.15)":"rgba(255,77,109,0.15)",border:`1px solid ${ch.ok?C.up:C.down}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:ch.ok?C.up:C.down,flexShrink:0}}>{ch.n}</div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:11,fontWeight:600,color:ch.ok?C.text:C.dim,marginBottom:2}}>{ch.label} {ch.ok?"✅":"❌"}</div>
+                      <div style={{fontSize:11,fontWeight:600,color:ch.ok?C.text:C.dim,marginBottom:2}}>{ch.label} {ch.ok?"OK":"X"}</div>
                       <div style={{fontSize:10,color:C.dim}}>{ch.detail}</div>
                     </div>
                   </div>
@@ -654,7 +631,7 @@ function App(){
               {/* Rejection Zone */}
               <div style={{...S.ibox,marginBottom:8}}>
                 <div style={S.row}>
-                  <span style={S.lbl}>🎯 REJECTION ZONE</span>
+                  <span style={S.lbl}>⚡ REJECTION ZONE</span>
                   <span style={{fontSize:11,fontWeight:700,color:sig.rz.atZone?(sig.rz.nearType==="SUPPORT"?C.up:C.down):C.dim2}}>{sig.rz.atZone?`${sig.rz.nearType} (${sig.rz.nearZone.touches}x)`:"NONE NEARBY"}</span>
                 </div>
                 <div style={{fontSize:11,color:C.dim,marginTop:3}}>{sig.rz.label}</div>
@@ -674,7 +651,7 @@ function App(){
                 <div>
                   <div style={S.lbl}>Signal</div>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    <span style={{fontSize:24}}>{sig.direction==="UP"?"🟢":sig.direction==="DOWN"?"🔴":"🟡"}</span>
+                    <span style={{fontSize:24}}>{sig.direction==="UP"?"📈":sig.direction==="DOWN"?"📉":"⏳"}</span>
                     <span style={{fontSize:26,fontWeight:900,color:dc}}>{sig.direction}</span>
                   </div>
                 </div>
@@ -686,7 +663,7 @@ function App(){
 
               {/* Reasons */}
               <div style={{...S.ibox,marginBottom:12}}>
-                <div style={{...S.lbl,marginBottom:8}}>💡 TOP 3 REASONS</div>
+                <div style={{...S.lbl,marginBottom:8}}>✨ TOP 3 REASONS</div>
                 {sig.reasons.map((r,i)=>(
                   <div key={i} style={{display:"flex",gap:8,marginBottom:7,alignItems:"flex-start"}}>
                     <div style={{width:18,height:18,borderRadius:"50%",background:`${dc}22`,color:dc,fontSize:10,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{i+1}</div>
@@ -700,7 +677,7 @@ function App(){
                 <div style={{borderRadius:12,border:`2px solid ${verdict.label==="GO"?verdict.color:C.border}`,marginBottom:12}}>
                   <div style={{background:verdict.label==="GO"?`${verdict.color}18`:C.box,padding:14,display:"flex",alignItems:"center",justifyContent:"space-between",borderRadius:10}}>
                     <div style={{display:"flex",alignItems:"center",gap:10}}>
-                      <div style={{width:40,height:40,borderRadius:"50%",background:verdict.label==="GO"?verdict.color:"#1b1e30",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{verdict.label==="GO"?"🚀":"⚠️"}</div>
+                      <div style={{width:40,height:40,borderRadius:"50%",background:verdict.label==="GO"?verdict.color:"#1b1e30",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{verdict.label==="GO"?"✅":"🚫"}</div>
                       <div>
                         <div style={{fontSize:22,fontWeight:900,letterSpacing:2,color:verdict.label==="GO"?verdict.color:C.dim2}}>{verdict.label}</div>
                         <div style={{fontSize:10,color:C.dim}}>{verdict.label==="GO"?"All 3 checks passed":"Triple check failed"}</div>
@@ -717,12 +694,12 @@ function App(){
               {/* Actions */}
               {!taken?(
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-                  <button onClick={takeTrade} style={{padding:13,border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",background:sig.direction==="UP"?C.up:C.down,animation:sig.direction==="UP"?"pulseG 2s infinite":"pulseR 2s infinite"}}>🎯 Take</button>
-                  <button onClick={skipToNext} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.text,fontWeight:700,fontSize:14,cursor:"pointer"}}>⏭️ Next</button>
+                  <button onClick={takeTrade} style={{padding:13,border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",background:sig.direction==="UP"?C.up:C.down,animation:sig.direction==="UP"?"pulseG 2s infinite":"pulseR 2s infinite"}}>✅ Take</button>
+                  <button onClick={skipToNext} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.text,fontWeight:700,fontSize:14,cursor:"pointer"}}>⏭ Next</button>
                 </div>
               ):(
                 <div style={{background:"rgba(0,224,150,0.06)",border:"1px solid rgba(0,224,150,0.18)",borderRadius:10,padding:14,textAlign:"center"}}>
-                  <div style={{fontSize:13,color:C.up,fontWeight:600,marginBottom:10}}>📝 Mark result:</div>
+                  <div style={{fontSize:13,color:C.up,fontWeight:600,marginBottom:10}}>💎 Mark result:</div>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
                     <button onClick={()=>markResult("WIN")} style={{padding:10,background:"rgba(0,224,150,0.15)",border:`1px solid ${C.up}60`,borderRadius:8,color:C.up,fontWeight:700,fontSize:13,cursor:"pointer"}}>✅ WIN</button>
                     <button onClick={()=>markResult("LOSS")} style={{padding:10,background:"rgba(255,77,109,0.15)",border:`1px solid ${C.down}60`,borderRadius:8,color:C.down,fontWeight:700,fontSize:13,cursor:"pointer"}}>❌ LOSS</button>
@@ -736,7 +713,7 @@ function App(){
         {/* Get Signal Button */}
         {!loading&&!sig&&(
           <button onClick={getSignal} style={{width:"100%",padding:15,background:`linear-gradient(135deg,${C.accentB},${C.accent})`,border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",boxShadow:`0 4px 24px ${C.accent}44`}}>
-            ⚡ Get Signal
+            🚀 Get Signal
           </button>
         )}
 
@@ -744,10 +721,10 @@ function App(){
         <div style={{display:"flex",justifyContent:"space-around",marginTop:24,borderTop:`1px solid rgba(255,255,255,0.05)`,paddingTop:14}}>
           {[
             {ic:"👤",lb:"Profile"},
-            {ic:"📂",lb:"History",action:()=>setPage("history")},
-            {ic:"📡",lb:"Signals"},
-            {ic:"🤖",lb:"AI"},
-            {ic:"💬",lb:"Support"}
+            {ic:"📊",lb:"History",action:()=>setPage("history")},
+            {ic:"📈",lb:"Signals"},
+            {ic:"🧠",lb:"AI"},
+            {ic:"🎧",lb:"Support"}
           ].map((x,i)=>(
             <div key={x.lb} onClick={x.action} style={{textAlign:"center",cursor:x.action?"pointer":"default",opacity:x.lb==="Signals"||x.lb==="History"?1:0.35}}>
               <div style={{fontSize:18,marginBottom:2}}>{x.ic}</div>
