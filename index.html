@@ -27,7 +27,7 @@ const PAIRS = [
   "AUD/CAD"
 ];
 
-const POLYGON_KEY = "r3zbbjSWp_a7XiCQo8SsDz1dYYTQ6Fed";
+const POLYGON_KEY = "qRpBREla7_HBFde0KNo90i9l5HflxWcn";
 
 // ?? Indicators ??????????????????????????????????????????????
 function calcEma(d, p) {
@@ -249,17 +249,52 @@ function analyze(O,H,L,C,V) {
   };
 }
 
+async function getRealTimePrice(symbol) {
+  // Get real-time snapshot price
+  const ticker="C:"+symbol.replace("/","");
+  try {
+    const url=`https://api.polygon.io/v2/snapshot/locale/global/markets/forex/tickers/${ticker}?apiKey=${POLYGON_KEY}`;
+    const res=await fetch(url);
+    const data=await res.json();
+    if(data.ticker&&data.ticker.day&&data.ticker.day.c) {
+      return data.ticker.day.c;
+    }
+    // Fallback to last trade
+    if(data.ticker&&data.ticker.lastTrade&&data.ticker.lastTrade.p) {
+      return data.ticker.lastTrade.p;
+    }
+  } catch(e) {}
+  return null;
+}
+
 async function fetchTF(symbol,interval) {
   const ticker="C:"+symbol.replace("/","");
   const map={"5min":"5","15min":"15","30min":"30","1h":"60","4h":"240"};
   const mins=map[interval]||"5";
+  
+  // Use multiplier/timespan format for better coverage
+  const spanMap={"5min":["5","minute"],"15min":["15","minute"],"30min":["30","minute"],"1h":["1","hour"],"4h":["4","hour"]};
+  const [mult,span]=spanMap[interval]||["5","minute"];
+  
   const to=new Date().toISOString().split("T")[0];
-  const from=new Date(Date.now()-7*24*60*60*1000).toISOString().split("T")[0];
-  const url=`https://api.polygon.io/v2/aggs/ticker/${ticker}/range/${mins}/minute/${from}/${to}?adjusted=true&sort=asc&limit=100&apiKey=${POLYGON_KEY}`;
+  const from=new Date(Date.now()-10*24*60*60*1000).toISOString().split("T")[0];
+  
+  // Use v2 aggs with timestamp sort desc to get freshest data first
+  const url=`https://api.polygon.io/v2/aggs/ticker/${ticker}/range/${mult}/${span}/${from}/${to}?adjusted=true&sort=desc&limit=101&apiKey=${POLYGON_KEY}`;
   const res=await fetch(url);
   const data=await res.json();
   if(!data.results||!data.results.length)throw new Error("No data");
-  const v=data.results.slice(0,-1);
+  
+  // Sort ascending for analysis, skip first (current incomplete) candle
+  const v=data.results.reverse().slice(0,-1);
+  
+  // Try to get real-time price and inject into last candle
+  const rtPrice=await getRealTimePrice(symbol);
+  if(rtPrice&&v.length>0) {
+    // Update last close with real-time price
+    v[v.length-1]={...v[v.length-1],c:rtPrice};
+  }
+  
   return{O:v.map(x=>x.o),H:v.map(x=>x.h),L:v.map(x=>x.l),C:v.map(x=>x.c),V:v.map(x=>x.v||0)};
 }
 
