@@ -23,11 +23,8 @@ body{background:#08090f;color:#e0e0f0;font-family:-apple-system,BlinkMacSystemFo
 const { useState, useCallback } = React;
 
 const PAIRS = [
-  "EUR/USD","GBP/USD","USD/JPY","AUD/USD","USD/CAD","USD/CHF",
-  "EUR/GBP","EUR/JPY","GBP/JPY","NZD/USD","AUD/JPY","EUR/CHF",
-  "GBP/CHF","EUR/AUD","GBP/AUD","AUD/CAD","AUD/NZD","NZD/JPY",
-  "CAD/JPY","CHF/JPY","EUR/NZD","GBP/NZD","EUR/CAD","GBP/CAD",
-  "USD/MXN","USD/SGD"
+  "EUR/USD","USD/JPY","AUD/USD","EUR/GBP","EUR/JPY","GBP/JPY","AUD/JPY",
+  "AUD/CAD"
 ];
 
 const POLYGON_KEY = "r3zbbjSWp_a7XiCQo8SsDz1dYYTQ6Fed";
@@ -231,15 +228,15 @@ function analyze(O,H,L,C,V) {
   if(direction!=="WAIT"){
     const up=direction==="UP";
     if(up&&last>e20||!up&&last<e20) reasons.push(`Price ${up?"above":"below"} EMA20 & EMA50`);
-    if(r<40&&up) reasons.push(`RSI ${r.toFixed(0)} — oversold reversal`);
-    if(r>60&&!up) reasons.push(`RSI ${r.toFixed(0)} — overbought reversal`);
-    if(ms.score!==0) reasons.push(`${ms.trend} — ${up?"HH/HL":"LH/LL"} confirmed`);
-    if(cp.patterns.length>0) reasons.push(`${cp.patterns[0]} — ${up?"bullish":"bearish"} pattern`);
+    if(r<40&&up) reasons.push(`RSI ${r.toFixed(0)} ? oversold reversal`);
+    if(r>60&&!up) reasons.push(`RSI ${r.toFixed(0)} ? overbought reversal`);
+    if(ms.score!==0) reasons.push(`${ms.trend} ? ${up?"HH/HL":"LH/LL"} confirmed`);
+    if(cp.patterns.length>0) reasons.push(`${cp.patterns[0]} ? ${up?"bullish":"bearish"} pattern`);
     if(rz.atZone) reasons.push(`${rz.nearType} zone ${rz.nearZone.touches}x confirmed`);
-    if(vp.atLVN) reasons.push("LVN — explosive move zone");
+    if(vp.atLVN) reasons.push("LVN ? explosive move zone");
     while(reasons.length<3) reasons.push(`${up?"Bullish":"Bearish"} momentum aligned`);
   } else {
-    reasons.push("Mixed signals — no clear bias");
+    reasons.push("Mixed signals ? no clear bias");
     reasons.push(`Smart Triple Check: ${stc.passed}/3 checks passed`);
     reasons.push("Wait for stronger confirmation");
   }
@@ -339,7 +336,7 @@ function App(){
       }
       if(mtfDir===result.direction&&result.direction!=="WAIT"){
         result.accuracy=Math.min(96,result.accuracy+align*2);
-        if(align>=3)result.reasons[2]=`${align}/3 timeframes aligned — strong confirmation`;
+        if(align>=3)result.reasons[2]=`${align}/3 timeframes aligned ? strong confirmation`;
       }
       // Final verdict
       const stcOk=result.stc.allPassed;
@@ -489,10 +486,25 @@ function App(){
       <div style={S.wrap}>
 
         {/* Header */}
-        <div style={S.hdr}>
-          <div>
-            <span style={{fontSize:22,fontWeight:800,background:`linear-gradient(135deg,${C.accentB},${C.accent})`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>SpriNg</span>
-            <span style={{fontSize:11,fontWeight:700,color:C.wait,background:"rgba(240,192,64,0.12)",padding:"2px 7px",borderRadius:5,marginLeft:6}}>PRO</span>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"48px 0 20px"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{width:38,height:38,borderRadius:10,background:"linear-gradient(135deg,#0d0f1a,#1a1c2e)",border:"1px solid #1e2235",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 0 12px rgba(124,131,255,0.15)"}}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <polyline points="2,18 8,11 13,15 22,5" stroke="#4fc3f7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="22" cy="5" r="2.5" fill="#00e096"/>
+              </svg>
+            </div>
+            <div>
+              <div style={{display:"flex",alignItems:"center",gap:6}}>
+                <span style={{fontSize:21,fontWeight:900,background:"linear-gradient(135deg,#4fc3f7,#7c83ff)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",letterSpacing:"-0.5px"}}>SpriNg</span>
+                <span style={{fontSize:10,fontWeight:700,color:"#f0c040",background:"rgba(240,192,64,0.12)",padding:"2px 6px",borderRadius:4,letterSpacing:"0.5px"}}>PRO</span>
+              </div>
+              <div style={{fontSize:8,color:"#2a2d45",letterSpacing:"1.5px",marginTop:1}}>AI TRADING SIGNALS</div>
+            </div>
+          </div>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontSize:8,color:"#1e2235",letterSpacing:"0.5px",marginBottom:1}}>Made By</div>
+            <div style={{fontSize:9,color:"#2a2d45",fontWeight:700,letterSpacing:"0.5px"}}>Abdallah Maher</div>
           </div>
         </div>
 
@@ -503,7 +515,7 @@ function App(){
             style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:"12px 14px",color:C.text,fontSize:14,fontWeight:600,cursor:"pointer"}}
           >
             <span>{pair}</span>
-            <span style={{color:C.dim,fontSize:10}}>?</span>
+            <span style={{color:C.dim,fontSize:11,marginLeft:4}}>&#9660;</span>
           </button>
           {showDD&&(
             <div style={{position:"absolute",top:50,left:0,right:0,zIndex:999,background:C.card,border:`1px solid ${C.border}`,borderRadius:10,maxHeight:220,overflowY:"auto",boxShadow:"0 8px 32px #000"}}>
@@ -584,17 +596,17 @@ function App(){
               <div style={{...S.ibox,border:`1px solid ${sig.stc.allPassed?"rgba(0,224,150,0.25)":"rgba(255,77,109,0.25)"}`,marginBottom:8}}>
                 <div style={{...S.row,marginBottom:8}}>
                   <span style={{...S.lbl,color:sig.stc.allPassed?C.up:C.down}}>? Smart Triple Check</span>
-                  <span style={{fontSize:12,fontWeight:700,color:sig.stc.allPassed?C.up:C.down}}>{sig.stc.passed}/3 {sig.stc.allPassed?"? PASSED":"? FAILED"}</span>
+                  <span style={{fontSize:12,fontWeight:700,color:sig.stc.allPassed?C.up:C.down}}>{sig.stc.passed}/3 {sig.stc.allPassed?"PASSED":"FAILED"}</span>
                 </div>
                 {[
                   {n:"1",label:"Momentum Consistency",ok:sig.stc.check1,detail:sig.stc.mcsDetails},
-                  {n:"2",label:"Structure Confluence",ok:sig.stc.check2,detail:`RZ:${sig.stc.rzOk?"?":"?"} | Vol:${sig.stc.vpOk?"?":"?"}`},
+                  {n:"2",label:"Structure Confluence",ok:sig.stc.check2,detail:`RZ:${sig.stc.rzOk?"OK":"X"} | Vol:${sig.stc.vpOk?"OK":"X"}`},
                   {n:"3",label:"Multi-Signal Agreement",ok:sig.stc.check3,detail:`${sig.stc.agree}/3 signals agree`},
                 ].map(ch=>(
                   <div key={ch.n} style={{display:"flex",alignItems:"flex-start",gap:8,marginBottom:6,background:"#0a0c14",borderRadius:8,padding:"8px 10px"}}>
                     <div style={{width:20,height:20,borderRadius:"50%",background:ch.ok?"rgba(0,224,150,0.15)":"rgba(255,77,109,0.15)",border:`1px solid ${ch.ok?C.up:C.down}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:ch.ok?C.up:C.down,flexShrink:0}}>{ch.n}</div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:11,fontWeight:600,color:ch.ok?C.text:C.dim,marginBottom:2}}>{ch.label} {ch.ok?"?":"?"}</div>
+                      <div style={{fontSize:11,fontWeight:600,color:ch.ok?C.text:C.dim,marginBottom:2}}>{ch.label} {ch.ok?"OK":"X"}</div>
                       <div style={{fontSize:10,color:C.dim}}>{ch.detail}</div>
                     </div>
                   </div>
@@ -615,7 +627,7 @@ function App(){
               <div style={{...S.ibox,marginBottom:8}}>
                 <div style={S.row}>
                   <span style={S.lbl}>?? Volume Profile</span>
-                  <span style={{fontSize:11,fontWeight:700,color:sig.vp.atLVN?C.wait:sig.vp.atHVN?C.accent:"#444"}}>{sig.vp.atLVN?"? EXPLOSION":sig.vp.atHVN?"HVN":sig.vp.nearPOC?"NEAR POC":"CLEAR"}</span>
+                  <span style={{fontSize:11,fontWeight:700,color:sig.vp.atLVN?C.wait:sig.vp.atHVN?C.accent:"#444"}}>{sig.vp.atLVN?"EXPLOSION ZONE":sig.vp.atHVN?"HVN":sig.vp.nearPOC?"NEAR POC":"CLEAR"}</span>
                 </div>
                 <div style={{fontSize:11,color:"#666",marginTop:3}}>{sig.vp.label}</div>
               </div>
@@ -625,7 +637,7 @@ function App(){
                 <div>
                   <div style={S.lbl}>Signal</div>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    <span style={{fontSize:24}}>{sig.direction==="UP"?"?":sig.direction==="DOWN"?"?":"—"}</span>
+                    <span style={{fontSize:24}}>{sig.direction==="UP"?"?":sig.direction==="DOWN"?"?":"?"}</span>
                     <span style={{fontSize:26,fontWeight:900,color:dc}}>{sig.direction}</span>
                   </div>
                 </div>
@@ -651,7 +663,7 @@ function App(){
                 <div style={{borderRadius:12,border:`2px solid ${verdict.label==="GO"?verdict.color:C.border}`,marginBottom:12}}>
                   <div style={{background:verdict.label==="GO"?`${verdict.color}18`:C.box,padding:14,display:"flex",alignItems:"center",justifyContent:"space-between",borderRadius:10}}>
                     <div style={{display:"flex",alignItems:"center",gap:10}}>
-                      <div style={{width:40,height:40,borderRadius:"50%",background:verdict.label==="GO"?verdict.color:C.card,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{verdict.label==="GO"?"?":"??"}</div>
+                      <div style={{width:40,height:40,borderRadius:"50%",background:verdict.label==="GO"?verdict.color:C.card,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{verdict.label==="GO"?"GO":"NO"}</div>
                       <div>
                         <div style={{fontSize:22,fontWeight:900,letterSpacing:2,color:verdict.label==="GO"?verdict.color:"#333"}}>{verdict.label}</div>
                         <div style={{fontSize:10,color:C.dim}}>{verdict.label==="GO"?"All 3 checks passed":"Triple check failed"}</div>
@@ -668,15 +680,15 @@ function App(){
               {/* Actions */}
               {!taken?(
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-                  <button onClick={takeTrade} style={{padding:13,border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",background:sig.direction==="UP"?C.up:C.down,animation:sig.direction==="UP"?"pulseG 2s infinite":"pulseR 2s infinite"}}>? Take</button>
-                  <button onClick={skipToNext} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.dim,fontWeight:700,fontSize:14,cursor:"pointer"}}>? Next</button>
+                  <button onClick={takeTrade} style={{padding:13,border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",background:sig.direction==="UP"?C.up:C.down,animation:sig.direction==="UP"?"pulseG 2s infinite":"pulseR 2s infinite"}}>Take</button>
+                  <button onClick={skipToNext} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.dim,fontWeight:700,fontSize:14,cursor:"pointer"}}>Next Pair</button>
                 </div>
               ):(
                 <div style={{background:"rgba(0,224,150,0.06)",border:"1px solid rgba(0,224,150,0.18)",borderRadius:10,padding:14,textAlign:"center"}}>
                   <div style={{fontSize:13,color:C.up,fontWeight:600,marginBottom:10}}>? Mark result:</div>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-                    <button onClick={()=>markResult("WIN")} style={{padding:10,background:"rgba(0,224,150,0.15)",border:`1px solid ${C.up}60`,borderRadius:8,color:C.up,fontWeight:700,fontSize:13,cursor:"pointer"}}>? WIN</button>
-                    <button onClick={()=>markResult("LOSS")} style={{padding:10,background:"rgba(255,77,109,0.15)",border:`1px solid ${C.down}60`,borderRadius:8,color:C.down,fontWeight:700,fontSize:13,cursor:"pointer"}}>? LOSS</button>
+                    <button onClick={()=>markResult("WIN")} style={{padding:10,background:"rgba(0,224,150,0.15)",border:`1px solid ${C.up}60`,borderRadius:8,color:C.up,fontWeight:700,fontSize:13,cursor:"pointer"}}>WIN</button>
+                    <button onClick={()=>markResult("LOSS")} style={{padding:10,background:"rgba(255,77,109,0.15)",border:`1px solid ${C.down}60`,borderRadius:8,color:C.down,fontWeight:700,fontSize:13,cursor:"pointer"}}>LOSS</button>
                   </div>
                 </div>
               )}
@@ -693,7 +705,7 @@ function App(){
 
         {/* Nav */}
         <div style={{display:"flex",justifyContent:"space-around",marginTop:24,borderTop:`1px solid ${C.card}`,paddingTop:14}}>
-          {[{ic:"??",lb:"Profile"},{ic:"??",lb:"History",action:()=>setPage("history")},{ic:"??",lb:"Signals"},{ic:"??",lb:"AI"},{ic:"??",lb:"Support"}].map((x,i)=>(
+          {[{ic:"P",lb:"Profile"},{ic:"H",lb:"History",action:()=>setPage("history")},{ic:"S",lb:"Signals"},{ic:"A",lb:"AI"},{ic:"X",lb:"Support"}].map((x,i)=>(
             <div key={x.lb} onClick={x.action} style={{textAlign:"center",cursor:x.action?"pointer":"default",opacity:x.lb==="Signals"||x.lb==="History"?1:0.25}}>
               <div style={{fontSize:17,marginBottom:2}}>{x.ic}</div>
               <div style={{fontSize:9,color:x.lb==="Signals"?C.accent:"#333",fontWeight:x.lb==="Signals"?700:400}}>{x.lb}</div>
