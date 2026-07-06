@@ -78,7 +78,6 @@ function quadMatrix(O,H,L,C,V) {
   
   // Perspective 4: Patterns (Candles + Breakout)
   let patScore = cp.score;
-  // Simple breakout detection
   const prev=C[n-2], prev2=C[n-3];
   if(prev>prev2&&last>prev) patScore+=2;
   else if(prev<prev2&&last<prev) patScore-=2;
@@ -120,12 +119,10 @@ function contrarianIndex(O,H,L,C,V) {
   const avgRange = (Math.max(...H)-Math.min(...L))/C[C.length-1];
   const volatility = avgRange;
   
-  // If >65% buying -> contrarian SELL signal
-  // If >65% selling -> contrarian BUY signal
   let signal = "NEUTRAL";
   let confidence = 0;
-  if(buyRatio>0.65) { signal="SELL"; confidence = Math.round((buyRatio-0.5)*200); }
-  else if(buyRatio<0.35) { signal="BUY"; confidence = Math.round((0.5-buyRatio)*200); }
+  if(buyRatio>0.65) { signal="BUY"; confidence = Math.round((buyRatio-0.5)*200); }
+  else if(buyRatio<0.35) { signal="SELL"; confidence = Math.round((0.5-buyRatio)*200); }
   
   return {
     buyRatio: Math.round(buyRatio*100),
@@ -144,9 +141,7 @@ function goldenWindow() {
   const hour = now.getHours();
   const day = now.getDay();
   
-  // Golden hours: 10am-11am, 2pm-3pm, 8pm-9pm (UTC)
   const goldenHours = [10,11,14,15,20,21];
-  // Avoid market open/close (volatile)
   const blackoutHours = [0,1,2,23,22];
   
   let isGolden = false;
@@ -156,7 +151,6 @@ function goldenWindow() {
   if(goldenHours.includes(hour)) isGolden = true;
   if(blackoutHours.includes(hour)) isBlackout = true;
   
-  // Find next golden hour
   for(let i=1;i<=24;i++) {
     const nextH = (hour+i)%24;
     if(goldenHours.includes(nextH)) { nextGolden = nextH; break; }
@@ -184,19 +178,15 @@ function trinityShield(O,H,L,C) {
   const atr = calcAtr(H,L,C);
   const avgRange = (Math.max(...H.slice(-20))-Math.min(...L.slice(-20)))/last;
   
-  // Layer 1: Dynamic Stop Loss (1.5x ATR)
   const stopLoss = last - (atr * 1.5);
   const stopLossPct = ((last - stopLoss)/last)*100;
   
-  // Layer 2: Smart Take Profit (2.5x ATR or nearest resistance)
   const resistance = Math.max(...H.slice(-20));
   const takeProfit = Math.min(last + (atr * 2.5), resistance);
   const takeProfitPct = ((takeProfit - last)/last)*100;
   
-  // Layer 3: Early Exit Signal
   let earlyExit = false;
   let earlyExitReason = "";
-  // Detect sudden momentum reversal
   const mom = C[n-1]-C[n-2];
   const prevMom = C[n-2]-C[n-3];
   if((mom>0 && prevMom<0 && Math.abs(mom)>Math.abs(prevMom)*1.5) ||
@@ -204,7 +194,6 @@ function trinityShield(O,H,L,C) {
     earlyExit = true;
     earlyExitReason = "Momentum reversal detected";
   }
-  // Detect overextension
   const bbUpper = calcEma(C.slice(-20),20) + (Math.sqrt(calcEma(C.map((x,i)=>Math.pow(x-calcEma(C.slice(-20),20),2)).slice(-20),20)) * 2);
   const bbLower = calcEma(C.slice(-20),20) - (Math.sqrt(calcEma(C.map((x,i)=>Math.pow(x-calcEma(C.slice(-20),20),2)).slice(-20),20)) * 2);
   if(last>bbUpper*1.01 || last<bbLower*0.99) {
@@ -238,25 +227,21 @@ function aiPredictor(O,H,L,C) {
   const n=C.length;
   if(n<30) return {signal:"NEUTRAL",probability:0,score:0};
   
-  // Look for patterns in last 20 candles
   const recent = C.slice(-20);
   const patternHistory = [];
   
-  // Pattern 1: Double Bottom / Double Top
   let dbCount=0, dtCount=0;
   for(let i=5;i<recent.length-5;i++) {
     if(recent[i] < recent[i-2] && recent[i] < recent[i+2]) dbCount++;
     if(recent[i] > recent[i-2] && recent[i] > recent[i+2]) dtCount++;
   }
   
-  // Pattern 2: Trend continuation
   let trendUp=0, trendDown=0;
   for(let i=1;i<recent.length;i++) {
     if(recent[i]>recent[i-1]) trendUp++;
     else trendDown++;
   }
   
-  // Pattern 3: Consolidation (narrow range)
   const range = Math.max(...recent) - Math.min(...recent);
   const avgRange = (Math.max(...C.slice(-50))-Math.min(...C.slice(-50)));
   const isConsolidating = range/avgRange < 0.3;
@@ -296,22 +281,12 @@ function aiPredictor(O,H,L,C) {
 // 🔴🔴🔴 PENTA SYSTEM - FINAL DECISION 🔴🔴🔴
 // ============================================================
 function pentaSystem(O,H,L,C,V) {
-  // LAYER 1: Quad Matrix
   const quad = quadMatrix(O,H,L,C,V);
-  
-  // LAYER 2: Contrarian Index
   const contrarian = contrarianIndex(O,H,L,C,V);
-  
-  // LAYER 3: Golden Window
   const golden = goldenWindow();
-  
-  // LAYER 4: Trinity Shield
   const shield = trinityShield(O,H,L,C);
-  
-  // LAYER 5: AI Predictor
   const ai = aiPredictor(O,H,L,C);
   
-  // ===== Aggregate Scores =====
   const layers = [
     { name: "Quad Matrix", signal: quad.direction, score: quad.score, details: quad.details },
     { name: "Contrarian", signal: contrarian.signal, score: contrarian.score, details: `${contrarian.buyRatio}% ${contrarian.label}` },
@@ -320,15 +295,12 @@ function pentaSystem(O,H,L,C,V) {
     { name: "AI Predictor", signal: ai.signal, score: ai.score, details: `${ai.probability}% ${ai.patterns}` }
   ];
   
-  // Count votes
   const upVotes = layers.filter(l=>l.signal==="UP").length;
   const downVotes = layers.filter(l=>l.signal==="DOWN").length;
   const neutralVotes = layers.filter(l=>l.signal==="NEUTRAL").length;
   
-  // Total score
   const totalScore = layers.reduce((sum,l)=>sum+(l.score||0),0);
   
-  // ===== FINAL DECISION =====
   let finalDirection = "WAIT";
   let finalConfidence = 0;
   let finalVerdict = "";
@@ -340,49 +312,50 @@ function pentaSystem(O,H,L,C,V) {
     else failedLayers.push(l.name);
   });
   
-  // PENTA RULE: 5/5 = 100% GOLD
-  if(upVotes===5) {
-    finalDirection = "CALL";
+  // ===== المدة الصريحة =====
+  let duration = "5 دقائق";
+  let entryTime = "N/A";
+  
+  if(upVotes===5 || downVotes===5) {
+    finalDirection = upVotes===5 ? "CALL" : "PUT";
     finalConfidence = 99;
     finalVerdict = "💎 PENTA GOLD - 5/5 Layers Agree!";
-  } else if(downVotes===5) {
-    finalDirection = "PUT";
-    finalConfidence = 99;
-    finalVerdict = "💎 PENTA GOLD - 5/5 Layers Agree!";
-  } else if(upVotes>=4) {
-    finalDirection = "CALL";
-    finalConfidence = 90 + (upVotes-3)*3;
-    finalVerdict = `🔥 STRONG - ${upVotes}/5 Layers Agree`;
-  } else if(downVotes>=4) {
-    finalDirection = "PUT";
-    finalConfidence = 90 + (downVotes-3)*3;
-    finalVerdict = `🔥 STRONG - ${downVotes}/5 Layers Agree`;
-  } else if(upVotes>=3) {
-    finalDirection = "CALL";
-    finalConfidence = 75 + (upVotes-2)*5;
-    finalVerdict = `✅ GOOD - ${upVotes}/5 Layers Agree`;
-  } else if(downVotes>=3) {
-    finalDirection = "PUT";
-    finalConfidence = 75 + (downVotes-2)*5;
-    finalVerdict = `✅ GOOD - ${downVotes}/5 Layers Agree`;
+    duration = "30 دقيقة";
+    entryTime = "Immediate";
+  } else if(upVotes>=4 || downVotes>=4) {
+    finalDirection = upVotes>=4 ? "CALL" : "PUT";
+    finalConfidence = 90 + (Math.max(upVotes, downVotes) - 3) * 3;
+    finalVerdict = `🔥 STRONG - ${Math.max(upVotes, downVotes)}/5 Layers Agree`;
+    duration = "15 دقيقة";
+    entryTime = "Now";
+  } else if(upVotes>=3 || downVotes>=3) {
+    finalDirection = upVotes>=3 ? "CALL" : "PUT";
+    finalConfidence = 75 + (Math.max(upVotes, downVotes) - 2) * 5;
+    finalVerdict = `✅ GOOD - ${Math.max(upVotes, downVotes)}/5 Layers Agree`;
+    duration = "10 دقائق";
+    entryTime = "Soon";
   } else {
     finalDirection = "WAIT";
     finalConfidence = 0;
-    finalVerdict = `⏳ WAIT - Only ${Math.max(upVotes,downVotes)}/5 Layers Agree`;
+    finalVerdict = `⏳ WAIT - Only ${Math.max(upVotes, downVotes)}/5 Layers Agree`;
+    duration = "5 دقائق";
+    entryTime = "N/A";
   }
   
-  // Override if Trinity Shield triggers early exit
   if(shield.earlyExit && finalDirection!=="WAIT") {
     finalDirection = "WAIT";
     finalConfidence = 0;
     finalVerdict = `🚫 BLOCKED - ${shield.earlyExitReason}`;
+    duration = "5 دقائق";
+    entryTime = "N/A";
   }
   
-  // Override if Blackout
   if(golden.isBlackout && finalDirection!=="WAIT") {
     finalDirection = "WAIT";
     finalConfidence = 0;
     finalVerdict = `🚫 BLACKOUT - Market closed/volatile`;
+    duration = "5 دقائق";
+    entryTime = "N/A";
   }
   
   return {
@@ -396,6 +369,8 @@ function pentaSystem(O,H,L,C,V) {
     finalVerdict,
     passedLayers: passedLayers.join(", "),
     failedLayers: failedLayers.join(", "),
+    duration,
+    entryTime,
     quad,
     contrarian,
     golden,
@@ -422,20 +397,68 @@ function rejZones(H,L,C){const n=C.length,levels=[],tol=0.0003;for(let i=5;i<n-5
 function volProfile(H,L,C,V){const n=C.length,minP=Math.min(...L),maxP=Math.max(...H),range=maxP-minP,buckets=20;const prof=Array.from({length:buckets},(_,b)=>({mid:minP+(b+0.5)*range/buckets,vol:0}));for(let i=0;i<n;i++){const v=V&&V[i]?V[i]:1;for(let b=0;b<buckets;b++)if(L[i]<=minP+(b+1)*range/buckets&&H[i]>=minP+b*range/buckets)prof[b].vol+=v;}const poc=prof.reduce((a,b)=>b.vol>a.vol?b:a);const avg=prof.reduce((a,b)=>a+b.vol,0)/buckets;const last=C[n-1];const atHVN=prof.some(z=>z.vol>avg*1.5&&Math.abs(last-z.mid)/last<0.0008);const atLVN=prof.some(z=>z.vol<avg*0.4&&z.vol>0&&Math.abs(last-z.mid)/last<0.0008);const nearPOC=Math.abs(last-poc.mid)/last<0.0005;const label=atLVN?"EXPLOSION ZONE":atHVN?"HVN - Institutional":nearPOC?`Near POC ${poc.mid.toFixed(5)}`:`POC: ${poc.mid.toFixed(5)}`;return{atHVN,atLVN,nearPOC,label};}
 
 // ============================================================
-// FETCH & HELPERS
+// CACHING
 // ============================================================
-async function fetchTF(symbol,interval) {
-  const ticker="C:"+symbol.replace("/","");
-  const map={"5min":"5","15min":"15","30min":"30","1h":"60","4h":"240"};
-  const mins=map[interval]||"5";
-  const to=new Date().toISOString().split("T")[0];
-  const from=new Date(Date.now()-7*24*60*60*1000).toISOString().split("T")[0];
-  const url=`https://api.polygon.io/v2/aggs/ticker/${ticker}/range/${mins}/minute/${from}/${to}?adjusted=true&sort=asc&limit=100&apiKey=${POLYGON_KEY}`;
-  const res=await fetch(url);
-  const data=await res.json();
-  if(!data.results||!data.results.length)throw new Error("No data");
-  const v=data.results.slice(0,-1);
-  return{O:v.map(x=>x.o),H:v.map(x=>x.h),L:v.map(x=>x.l),C:v.map(x=>x.c),V:v.map(x=>x.v||0)};
+const CACHE_KEY = 'polygon_cache';
+const CACHE_DURATION = 5 * 60 * 1000;
+
+function getCachedData(symbol, interval) {
+    const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+    const key = `${symbol}_${interval}`;
+    const entry = cache[key];
+    if (entry && (Date.now() - entry.timestamp) < CACHE_DURATION) {
+        return entry.data;
+    }
+    return null;
+}
+
+function setCachedData(symbol, interval, data) {
+    const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+    const key = `${symbol}_${interval}`;
+    cache[key] = { data, timestamp: Date.now() };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+}
+
+// ============================================================
+// FETCH
+// ============================================================
+async function fetchTF(symbol, interval) {
+    const cached = getCachedData(symbol, interval);
+    if (cached) return cached;
+
+    const ticker = "C:" + symbol.replace("/", "");
+    const map = {"5min":"5","15min":"15","30min":"30","1h":"60","4h":"240"};
+    const mins = map[interval] || "5";
+    const to = new Date().toISOString().split("T")[0];
+    const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    const url = `https://api.polygon.io/v2/aggs/ticker/${ticker}/range/${mins}/minute/${from}/${to}?adjusted=true&sort=asc&limit=100&apiKey=${POLYGON_KEY}`;
+
+    await new Promise(r => setTimeout(r, 500));
+
+    const res = await fetch(url);
+    if (!res.ok) {
+        if (res.status === 403 || res.status === 429) {
+            throw new Error(`API Limit Reached (${res.status}). Please wait.`);
+        }
+        throw new Error(`HTTP ${res.status}`);
+    }
+    
+    const data = await res.json();
+    if (!data.results || !data.results.length) {
+        throw new Error("No data from Polygon. Check symbol or market hours.");
+    }
+    
+    const v = data.results.slice(0, -1);
+    const result = {
+        O: v.map(x => x.o),
+        H: v.map(x => x.h),
+        L: v.map(x => x.l),
+        C: v.map(x => x.c),
+        V: v.map(x => x.v || 0)
+    };
+
+    setCachedData(symbol, interval, result);
+    return result;
 }
 
 function quickBias(O,H,L,C){
@@ -490,9 +513,63 @@ function App(){
   const [history,setHistory]=useState(loadH);
   const [lastId,setLastId]=useState(null);
   const [taken,setTaken]=useState(false);
+  const [scanResults,setScanResults]=useState([]);
+  const [scanning,setScanning]=useState(false);
+
+  // ===== SCAN ALL PAIRS =====
+  const scanAllPairs = useCallback(async()=>{
+    setScanning(true);
+    setScanResults([]);
+    setErr("");
+    const results = [];
+
+    try {
+      for (const p of PAIRS) {
+        try {
+          const main = await fetchTF(p, "5min");
+          const pentaResult = pentaSystem(main.O, main.H, main.L, main.C, main.V);
+          
+          results.push({
+            pair: p,
+            signal: pentaResult.finalDirection,
+            confidence: pentaResult.finalConfidence,
+            verdict: pentaResult.finalVerdict,
+            layers: pentaResult.upVotes,
+            price: main.C[main.C.length - 1].toFixed(5),
+            duration: pentaResult.duration,
+            penta: pentaResult
+          });
+        } catch (e) {
+          results.push({
+            pair: p,
+            signal: "ERROR",
+            confidence: 0,
+            verdict: e.message,
+            layers: 0,
+            price: "---",
+            duration: "---"
+          });
+        }
+      }
+
+      const sorted = results.sort((a, b) => {
+        const order = { "CALL": 3, "PUT": 3, "WAIT": 1, "ERROR": 0 };
+        const aScore = order[a.signal] || 0;
+        const bScore = order[b.signal] || 0;
+        if (aScore !== bScore) return bScore - aScore;
+        return b.confidence - a.confidence;
+      });
+
+      setScanResults(sorted);
+      setScanning(false);
+    } catch (e) {
+      setErr(e.message);
+      setScanning(false);
+    }
+  }, []);
 
   const getSignal = useCallback(async()=>{
-    setLoading(true);setSig(null);setPenta(null);setErr("");setMtf([]);setTaken(false);
+    setLoading(true);setSig(null);setPenta(null);setErr("");setMtf([]);setTaken(false);setScanResults([]);
     try{
       const main=await fetchTF(pair,"5min");
       const tfs=[["5min","5M"],["15min","15M"],["1h","1H"]];
@@ -508,17 +585,16 @@ function App(){
       }
       setMtf(mtfArr);
       
-      // ===== PENTA SYSTEM ANALYSIS =====
       const pentaResult = pentaSystem(main.O,main.H,main.L,main.C,main.V);
       setPenta(pentaResult);
       
-      // Build signal from Penta
       const result = {
         direction: pentaResult.finalDirection==="CALL"?"UP":pentaResult.finalDirection==="PUT"?"DOWN":"WAIT",
         dcls: pentaResult.finalDirection==="CALL"?"up":pentaResult.finalDirection==="PUT"?"down":"wait",
         accuracy: pentaResult.finalConfidence,
         strength: pentaResult.finalConfidence,
-        duration: pentaResult.finalDirection!=="WAIT"?"15-30 min":"No Entry",
+        duration: pentaResult.duration,
+        entryTime: pentaResult.entryTime,
         total: pentaResult.totalScore,
         last: main.C[main.C.length-1].toFixed(5),
         reasons: [
@@ -534,7 +610,6 @@ function App(){
         penta: pentaResult
       };
       
-      // Add some dummy data for display
       const r=calcRsi(main.C);
       const m=calcMacd(main.C);
       const k=calcStoch(main.H,main.L,main.C);
@@ -581,7 +656,8 @@ function App(){
           dcls: pentaResult.finalDirection==="CALL"?"up":pentaResult.finalDirection==="PUT"?"down":"wait",
           accuracy: pentaResult.finalConfidence,
           strength: pentaResult.finalConfidence,
-          duration: pentaResult.finalDirection!=="WAIT"?"15-30 min":"No Entry",
+          duration: pentaResult.duration,
+          entryTime: pentaResult.entryTime,
           total: pentaResult.totalScore,
           last: main.C[main.C.length-1].toFixed(5),
           reasons: [
@@ -639,7 +715,7 @@ function App(){
             <div key={t.id} style={{background:C.card,borderRadius:10,padding:"12px 14px",marginBottom:8,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <div>
                 <div style={{fontSize:13,fontWeight:700,color:C.text}}>{t.pair}</div>
-                <div style={{fontSize:10,color:C.dim}}>{t.date} {t.time} | {t.dir} | {t.accuracy}%</div>
+                <div style={{fontSize:10,color:C.dim}}>{t.date} {t.time} | {t.dir} | {t.accuracy}% | ⏱️ {t.dur}</div>
                 {t.pentaVerdict&&<div style={{fontSize:8,color:C.gold,marginTop:1}}>{t.pentaVerdict}</div>}
               </div>
               {t.result===null?(
@@ -657,6 +733,11 @@ function App(){
       </div>
     </div>
   );
+
+  // ============================================================
+  // SCAN RESULTS COMPONENT
+  // ============================================================
+  const hasSignal = scanResults.some(r => r.signal === "CALL" || r.signal === "PUT");
 
   // ============================================================
   // MAIN SIGNALS PAGE
@@ -712,7 +793,7 @@ function App(){
               {PAIRS.map(p=>(
                 <div
                   key={p}
-                  onClick={()=>{setPair(p);setShowDD(false);setSig(null);setPenta(null);}}
+                  onClick={()=>{setPair(p);setShowDD(false);setSig(null);setPenta(null);setScanResults([]);}}
                   style={{padding:"11px 14px",fontSize:13,cursor:"pointer",color:p===pair?C.accent:C.text,background:p===pair?"#1a1c2e":"transparent",borderBottom:"1px solid #0d0f1a"}}
                 >{p}</div>
               ))}
@@ -720,16 +801,73 @@ function App(){
           )}
         </div>
 
+        {/* ===== SCAN RESULTS ===== */}
+        {scanResults.length > 0 && (
+          <div style={{...S.ibox, marginBottom: 12, border: hasSignal ? `1px solid ${C.gold}` : `1px solid ${C.border}`}}>
+            <div style={S.row}>
+              <div style={S.lbl}>🔍 Scan Results ({PAIRS.length} pairs)</div>
+              <span style={{fontSize:10, color: hasSignal ? C.gold : C.dim}}>
+                {hasSignal ? "✅ Signals found!" : "⏳ No signals"}
+              </span>
+            </div>
+            
+            {scanResults.map((r, i) => {
+              const isSignal = r.signal === "CALL" || r.signal === "PUT";
+              const isError = r.signal === "ERROR";
+              const color = r.signal === "CALL" ? C.up : r.signal === "PUT" ? C.down : C.dim;
+              const bg = isSignal ? `${color}22` : "transparent";
+              const border = isSignal ? `1px solid ${color}` : isError ? `1px solid ${C.down}` : "1px solid transparent";
+              
+              return (
+                <div key={i} style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "6px 8px",
+                  marginBottom: 4,
+                  background: bg,
+                  border: border,
+                  borderRadius: 6,
+                }}>
+                  <span style={{fontSize: 12, fontWeight: isSignal ? 700 : 400, color: isSignal ? C.text : C.dim}}>
+                    {r.pair}
+                  </span>
+                  <span style={{fontSize: 11, fontWeight: 700, color: color}}>
+                    {r.signal === "CALL" ? "📈 CALL" : r.signal === "PUT" ? "📉 PUT" : r.signal === "ERROR" ? "⚠️" : "⏳ WAIT"}
+                  </span>
+                  <span style={{fontSize: 9, color: C.dim}}>
+                    {r.confidence > 0 ? `${r.confidence}%` : "---"}
+                  </span>
+                  <span style={{fontSize: 9, color: C.accent, fontWeight: 600}}>
+                    {r.duration !== "No Entry" ? r.duration : ""}
+                  </span>
+                </div>
+              );
+            })}
+            
+            {/* Auto-select best signal */}
+            {hasSignal && (
+              <div style={{marginTop: 8, padding: 8, background: `${C.gold}22`, borderRadius: 6, border: `1px solid ${C.gold}`}}>
+                <div style={{fontSize: 11, color: C.gold, fontWeight: 700}}>
+                  🏆 Best Signal: {scanResults.filter(r => r.signal === "CALL" || r.signal === "PUT").sort((a,b) => b.confidence - a.confidence)[0]?.pair} 
+                  ({scanResults.filter(r => r.signal === "CALL" || r.signal === "PUT").sort((a,b) => b.confidence - a.confidence)[0]?.signal}) 
+                  {scanResults.filter(r => r.signal === "CALL" || r.signal === "PUT").sort((a,b) => b.confidence - a.confidence)[0]?.confidence}%
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Card */}
         <div style={{background:C.card,border:`1px solid ${penta?.finalConfidence>=95?"#ffd700":sig?.direction==="UP"?C.up:sig?.direction==="DOWN"?C.down:"#1a1c2e"}`,borderRadius:16,padding:18,marginBottom:12,minHeight:100,transition:"border-color 0.5s"}}>
-          {!sig&&!loading&&!err&&<div style={{textAlign:"center",color:C.dim2,fontSize:14,padding:"20px 0"}}>Press Get Signal to start</div>}
-          {loading&&<div style={{textAlign:"center",padding:"20px 0"}}><div style={{width:36,height:36,border:`3px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,borderRadius:"50%",animation:"spin 0.8s linear infinite",margin:"0 auto 10px"}}/><div style={{color:C.dim,fontSize:12}}>Analyzing 5 Penta Layers...</div></div>}
+          {!sig&&!loading&&!err&&!scanning&&scanResults.length===0&&<div style={{textAlign:"center",color:C.dim2,fontSize:14,padding:"20px 0"}}>Press Scan All or Get Signal to start</div>}
+          {(loading||scanning)&&<div style={{textAlign:"center",padding:"20px 0"}}><div style={{width:36,height:36,border:`3px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,borderRadius:"50%",animation:"spin 0.8s linear infinite",margin:"0 auto 10px"}}/><div style={{color:C.dim,fontSize:12}}>{scanning ? "Scanning all pairs..." : "Analyzing 5 Penta Layers..."}</div></div>}
           {err&&<div style={{textAlign:"center",color:C.down,fontSize:13,padding:"20px 0"}}>❌ {err}</div>}
 
           {sig&&!loading&&penta&&(
             <div style={{animation:"fadeUp 0.4s ease"}}>
 
-              {/* PENTA VERDICT - HIGHLIGHT */}
+              {/* PENTA VERDICT */}
               <div style={{...S.ibox,background:penta.finalConfidence>=95?"rgba(255,215,0,0.08)":"transparent",border:penta.finalConfidence>=95?"1px solid #ffd700":"1px solid transparent",marginBottom:10}}>
                 <div style={S.row}>
                   <div>
@@ -743,6 +881,22 @@ function App(){
                     <div style={{fontSize:22,fontWeight:900,color:penta.finalConfidence>=95?C.gold:penta.finalConfidence>=90?C.up:penta.finalConfidence>=75?C.wait:C.down}}>
                       {penta.finalConfidence}%
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Direction + Duration */}
+              <div style={{...S.ibox, marginBottom:8}}>
+                <div style={S.row}>
+                  <div>
+                    <div style={S.lbl}>Decision</div>
+                    <div style={{fontSize:20,fontWeight:900,color:penta.finalDirection==="CALL"?C.up:penta.finalDirection==="PUT"?C.down:C.wait}}>
+                      {penta.finalDirection==="CALL"?"📈 CALL":penta.finalDirection==="PUT"?"📉 PUT":"⏳ WAIT"}
+                    </div>
+                  </div>
+                  <div style={{textAlign:"right"}}>
+                    <div style={S.lbl}>⏱️ Duration</div>
+                    <div style={{fontSize:16,fontWeight:700,color:C.accent}}>{penta.duration}</div>
                   </div>
                 </div>
               </div>
@@ -771,20 +925,6 @@ function App(){
                 ))}
               </div>
 
-              {/* Direction */}
-              <div style={{...S.ibox,marginBottom:8}}>
-                <div style={S.row}>
-                  <span style={S.lbl}>Decision</span>
-                  <span style={{fontSize:20,fontWeight:900,color:penta.finalDirection==="CALL"?C.up:penta.finalDirection==="PUT"?C.down:C.wait}}>
-                    {penta.finalDirection==="CALL"?"📈 CALL":penta.finalDirection==="PUT"?"📉 PUT":"⏳ WAIT"}
-                  </span>
-                </div>
-                <div style={S.row}>
-                  <span style={S.lbl}>Duration</span>
-                  <span style={{fontSize:14,fontWeight:700,color:C.accent}}>{penta.finalDirection!=="WAIT"?"15-30 min":"No Entry"}</span>
-                </div>
-              </div>
-
               {/* Actions */}
               {!taken && penta.finalDirection!=="WAIT" ? (
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
@@ -811,11 +951,40 @@ function App(){
           )}
         </div>
 
-        {/* Get Signal Button */}
-        {!loading&&!sig&&(
-          <button onClick={getSignal} style={{width:"100%",padding:15,background:"linear-gradient(135deg,#4fc3f7,#7c83ff)",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",boxShadow:"0 4px 24px rgba(124,131,255,0.3)"}}>
-            🔬 Penta Analysis
-          </button>
+        {/* Buttons */}
+        {!loading && !sig && !scanning && (
+          <div style={{display:"grid", gridTemplateColumns: "1fr 1fr", gap: 10}}>
+            <button 
+              onClick={scanAllPairs}
+              style={{
+                padding: 15,
+                background: "linear-gradient(135deg,#ffd700,#f0a500)",
+                border: "none",
+                borderRadius: 12,
+                color: "#000",
+                fontWeight: 800,
+                fontSize: 14,
+                cursor: "pointer"
+              }}
+            >
+              🔍 Scan All
+            </button>
+            <button 
+              onClick={getSignal}
+              style={{
+                padding: 15,
+                background: "linear-gradient(135deg,#4fc3f7,#7c83ff)",
+                border: "none",
+                borderRadius: 12,
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: 14,
+                cursor: "pointer"
+              }}
+            >
+              📊 Single
+            </button>
+          </div>
         )}
 
         {/* Nav */}
