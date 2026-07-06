@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="SpriNg Bot - Penta System"/>
+<meta name="apple-mobile-web-app-title" content="SpriNg Bot"/>
 <meta name="theme-color" content="#08090f"/>
-<title>SpriNg Bot - Penta System</title>
+<title>SpriNg Bot</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
@@ -20,7 +20,7 @@ body{background:#08090f;color:#e0e0f0;font-family:-apple-system,BlinkMacSystemFo
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useCallback, useEffect } = React;
+const { useState, useCallback } = React;
 
 const PAIRS = [
   "EUR/USD","USD/JPY","AUD/USD","EUR/GBP","EUR/JPY","GBP/JPY","AUD/JPY",
@@ -29,9 +29,7 @@ const PAIRS = [
 
 const POLYGON_KEY = "r3zbbjSWp_a7XiCQo8SsDz1dYYTQ6Fed";
 
-// ============================================================
-// INDICATORS
-// ============================================================
+// ?? Indicators ??????????????????????????????????????????????
 function calcEma(d, p) {
   const k = 2/(p+1); let e = d[0];
   for (let i=1;i<d.length;i++) e = d[i]*k + e*(1-k);
@@ -54,6 +52,7 @@ function calcAtr(H,L,C,p=14) {
   return tr.slice(-p).reduce((a,b)=>a+b,0)/p;
 }
 
+// ?? Market Structure ?????????????????????????????????????????
 function marketStr(C) {
   let u=0,d=0;
   for (let i=3;i<Math.min(C.length,25);i++) {
@@ -65,6 +64,7 @@ function marketStr(C) {
   return {trend:"SIDEWAYS",score:0};
 }
 
+// ?? Candle Patterns ??????????????????????????????????????????
 function candleP(O,H,L,C) {
   const n=C.length-1,o=O[n],h=H[n],l=L[n],c=C[n];
   const body=Math.abs(c-o),range=h-l,bull=c>o;
@@ -87,6 +87,7 @@ function candleP(O,H,L,C) {
   return {patterns:p,score:s};
 }
 
+// ?? Rejection Zones ??????????????????????????????????????????
 function rejZones(H,L,C) {
   const n=C.length,levels=[],tol=0.0003;
   for(let i=5;i<n-5;i++){
@@ -109,6 +110,7 @@ function rejZones(H,L,C) {
   return {nearZone:nz,nearType:nt,nearStrength:ns,atZone,score,label:atZone?`${nt} zone (${nz.touches}x) at ${nz.price.toFixed(5)}`:"No rejection zone nearby"};
 }
 
+// ?? Volume Profile ???????????????????????????????????????????
 function volProfile(H,L,C,V) {
   const n=C.length,minP=Math.min(...L),maxP=Math.max(...H),range=maxP-minP,buckets=20;
   const prof=Array.from({length:buckets},(_,b)=>({mid:minP+(b+0.5)*range/buckets,vol:0}));
@@ -126,7 +128,9 @@ function volProfile(H,L,C,V) {
   return {atHVN,atLVN,nearPOC,label};
 }
 
+// ?? Smart Triple Check ????????????????????????????????????????
 function smartTripleCheck(O,H,L,C,rz,vp,sig) {
+  // CHECK 1: Momentum Consistency (MCS)
   const n=C.length;
   let lu=0,ld=0;
   for(let i=n-5;i<n;i++){lu+=(C[i]>C[i-1]?1:0);ld+=(C[i]<C[i-1]?1:0);}
@@ -139,10 +143,12 @@ function smartTripleCheck(O,H,L,C,rz,vp,sig) {
   if(cndCons>=3)mcs++;if(strongCnd)mcs++;if(clearEma)mcs++;if(momAcc)mcs++;
   const check1=mcs>=3;
 
+  // CHECK 2: Structure Confluence (Rejection Zone + Volume)
   const rzOk=!rz.atZone||(rz.nearType==="SUPPORT"&&sig==="UP")||(rz.nearType==="RESISTANCE"&&sig==="DOWN");
   const vpOk=!vp.atHVN&&!vp.nearPOC;
   const check2=rzOk&&vpOk;
 
+  // CHECK 3: Multi-Signal Agreement (RSI + MACD + Price vs EMA)
   const rsiV=calcRsi(C);
   const macdV=calcMacd(C);
   const e20=calcEma(C.slice(-20),20),e50=calcEma(C.slice(-50),50);
@@ -169,6 +175,7 @@ function smartTripleCheck(O,H,L,C,rz,vp,sig) {
   };
 }
 
+// ?? Main Analysis ????????????????????????????????????????????
 function analyze(O,H,L,C,V) {
   const n=C.length,last=C[n-1];
   const e20=calcEma(C.slice(-20),20),e50=calcEma(C.slice(-50),50);
@@ -199,6 +206,7 @@ function analyze(O,H,L,C,V) {
     dcls=total>0?"up":"down";
   }
 
+  // Smart Triple Check
   const stc=smartTripleCheck(O,H,L,C,rz,vp,direction);
   if(direction!=="WAIT"&&!stc.allPassed){direction="WAIT";dcls="wait";}
 
@@ -210,24 +218,26 @@ function analyze(O,H,L,C,V) {
   const atrPct=(atrVal/last)*100;
   let duration="No Entry";
   if(direction!=="WAIT"){
-    if(atrPct>0.15)duration="5 دقائق";
-    else if(atrPct>0.08)duration="10 دقائق";
-    else if(atrPct>0.04)duration="15 دقيقة";
-    else duration="30 دقيقة";
+    if(atrPct>0.15)duration="5 min";
+    else if(atrPct>0.08)duration="15 min";
+    else if(atrPct>0.04)duration="30 min";
+    else duration="1 hour";
   }
 
   const reasons=[];
   if(direction!=="WAIT"){
     const up=direction==="UP";
     if(up&&last>e20||!up&&last<e20) reasons.push(`Price ${up?"above":"below"} EMA20 & EMA50`);
-    if(r<40&&up) reasons.push(`RSI ${r.toFixed(0)} - oversold reversal`);
-    if(r>60&&!up) reasons.push(`RSI ${r.toFixed(0)} - overbought reversal`);
-    if(ms.score!==0) reasons.push(`${ms.trend} confirmed`);
-    if(cp.patterns.length>0) reasons.push(`${cp.patterns[0]} pattern`);
-    while(reasons.length<3) reasons.push(`${up?"Bullish":"Bearish"} momentum`);
+    if(r<40&&up) reasons.push(`RSI ${r.toFixed(0)} ? oversold reversal`);
+    if(r>60&&!up) reasons.push(`RSI ${r.toFixed(0)} ? overbought reversal`);
+    if(ms.score!==0) reasons.push(`${ms.trend} ? ${up?"HH/HL":"LH/LL"} confirmed`);
+    if(cp.patterns.length>0) reasons.push(`${cp.patterns[0]} ? ${up?"bullish":"bearish"} pattern`);
+    if(rz.atZone) reasons.push(`${rz.nearType} zone ${rz.nearZone.touches}x confirmed`);
+    if(vp.atLVN) reasons.push("LVN ? explosive move zone");
+    while(reasons.length<3) reasons.push(`${up?"Bullish":"Bearish"} momentum aligned`);
   } else {
-    reasons.push("Mixed signals - no clear bias");
-    reasons.push(`Triple Check: ${stc.passed}/3 passed`);
+    reasons.push("Mixed signals ? no clear bias");
+    reasons.push(`Smart Triple Check: ${stc.passed}/3 checks passed`);
     reasons.push("Wait for stronger confirmation");
   }
 
@@ -239,69 +249,18 @@ function analyze(O,H,L,C,V) {
   };
 }
 
-// ============================================================
-// CACHING
-// ============================================================
-const CACHE_KEY = 'polygon_cache';
-const CACHE_DURATION = 5 * 60 * 1000;
-
-function getCachedData(symbol, interval) {
-    const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
-    const key = `${symbol}_${interval}`;
-    const entry = cache[key];
-    if (entry && (Date.now() - entry.timestamp) < CACHE_DURATION) {
-        return entry.data;
-    }
-    return null;
-}
-
-function setCachedData(symbol, interval, data) {
-    const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
-    const key = `${symbol}_${interval}`;
-    cache[key] = { data, timestamp: Date.now() };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-}
-
-// ============================================================
-// FETCH
-// ============================================================
-async function fetchTF(symbol, interval) {
-    const cached = getCachedData(symbol, interval);
-    if (cached) return cached;
-
-    const ticker = "C:" + symbol.replace("/", "");
-    const map = {"5min":"5","15min":"15","30min":"30","1h":"60","4h":"240"};
-    const mins = map[interval] || "5";
-    const to = new Date().toISOString().split("T")[0];
-    const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-    const url = `https://api.polygon.io/v2/aggs/ticker/${ticker}/range/${mins}/minute/${from}/${to}?adjusted=true&sort=asc&limit=100&apiKey=${POLYGON_KEY}`;
-
-    await new Promise(r => setTimeout(r, 500));
-
-    const res = await fetch(url);
-    if (!res.ok) {
-        if (res.status === 403 || res.status === 429) {
-            throw new Error(`API Limit Reached (${res.status}). Please wait.`);
-        }
-        throw new Error(`HTTP ${res.status}`);
-    }
-    
-    const data = await res.json();
-    if (!data.results || !data.results.length) {
-        throw new Error("No data from Polygon. Check symbol or market hours.");
-    }
-    
-    const v = data.results.slice(0, -1);
-    const result = {
-        O: v.map(x => x.o),
-        H: v.map(x => x.h),
-        L: v.map(x => x.l),
-        C: v.map(x => x.c),
-        V: v.map(x => x.v || 0)
-    };
-
-    setCachedData(symbol, interval, result);
-    return result;
+async function fetchTF(symbol,interval) {
+  const ticker="C:"+symbol.replace("/","");
+  const map={"5min":"5","15min":"15","30min":"30","1h":"60","4h":"240"};
+  const mins=map[interval]||"5";
+  const to=new Date().toISOString().split("T")[0];
+  const from=new Date(Date.now()-7*24*60*60*1000).toISOString().split("T")[0];
+  const url=`https://api.polygon.io/v2/aggs/ticker/${ticker}/range/${mins}/minute/${from}/${to}?adjusted=true&sort=asc&limit=100&apiKey=${POLYGON_KEY}`;
+  const res=await fetch(url);
+  const data=await res.json();
+  if(!data.results||!data.results.length)throw new Error("No data");
+  const v=data.results.slice(0,-1);
+  return{O:v.map(x=>x.o),H:v.map(x=>x.h),L:v.map(x=>x.l),C:v.map(x=>x.c),V:v.map(x=>x.v||0)};
 }
 
 function quickBias(O,H,L,C){
@@ -316,19 +275,15 @@ function quickBias(O,H,L,C){
 function loadH(){try{return JSON.parse(localStorage.getItem("sbh")||"[]");}catch{return[];}}
 function saveH(h){try{localStorage.setItem("sbh",JSON.stringify(h));}catch{}}
 
-// ============================================================
-// COLORS
-// ============================================================
+// ?? Colors ???????????????????????????????????????????????????
 const C={
   bg:"#08090f",card:"#10121e",box:"#0d0f1a",border:"#1e2235",
   text:"#e0e0f0",dim:"#444",dim2:"#2a2d45",
   up:"#00e096",down:"#ff4d6d",wait:"#f0c040",accent:"#7c83ff",
-  accentB:"#4fc3f7",gold:"#ffd700"
+  accentB:"#4fc3f7"
 };
 
-// ============================================================
-// STYLES
-// ============================================================
+// ?? Styles ???????????????????????????????????????????????????
 const S={
   app:{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"-apple-system,BlinkMacSystemFont,sans-serif",display:"flex",justifyContent:"center"},
   wrap:{width:"100%",maxWidth:400,padding:"0 16px 60px"},
@@ -341,9 +296,6 @@ const S={
   g4:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:6,marginBottom:8},
 };
 
-// ============================================================
-// MAIN APP
-// ============================================================
 function App(){
   const [pair,setPair]=useState("EUR/USD");
   const [showDD,setShowDD]=useState(false);
@@ -356,87 +308,12 @@ function App(){
   const [history,setHistory]=useState(loadH);
   const [lastId,setLastId]=useState(null);
   const [taken,setTaken]=useState(false);
-  const [scanResults,setScanResults]=useState([]);
-  const [scanning,setScanning]=useState(false);
+  const [pairIdx,setPairIdx]=useState(0);
 
-  // ===== SCAN ALL PAIRS - ONLY GO SIGNALS =====
-  const scanAllPairs = useCallback(async()=>{
-    setScanning(true);
-    setScanResults([]);
-    setErr("");
-    const results = [];
+  const dc=sig?.direction==="UP"?C.up:sig?.direction==="DOWN"?C.down:C.wait;
 
-    try {
-      for (const p of PAIRS) {
-        try {
-          const main = await fetchTF(p, "5min");
-          const tfs=[["5min","5M"],["15min","15M"],["1h","1H"]];
-          let up=0,dn=0;
-          for(const [tf,lbl] of tfs){
-            try{
-              if(tf!=="5min")await new Promise(r=>setTimeout(r,300));
-              const d=tf==="5min"?main:await fetchTF(p,tf);
-              const b=quickBias(d.O,d.H,d.L,d.C);
-              if(b==="UP")up++;else if(b==="DOWN")dn++;
-            }catch{}
-          }
-          const align=Math.max(up,dn);
-          const mtfDir=up>dn?"UP":dn>up?"DOWN":"NEUTRAL";
-          
-          const result = analyze(main.O,main.H,main.L,main.C,main.V);
-          if(mtfDir!=="NEUTRAL"&&mtfDir!==result.direction&&result.direction!=="WAIT"){
-            result.direction="WAIT";result.dcls="wait";result.duration="No Entry";
-          }
-          if(mtfDir===result.direction&&result.direction!=="WAIT"){
-            result.accuracy=Math.min(96,result.accuracy+align*2);
-          }
-          
-          const stcOk=result.stc.allPassed;
-          const mtfOk=align>=2;
-          const confOk=result.accuracy>=80;
-          const isGo=result.direction!=="WAIT"&&stcOk&&mtfOk&&confOk;
-          
-          results.push({
-            pair: p,
-            signal: result.direction,
-            confidence: result.accuracy,
-            duration: result.duration,
-            verdict: isGo ? "✅ GO" : "⏳ WAIT",
-            isGo: isGo,
-            price: main.C[main.C.length - 1].toFixed(5),
-            reasons: result.reasons
-          });
-        } catch (e) {
-          results.push({
-            pair: p,
-            signal: "ERROR",
-            confidence: 0,
-            duration: "---",
-            verdict: "❌ Error",
-            isGo: false,
-            price: "---",
-            reasons: [e.message]
-          });
-        }
-      }
-
-      // Filter ONLY GO signals
-      const goSignals = results.filter(r => r.isGo === true);
-      setScanResults(goSignals);
-      setScanning(false);
-      
-      // If no GO signals found, show message
-      if (goSignals.length === 0) {
-        setErr("⏳ No GO signals found in any pair. Try again in 5-10 minutes.");
-      }
-    } catch (e) {
-      setErr(e.message);
-      setScanning(false);
-    }
-  }, []);
-
-  const getSignal = useCallback(async()=>{
-    setLoading(true);setSig(null);setErr("");setMtf([]);setVerdict(null);setTaken(false);setScanResults([]);
+  const getSignal=useCallback(async()=>{
+    setLoading(true);setSig(null);setErr("");setMtf([]);setVerdict(null);setTaken(false);
     try{
       const main=await fetchTF(pair,"5min");
       const tfs=[["5min","5M"],["15min","15M"],["1h","1H"]];
@@ -459,7 +336,9 @@ function App(){
       }
       if(mtfDir===result.direction&&result.direction!=="WAIT"){
         result.accuracy=Math.min(96,result.accuracy+align*2);
+        if(align>=3)result.reasons[2]=`${align}/3 timeframes aligned ? strong confirmation`;
       }
+      // Final verdict
       const stcOk=result.stc.allPassed;
       const mtfOk=align>=2;
       const confOk=result.accuracy>=80;
@@ -470,12 +349,74 @@ function App(){
     setLoading(false);
   },[pair]);
 
+  const skipToNext=useCallback(async()=>{
+    // Try next pairs until we find GO or run out
+    setSig(null);setVerdict(null);setErr("");
+    const startIdx=PAIRS.indexOf(pair);
+    for(let i=1;i<PAIRS.length;i++){
+      const nextPair=PAIRS[(startIdx+i)%PAIRS.length];
+      setPair(nextPair);
+      setLoading(true);
+      try{
+        const main=await fetchTF(nextPair,"5min");
+        const tfs=[["5min","5M"],["15min","15M"],["1h","1H"]];
+        const mtfArr=[];let up=0,dn=0;
+        for(const [tf,lbl] of tfs){
+          try{
+            if(tf!=="5min")await new Promise(r=>setTimeout(r,250));
+            const d=tf==="5min"?main:await fetchTF(nextPair,tf);
+            const b=quickBias(d.O,d.H,d.L,d.C);
+            mtfArr.push({lbl,bias:b,active:tf==="5min"});
+            if(b==="UP")up++;else if(b==="DOWN")dn++;
+          }catch{mtfArr.push({lbl,bias:"N/A",active:tf==="5min"});}
+        }
+        setMtf(mtfArr);
+        const align=Math.max(up,dn);
+        const mtfDir=up>dn?"UP":dn>up?"DOWN":"NEUTRAL";
+        const result=analyze(main.O,main.H,main.L,main.C,main.V);
+        if(mtfDir!=="NEUTRAL"&&mtfDir!==result.direction&&result.direction!=="WAIT"){
+          result.direction="WAIT";result.dcls="wait";result.duration="No Entry";
+        }
+        if(mtfDir===result.direction&&result.direction!=="WAIT"){
+          result.accuracy=Math.min(96,result.accuracy+align*2);
+        }
+        const stcOk=result.stc.allPassed;
+        const mtfOk=align>=2;
+        const confOk=result.accuracy>=80;
+        const isGo=result.direction!=="WAIT"&&stcOk&&mtfOk&&confOk;
+        const v={label:isGo?"GO":"AVOID",dir:result.direction,time:result.duration,color:result.direction==="UP"?C.up:C.down};
+        setVerdict(v);setSig(result);setLoading(false);
+        if(isGo)return; // Found GO - stop scanning
+      }catch(e){setErr(e.message);}
+    }
+    setLoading(false);
+  },[pair]);
+
   const takeTrade=()=>{
     if(!sig)return;
     const id=Date.now();
-    const t={id,pair,dir:sig.direction,dur:sig.duration,time:new Date().toLocaleTimeString(),date:new Date().toLocaleDateString(),result:null,accuracy:sig.accuracy,entryPrice:parseFloat(sig.last),expiryTime:Date.now()};
+    const durationMs={"5 min":5*60*1000,"15 min":15*60*1000,"30 min":30*60*1000,"1 hour":60*60*1000}[sig.duration]||5*60*1000;
+    const t={id,pair,dir:sig.direction,dur:sig.duration,time:new Date().toLocaleTimeString(),date:new Date().toLocaleDateString(),result:null,accuracy:sig.accuracy,entryPrice:parseFloat(sig.last),expiryTime:Date.now()+durationMs};
     const h=[t,...history].slice(0,100);
     setHistory(h);saveH(h);setLastId(id);setTaken(true);
+    // Auto-track result after duration
+    const durationMs2={"5 min":5*60*1000,"15 min":15*60*1000,"30 min":30*60*1000,"1 hour":60*60*1000}[sig.duration]||5*60*1000;
+    const entryP=parseFloat(sig.last);
+    const tradeDir=sig.direction;
+    const tradePair=pair;
+    setTimeout(async()=>{
+      try{
+        const data=await fetchTF(tradePair,"5min");
+        const exitPrice=data.C[data.C.length-1];
+        const autoResult=tradeDir==="UP"?(exitPrice>entryP?"WIN":"LOSS"):(exitPrice<entryP?"WIN":"LOSS");
+        setHistory(prev=>{
+          const updated=prev.map(tr=>tr.id===id&&tr.result===null?{...tr,result:autoResult,exitPrice,auto:true}:tr);
+          saveH(updated);
+          return updated;
+        });
+        setTaken(false);setSig(null);
+      }catch(e){console.log("Auto-track failed:",e);}
+    },durationMs2);
   };
 
   const markResult=(result)=>{
@@ -493,15 +434,13 @@ function App(){
   const losses=done.filter(t=>t.result==="LOSS").length;
   const rate=done.length>0?Math.round(wins/done.length*100):0;
 
-  // ============================================================
-  // HISTORY PAGE
-  // ============================================================
+  // ?? History Page ?????????????????????????????????????????
   if(page==="history") return(
     <div style={S.app}>
       <div style={S.wrap}>
         <div style={{...S.hdr}}>
-          <div style={{fontSize:18,fontWeight:800,color:C.text}}>📊 Trade History</div>
-          <button onClick={()=>setPage("signals")} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"8px 14px",color:C.accent,fontSize:13,fontWeight:600,cursor:"pointer"}}>← Back</button>
+          <div style={{fontSize:18,fontWeight:800,color:C.text}}>?? Trade History</div>
+          <button onClick={()=>setPage("signals")} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"8px 14px",color:C.accent,fontSize:13,fontWeight:600,cursor:"pointer"}}>? Back</button>
         </div>
         <div style={{...S.g4,marginBottom:16}}>
           {[{n:history.length,l:"TOTAL",c:C.accent},{n:wins,l:"WINS",c:C.up},{n:losses,l:"LOSSES",c:C.down},{n:`${rate}%`,l:"WIN RATE",c:rate>=65?C.up:rate>=50?C.wait:C.down}].map(x=>(
@@ -516,7 +455,7 @@ function App(){
             <div key={t.id} style={{background:C.card,borderRadius:10,padding:"12px 14px",marginBottom:8,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <div>
                 <div style={{fontSize:13,fontWeight:700,color:C.text}}>{t.pair}</div>
-                <div style={{fontSize:10,color:C.dim}}>{t.date} {t.time} | {t.dir} | {t.accuracy}% | ⏱️ {t.dur}</div>
+                <div style={{fontSize:10,color:C.dim}}>{t.date} {t.time} | {t.dir} | {t.accuracy}%</div>
               </div>
               {t.result===null?(
                 <div style={{display:"flex",gap:6}}>
@@ -529,14 +468,12 @@ function App(){
             </div>
           ))
         }
-        {history.length>0&&<button onClick={()=>{if(window.confirm("Clear all trade history?")){const h=[];setHistory(h);saveH(h);}}} style={{width:"100%",marginTop:12,padding:10,background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.dim,fontSize:11,cursor:"pointer"}}>🗑 Clear All History</button>}
+        {history.length>0&&<button onClick={()=>{if(window.confirm("Clear all trade history?")){const h=[];setHistory(h);saveH(h);}}} style={{width:"100%",marginTop:12,padding:10,background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.dim,fontSize:11,cursor:"pointer"}}>??? Clear All History</button>}
       </div>
     </div>
   );
 
-  // ============================================================
-  // MAIN SIGNALS PAGE
-  // ============================================================
+  // ?? Signals Page ?????????????????????????????????????????
   return(
     <div style={S.app}>
       <style>{`
@@ -544,10 +481,7 @@ function App(){
         @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         @keyframes pulseG{0%,100%{box-shadow:0 0 0 0 rgba(0,224,150,0.3)}50%{box-shadow:0 0 0 8px rgba(0,224,150,0)}}
         @keyframes pulseR{0%,100%{box-shadow:0 0 0 0 rgba(255,77,109,0.3)}50%{box-shadow:0 0 0 8px rgba(255,77,109,0)}}
-        @keyframes pulseGold{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.4)}50%{box-shadow:0 0 0 12px rgba(255,215,0,0)}}
         *{box-sizing:border-box;-webkit-tap-highlight-color:rgba(0,0,0,0);}
-        .gold-border{border-color:#ffd700 !important;box-shadow:0 0 20px rgba(255,215,0,0.15) !important;}
-        .gold-text{color:#ffd700 !important;}
       `}</style>
       <div style={S.wrap}>
 
@@ -557,15 +491,15 @@ function App(){
             <div style={{width:38,height:38,borderRadius:10,background:"linear-gradient(135deg,#0d0f1a,#1a1c2e)",border:"1px solid #1e2235",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 0 12px rgba(124,131,255,0.15)"}}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                 <polyline points="2,18 8,11 13,15 22,5" stroke="#4fc3f7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="22" cy="5" r="2.5" fill="#ffd700"/>
+                <circle cx="22" cy="5" r="2.5" fill="#00e096"/>
               </svg>
             </div>
             <div>
               <div style={{display:"flex",alignItems:"center",gap:6}}>
                 <span style={{fontSize:21,fontWeight:900,background:"linear-gradient(135deg,#4fc3f7,#7c83ff)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",letterSpacing:"-0.5px"}}>SpriNg</span>
-                <span style={{fontSize:10,fontWeight:700,color:"#f0c040",background:"rgba(240,192,64,0.12)",padding:"2px 6px",borderRadius:4,letterSpacing:"0.5px"}}>SCAN</span>
+                <span style={{fontSize:10,fontWeight:700,color:"#f0c040",background:"rgba(240,192,64,0.12)",padding:"2px 6px",borderRadius:4,letterSpacing:"0.5px"}}>PRO</span>
               </div>
-              <div style={{fontSize:8,color:"#ffd700",letterSpacing:"1.5px",marginTop:1}}>GO SIGNALS ONLY</div>
+              <div style={{fontSize:8,color:"#2a2d45",letterSpacing:"1.5px",marginTop:1}}>AI TRADING SIGNALS</div>
             </div>
           </div>
           <div style={{textAlign:"right"}}>
@@ -581,14 +515,14 @@ function App(){
             style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:"12px 14px",color:C.text,fontSize:14,fontWeight:600,cursor:"pointer"}}
           >
             <span>{pair}</span>
-            <span style={{color:C.dim,fontSize:11,marginLeft:4}}>▼</span>
+            <span style={{color:C.dim,fontSize:11,marginLeft:4}}>&#9660;</span>
           </button>
           {showDD&&(
             <div style={{position:"absolute",top:50,left:0,right:0,zIndex:999,background:C.card,border:`1px solid ${C.border}`,borderRadius:10,maxHeight:220,overflowY:"auto",boxShadow:"0 8px 32px #000"}}>
               {PAIRS.map(p=>(
                 <div
                   key={p}
-                  onClick={()=>{setPair(p);setShowDD(false);setSig(null);setVerdict(null);setScanResults([]);}}
+                  onClick={()=>{setPair(p);setShowDD(false);setSig(null);setVerdict(null);}}
                   style={{padding:"11px 14px",fontSize:13,cursor:"pointer",color:p===pair?C.accent:C.text,background:p===pair?"#1a1c2e":"transparent",borderBottom:"1px solid #0d0f1a"}}
                 >{p}</div>
               ))}
@@ -596,62 +530,11 @@ function App(){
           )}
         </div>
 
-        {/* ===== SCAN RESULTS - GO SIGNALS ONLY ===== */}
-        {scanResults.length > 0 && (
-          <div style={{...S.ibox, marginBottom: 12, border: `2px solid ${C.gold}`, background: `${C.gold}11`}}>
-            <div style={S.row}>
-              <div style={S.lbl}>🏆 GO SIGNALS FOUND ({scanResults.length}/{PAIRS.length} pairs)</div>
-              <span style={{fontSize:10, color: C.gold, fontWeight: 700}}>✅ Ready to trade!</span>
-            </div>
-            
-            {scanResults.map((r, i) => {
-              const color = r.signal === "UP" ? C.up : r.signal === "DOWN" ? C.down : C.wait;
-              
-              return (
-                <div key={i} style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "8px 10px",
-                  marginBottom: 6,
-                  background: `${C.box}`,
-                  border: `1px solid ${color}`,
-                  borderRadius: 8,
-                }}>
-                  <div>
-                    <span style={{fontSize: 13, fontWeight: 700, color: C.text}}>{r.pair}</span>
-                    <div style={{fontSize: 9, color: C.dim}}>{r.reasons?.[0] || ""}</div>
-                  </div>
-                  <div style={{textAlign:"right"}}>
-                    <span style={{fontSize: 14, fontWeight: 800, color: color}}>
-                      {r.signal === "UP" ? "📈 CALL" : r.signal === "DOWN" ? "📉 PUT" : "⏳ WAIT"}
-                    </span>
-                    <div style={{fontSize: 10, color: C.accent, fontWeight: 600}}>
-                      {r.confidence}% | ⏱️ {r.duration}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-            
-            {/* Auto-select best GO signal */}
-            {scanResults.length > 0 && (
-              <div style={{marginTop: 8, padding: 10, background: `${C.gold}22`, borderRadius: 8, border: `2px solid ${C.gold}`}}>
-                <div style={{fontSize: 12, color: C.gold, fontWeight: 700, textAlign: "center"}}>
-                  🏆 Best Signal: {scanResults.sort((a,b) => b.confidence - a.confidence)[0]?.pair} 
-                  ({scanResults.sort((a,b) => b.confidence - a.confidence)[0]?.signal}) 
-                  {scanResults.sort((a,b) => b.confidence - a.confidence)[0]?.confidence}%
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Card - Single Analysis */}
-        <div style={{background:C.card,border:`1px solid ${verdict?.label==="GO"?C.gold:"#1a1c2e"}`,borderRadius:16,padding:18,marginBottom:12,minHeight:100,transition:"border-color 0.5s"}}>
-          {!sig&&!loading&&!err&&scanResults.length===0&&!scanning&&<div style={{textAlign:"center",color:C.dim2,fontSize:14,padding:"20px 0"}}>Press "Scan All" to find GO signals</div>}
-          {(loading||scanning)&&<div style={{textAlign:"center",padding:"20px 0"}}><div style={{width:36,height:36,border:`3px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,borderRadius:"50%",animation:"spin 0.8s linear infinite",margin:"0 auto 10px"}}/><div style={{color:C.dim,fontSize:12}}>{scanning ? "Scanning all pairs for GO signals..." : "Analyzing..."}</div></div>}
-          {err&&!scanResults.length>0&&<div style={{textAlign:"center",color:C.down,fontSize:13,padding:"20px 0"}}>⏳ {err}</div>}
+        {/* Card */}
+        <div style={{background:C.card,border:`1px solid #1a1c2e`,borderRadius:16,padding:18,marginBottom:12,minHeight:100}}>
+          {!sig&&!loading&&!err&&<div style={{textAlign:"center",color:C.dim2,fontSize:14,padding:"20px 0"}}>Press Get Signal to start</div>}
+          {loading&&<div style={{textAlign:"center",padding:"20px 0"}}><div style={{width:36,height:36,border:`3px solid ${C.border}`,borderTop:`3px solid ${C.accent}`,borderRadius:"50%",animation:"spin 0.8s linear infinite",margin:"0 auto 10px"}}/><div style={{color:C.dim,fontSize:12}}>Analyzing 3 timeframes...</div></div>}
+          {err&&<div style={{textAlign:"center",color:C.down,fontSize:13,padding:"20px 0"}}>? {err}</div>}
 
           {sig&&!loading&&(
             <div style={{animation:"fadeUp 0.4s ease"}}>
@@ -687,41 +570,125 @@ function App(){
                 ))}
               </div>
 
-              {/* Direction + Duration */}
+              {/* Signal Strength */}
               <div style={{...S.ibox,marginBottom:8}}>
-                <div style={S.row}>
-                  <div>
-                    <div style={S.lbl}>Decision</div>
-                    <div style={{fontSize:20,fontWeight:900,color:sig.direction==="UP"?C.up:sig.direction==="DOWN"?C.down:C.wait}}>
-                      {sig.direction==="UP"?"📈 CALL":sig.direction==="DOWN"?"📉 PUT":"⏳ WAIT"}
-                    </div>
-                  </div>
-                  <div style={{textAlign:"right"}}>
-                    <div style={S.lbl}>⏱️ Duration</div>
-                    <div style={{fontSize:16,fontWeight:700,color:C.accent}}>{sig.duration}</div>
-                  </div>
+                <div style={{...S.row,marginBottom:5}}>
+                  <span style={S.lbl}>Signal Strength</span>
+                  <span style={{fontSize:10,color:C.dim}}>{sig.direction==="WAIT"?"WAIT":`${sig.strength}%`}</span>
+                </div>
+                <div style={{height:5,background:"#1a1c2e",borderRadius:100,overflow:"hidden"}}>
+                  <div style={{width:`${sig.direction==="WAIT"?0:sig.strength}%`,height:"100%",background:sig.dcls==="up"?`linear-gradient(90deg,${C.accentB},${C.up})`:`linear-gradient(90deg,${C.down},#ff8c00)`,borderRadius:100,transition:"width 0.8s"}}/>
+                </div>
+                <div style={{...S.row,marginTop:3}}>
+                  <span style={{fontSize:9,color:"#333"}}>Weak</span>
+                  <span style={{fontSize:9,color:C.dim}}>Score: {sig.total}</span>
+                  <span style={{fontSize:9,color:"#333"}}>Strong</span>
                 </div>
               </div>
 
+              {/* Patterns */}
+              <div style={{...S.ibox,marginBottom:8}}>
+                <div style={{fontSize:10,color:"#666",marginBottom:4}}>{sig.ms.trend}</div>
+                <div>{sig.cp.patterns.length>0?sig.cp.patterns.map(p=><span key={p} style={{background:"#1a1c2e",borderRadius:5,padding:"2px 7px",fontSize:10,color:C.accent,marginRight:3}}>{p}</span>):<span style={{fontSize:10,color:"#333"}}>No pattern detected</span>}</div>
+              </div>
+
+              {/* ??? SMART TRIPLE CHECK ???????????????????????? */}
+              <div style={{...S.ibox,border:`1px solid ${sig.stc.allPassed?"rgba(0,224,150,0.25)":"rgba(255,77,109,0.25)"}`,marginBottom:8}}>
+                <div style={{...S.row,marginBottom:8}}>
+                  <span style={{...S.lbl,color:sig.stc.allPassed?C.up:C.down}}>? Smart Triple Check</span>
+                  <span style={{fontSize:12,fontWeight:700,color:sig.stc.allPassed?C.up:C.down}}>{sig.stc.passed}/3 {sig.stc.allPassed?"PASSED":"FAILED"}</span>
+                </div>
+                {[
+                  {n:"1",label:"Momentum Consistency",ok:sig.stc.check1,detail:sig.stc.mcsDetails},
+                  {n:"2",label:"Structure Confluence",ok:sig.stc.check2,detail:`RZ:${sig.stc.rzOk?"OK":"X"} | Vol:${sig.stc.vpOk?"OK":"X"}`},
+                  {n:"3",label:"Multi-Signal Agreement",ok:sig.stc.check3,detail:`${sig.stc.agree}/3 signals agree`},
+                ].map(ch=>(
+                  <div key={ch.n} style={{display:"flex",alignItems:"flex-start",gap:8,marginBottom:6,background:"#0a0c14",borderRadius:8,padding:"8px 10px"}}>
+                    <div style={{width:20,height:20,borderRadius:"50%",background:ch.ok?"rgba(0,224,150,0.15)":"rgba(255,77,109,0.15)",border:`1px solid ${ch.ok?C.up:C.down}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:ch.ok?C.up:C.down,flexShrink:0}}>{ch.n}</div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:11,fontWeight:600,color:ch.ok?C.text:C.dim,marginBottom:2}}>{ch.label} {ch.ok?"OK":"X"}</div>
+                      <div style={{fontSize:10,color:C.dim}}>{ch.detail}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* ??????????????????????????????????????????????? */}
+
+              {/* Rejection Zone */}
+              <div style={{...S.ibox,marginBottom:8}}>
+                <div style={S.row}>
+                  <span style={S.lbl}>? Rejection Zone</span>
+                  <span style={{fontSize:11,fontWeight:700,color:sig.rz.atZone?(sig.rz.nearType==="SUPPORT"?C.up:C.down):"#444"}}>{sig.rz.atZone?`${sig.rz.nearType} (${sig.rz.nearZone.touches}x)`:"NONE NEARBY"}</span>
+                </div>
+                <div style={{fontSize:11,color:"#666",marginTop:3}}>{sig.rz.label}</div>
+              </div>
+
+              {/* Volume Profile */}
+              <div style={{...S.ibox,marginBottom:8}}>
+                <div style={S.row}>
+                  <span style={S.lbl}>?? Volume Profile</span>
+                  <span style={{fontSize:11,fontWeight:700,color:sig.vp.atLVN?C.wait:sig.vp.atHVN?C.accent:"#444"}}>{sig.vp.atLVN?"EXPLOSION ZONE":sig.vp.atHVN?"HVN":sig.vp.nearPOC?"NEAR POC":"CLEAR"}</span>
+                </div>
+                <div style={{fontSize:11,color:"#666",marginTop:3}}>{sig.vp.label}</div>
+              </div>
+
+              {/* Direction Box */}
+              <div style={{borderRadius:11,padding:"14px 16px",marginBottom:10,display:"flex",alignItems:"center",justifyContent:"space-between",background:sig.dcls==="up"?"rgba(0,224,150,0.07)":sig.dcls==="down"?"rgba(255,77,109,0.07)":"rgba(240,192,64,0.07)",border:`1px solid ${sig.dcls==="up"?"rgba(0,224,150,0.2)":sig.dcls==="down"?"rgba(255,77,109,0.2)":"rgba(240,192,64,0.2)"}`}}>
+                <div>
+                  <div style={S.lbl}>Signal</div>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <span style={{fontSize:24}}>{sig.direction==="UP"?"?":sig.direction==="DOWN"?"?":"?"}</span>
+                    <span style={{fontSize:26,fontWeight:900,color:dc}}>{sig.direction}</span>
+                  </div>
+                </div>
+                <div style={{textAlign:"right"}}>
+                  <div style={S.lbl}>Duration</div>
+                  <div style={{fontSize:16,fontWeight:700,color:C.accent}}>{sig.duration}</div>
+                </div>
+              </div>
+
+              {/* Reasons */}
+              <div style={{...S.ibox,marginBottom:12}}>
+                <div style={{...S.lbl,marginBottom:8}}>? Top 3 Reasons</div>
+                {sig.reasons.map((r,i)=>(
+                  <div key={i} style={{display:"flex",gap:8,marginBottom:7,alignItems:"flex-start"}}>
+                    <div style={{width:18,height:18,borderRadius:"50%",background:`${dc}22`,color:dc,fontSize:10,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{i+1}</div>
+                    <div style={{fontSize:12,color:"#a0a8c8",lineHeight:1.5}}>{r}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* GO / AVOID */}
+              {verdict&&(
+                <div style={{borderRadius:12,border:`2px solid ${verdict.label==="GO"?verdict.color:C.border}`,marginBottom:12}}>
+                  <div style={{background:verdict.label==="GO"?`${verdict.color}18`:C.box,padding:14,display:"flex",alignItems:"center",justifyContent:"space-between",borderRadius:10}}>
+                    <div style={{display:"flex",alignItems:"center",gap:10}}>
+                      <div style={{width:40,height:40,borderRadius:"50%",background:verdict.label==="GO"?verdict.color:C.card,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{verdict.label==="GO"?"GO":"NO"}</div>
+                      <div>
+                        <div style={{fontSize:22,fontWeight:900,letterSpacing:2,color:verdict.label==="GO"?verdict.color:"#333"}}>{verdict.label}</div>
+                        <div style={{fontSize:10,color:C.dim}}>{verdict.label==="GO"?"All 3 checks passed":"Triple check failed"}</div>
+                      </div>
+                    </div>
+                    {verdict.label==="GO"&&<div style={{textAlign:"right"}}>
+                      <div style={{fontSize:18,fontWeight:800,color:verdict.color}}>{verdict.dir}</div>
+                      <div style={{fontSize:12,color:"#666"}}>{verdict.time}</div>
+                    </div>}
+                  </div>
+                </div>
+              )}
+
               {/* Actions */}
-              {!taken && sig.direction!=="WAIT" ? (
+              {!taken?(
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-                  <button onClick={takeTrade} style={{padding:13,border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",background:sig.direction==="UP"?C.up:C.down,animation:sig.direction==="UP"?"pulseG 2s infinite":"pulseR 2s infinite"}}>
-                    ✅ TAKE
-                  </button>
-                  <button onClick={scanAllPairs} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.dim,fontWeight:700,fontSize:14,cursor:"pointer"}}>🔍 Scan All</button>
+                  <button onClick={takeTrade} style={{padding:13,border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",background:sig.direction==="UP"?C.up:C.down,animation:sig.direction==="UP"?"pulseG 2s infinite":"pulseR 2s infinite"}}>Take</button>
+                  <button onClick={skipToNext} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.dim,fontWeight:700,fontSize:14,cursor:"pointer"}}>Next Pair</button>
                 </div>
-              ) : !taken ? (
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-                  <button style={{padding:13,border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:14,background:"#1e2235",cursor:"not-allowed",opacity:0.5}}>⏳ WAIT</button>
-                  <button onClick={scanAllPairs} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.dim,fontWeight:700,fontSize:14,cursor:"pointer"}}>🔍 Scan All</button>
-                </div>
-              ) : (
-                <div style={{background:"rgba(255,215,0,0.06)",border:"1px solid rgba(255,215,0,0.18)",borderRadius:10,padding:14,textAlign:"center"}}>
-                  <div style={{fontSize:13,color:C.gold,fontWeight:600,marginBottom:10}}>💎 Mark result:</div>
+              ):(
+                <div style={{background:"rgba(0,224,150,0.06)",border:"1px solid rgba(0,224,150,0.18)",borderRadius:10,padding:14,textAlign:"center"}}>
+                  <div style={{fontSize:13,color:C.up,fontWeight:600,marginBottom:10}}>? Mark result:</div>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-                    <button onClick={()=>markResult("WIN")} style={{padding:10,background:"rgba(0,224,150,0.15)",border:`1px solid ${C.up}60`,borderRadius:8,color:C.up,fontWeight:700,fontSize:13,cursor:"pointer"}}>✅ WIN</button>
-                    <button onClick={()=>markResult("LOSS")} style={{padding:10,background:"rgba(255,77,109,0.15)",border:`1px solid ${C.down}60`,borderRadius:8,color:C.down,fontWeight:700,fontSize:13,cursor:"pointer"}}>❌ LOSS</button>
+                    <button onClick={()=>markResult("WIN")} style={{padding:10,background:"rgba(0,224,150,0.15)",border:`1px solid ${C.up}60`,borderRadius:8,color:C.up,fontWeight:700,fontSize:13,cursor:"pointer"}}>WIN</button>
+                    <button onClick={()=>markResult("LOSS")} style={{padding:10,background:"rgba(255,77,109,0.15)",border:`1px solid ${C.down}60`,borderRadius:8,color:C.down,fontWeight:700,fontSize:13,cursor:"pointer"}}>LOSS</button>
                   </div>
                 </div>
               )}
@@ -729,46 +696,16 @@ function App(){
           )}
         </div>
 
-        {/* Buttons */}
-        {!loading && !sig && !scanning && (
-          <div style={{display:"grid", gridTemplateColumns: "1fr 1fr", gap: 10}}>
-            <button 
-              onClick={scanAllPairs}
-              style={{
-                padding: 15,
-                background: "linear-gradient(135deg,#ffd700,#f0a500)",
-                border: "none",
-                borderRadius: 12,
-                color: "#000",
-                fontWeight: 800,
-                fontSize: 14,
-                cursor: "pointer",
-                boxShadow: "0 4px 20px rgba(255,215,0,0.3)"
-              }}
-            >
-              🔍 Scan All
-            </button>
-            <button 
-              onClick={getSignal}
-              style={{
-                padding: 15,
-                background: "linear-gradient(135deg,#4fc3f7,#7c83ff)",
-                border: "none",
-                borderRadius: 12,
-                color: "#fff",
-                fontWeight: 700,
-                fontSize: 14,
-                cursor: "pointer"
-              }}
-            >
-              📊 Single
-            </button>
-          </div>
+        {/* Get Signal Button */}
+        {!loading&&!sig&&(
+          <button onClick={getSignal} style={{width:"100%",padding:15,background:`linear-gradient(135deg,${C.accentB},${C.accent})`,border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",boxShadow:`0 4px 24px ${C.accent}44`}}>
+            ? Get Signal
+          </button>
         )}
 
         {/* Nav */}
         <div style={{display:"flex",justifyContent:"space-around",marginTop:24,borderTop:`1px solid ${C.card}`,paddingTop:14}}>
-          {[{ic:"👤",lb:"Profile"},{ic:"📊",lb:"History",action:()=>setPage("history")},{ic:"📈",lb:"Signals"},{ic:"🧠",lb:"AI"},{ic:"🎧",lb:"Support"}].map((x,i)=>(
+          {[{ic:"P",lb:"Profile"},{ic:"H",lb:"History",action:()=>setPage("history")},{ic:"S",lb:"Signals"},{ic:"A",lb:"AI"},{ic:"X",lb:"Support"}].map((x,i)=>(
             <div key={x.lb} onClick={x.action} style={{textAlign:"center",cursor:x.action?"pointer":"default",opacity:x.lb==="Signals"||x.lb==="History"?1:0.25}}>
               <div style={{fontSize:17,marginBottom:2}}>{x.ic}</div>
               <div style={{fontSize:9,color:x.lb==="Signals"?C.accent:"#333",fontWeight:x.lb==="Signals"?700:400}}>{x.lb}</div>
@@ -780,6 +717,7 @@ function App(){
     </div>
   );
 }
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
 </script>
