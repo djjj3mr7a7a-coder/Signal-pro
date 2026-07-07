@@ -5,460 +5,344 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="SpriNg Bot - Penta System"/>
-<meta name="theme-color" content="#08090f"/>
-<title>SpriNg Bot - Penta System</title>
+<meta name="apple-mobile-web-app-title" content="SpriNg Bot"/>
+<meta name="theme-color" content="#06070c"/>
+<title>SpriNg Bot – Zero Reversal</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
-body{background:#08090f;color:#e0e0f0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
+body{
+  background: radial-gradient(circle at 50% 10%, #121526 0%, #06070c 70%);
+  background-attachment: fixed;
+  color:#e0e0f0;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-image: linear-gradient(rgba(26, 29, 50, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(26, 29, 50, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+  z-index: -1;
+  pointer-events: none;
+}
 ::-webkit-scrollbar{width:0;}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useCallback, useEffect } = React;
+const { useState, useCallback, useRef, useEffect } = React;
 
 const PAIRS = [
   "EUR/USD","USD/JPY","AUD/USD","EUR/GBP","EUR/JPY","GBP/JPY","AUD/JPY",
   "AUD/CAD"
 ];
 
-const POLYGON_KEY = "qRpBREla7_HBFde0KNo90i9l5HflxWcn";
+const TWELVE_KEY = "30a1cd1a62274ed29c7fb8d8e41c1f00";
 
 // ============================================================
-// ?????? PENTA SYSTEM - 5 LAYERS OF ANALYSIS ??????
+// ZERO REVERSAL DETECTOR
 // ============================================================
+function detectZeroReversal(O,H,L,C) {
+  const n = C.length;
+  if (n < 10) return { isZeroReversal: false, score: 0 };
+  
+  const last = C[n-1];
+  const prev = C[n-2];
+  const prev2 = C[n-3];
+  const prev3 = C[n-4];
+  const prev4 = C[n-5];
+  
+  // معيار 1: تغير حاد في الاتجاه (مفاجئ)
+  const lastMove = last - prev;
+  const prevMove = prev - prev2;
+  const isSharpReversal = (lastMove > 0 && prevMove < 0 && Math.abs(lastMove) > Math.abs(prevMove) * 1.5) ||
+                          (lastMove < 0 && prevMove > 0 && Math.abs(lastMove) > Math.abs(prevMove) * 1.5);
+  
+  // معيار 2: حركة قوية في آخر شمعتين
+  const avgRange = (Math.max(...H.slice(-10)) - Math.min(...L.slice(-10))) / 10;
+  const lastRange = H[n-1] - L[n-1];
+  const isStrongMove = lastRange > avgRange * 1.5;
+  
+  // معيار 3: اختراق قوي لمستوى (دعم/مقاومة)
+  const recentHigh = Math.max(...H.slice(-15, -1));
+  const recentLow = Math.min(...L.slice(-15, -1));
+  const isBreakout = last > recentHigh * 1.0002 || last < recentLow * 0.9998;
+  
+  // معيار 4: تغير في الزخم (Momentum Shift)
+  const rsi = calcRsi(C);
+  const prevRsi = calcRsi(C.slice(0, -1));
+  const isMomentumShift = (rsi - prevRsi) > 10 || (rsi - prevRsi) < -10;
+  
+  // حساب النقاط
+  let score = 0;
+  if (isSharpReversal) score += 3;
+  if (isStrongMove) score += 2;
+  if (isBreakout) score += 2;
+  if (isMomentumShift) score += 1;
+  
+  const isZeroReversal = score >= 4;
+  
+  return {
+    isZeroReversal,
+    score,
+    details: `Sharp:${isSharpReversal} Strong:${isStrongMove} Breakout:${isBreakout} MomShift:${isMomentumShift}`
+  };
+}
 
 // ============================================================
-// LAYER 1: QUAD MATRIX (4 Technical Perspectives)
+// INDICATORS
 // ============================================================
-function quadMatrix(O,H,L,C,V) {
+function calcEma(d, p) {
+  const k = 2/(p+1); let e = d[0];
+  for (let i=1;i<d.length;i++) e = d[i]*k + e*(1-k);
+  return e;
+}
+function calcRsi(d, p=14) {
+  if (d.length<p+1) return 50;
+  let g=0,l=0;
+  for (let i=d.length-p;i<d.length;i++) { const x=d[i]-d[i-1]; x>0?g+=x:l+=Math.abs(x); }
+  return 100 - 100/(1+(g/p)/((l/p)||0.0001));
+}
+function calcMacd(d) { return calcEma(d.slice(-26),12)-calcEma(d.slice(-26),26); }
+function calcStoch(H,L,C,p=14) {
+  const hh=Math.max(...H.slice(-p)), ll=Math.min(...L.slice(-p));
+  return ((C[C.length-1]-ll)/((hh-ll)||0.0001))*100;
+}
+function calcAtr(H,L,C,p=14) {
+  const tr=[];
+  for (let i=1;i<C.length;i++) tr.push(Math.max(H[i]-L[i],Math.abs(H[i]-C[i-1]),Math.abs(L[i]-C[i-1])));
+  return tr.slice(-p).reduce((a,b)=>a+b,0)/p;
+}
+
+function marketStr(C) {
+  let u=0,d=0;
+  for (let i=3;i<Math.min(C.length,25);i++) {
+    if(C[i]>C[i-1]&&C[i-1]>C[i-2]&&C[i-2]>C[i-3])u++;
+    if(C[i]<C[i-1]&&C[i-1]<C[i-2]&&C[i-2]<C[i-3])d++;
+  }
+  if(u>d+1) return {trend:"UPTREND",score:2};
+  if(d>u+1) return {trend:"DOWNTREND",score:-2};
+  return {trend:"SIDEWAYS",score:0};
+}
+
+function candleP(O,H,L,C) {
+  const n=C.length-1,o=O[n],h=H[n],l=L[n],c=C[n];
+  const body=Math.abs(c-o),range=h-l,bull=c>o;
+  const up=h-Math.max(o,c),dn=Math.min(o,c)-l;
+  const p=[]; let s=0;
+  if(body<range*0.1){p.push("Doji");}
+  if(dn>body*2.5&&up<body*0.5){p.push(bull?"Hammer":"Hanging Man");s+=bull?2:-1;}
+  if(up>body*2.5&&dn<body*0.5){p.push(bull?"Shooting Star":"Inv Hammer");s+=bull?-2:1;}
+  if(body>range*0.75){p.push(bull?"Marubozu Bull":"Marubozu Bear");s+=bull?2:-2;}
+  if(n>0){
+    const po=O[n-1],pc=C[n-1];
+    if(pc<po&&c>o&&c>po&&o<pc){p.push("Bullish Engulfing");s+=3;}
+    if(pc>po&&c<o&&c<po&&o>pc){p.push("Bearish Engulfing");s-=3;}
+    if(n>1){
+      const ppc=C[n-2],ppo=O[n-2];
+      if(ppc<ppo&&Math.abs(pc-po)<Math.abs(ppc-ppo)*0.3&&c>o&&c>(ppo+ppc)/2){p.push("Morning Star");s+=4;}
+      if(ppc>ppo&&Math.abs(pc-po)<Math.abs(ppc-ppo)*0.3&&c<o&&c<(ppo+ppc)/2){p.push("Evening Star");s-=4;}
+    }
+  }
+  return {patterns:p,score:s};
+}
+
+function rejZones(H,L,C) {
+  const n=C.length,levels=[],tol=0.0003;
+  for(let i=5;i<n-5;i++){
+    if(H[i]>H[i-1]&&H[i]>H[i-2]&&H[i]>H[i+1]&&H[i]>H[i+2])levels.push({price:H[i],type:"R"});
+    if(L[i]<L[i-1]&&L[i]<L[i-2]&&L[i]<L[i+1]&&L[i]<L[i+2])levels.push({price:L[i],type:"S"});
+  }
+  const cl=[];
+  levels.forEach(lv=>{
+    let found=false;
+    cl.forEach(c=>{if(Math.abs(c.price-lv.price)/lv.price<tol){c.touches++;lv.type==="R"?c.ru++:c.rd++;found=true;}});
+    if(!found)cl.push({price:lv.price,touches:1,ru:lv.type==="R"?1:0,rd:lv.type==="S"?1:0});
+  });
+  const strong=cl.filter(c=>c.touches>=3).sort((a,b)=>b.touches-a.touches);
+  const last=C[n-1]; let nz=null,nt="",ns=0;
+  strong.forEach(z=>{
+    const d=Math.abs(last-z.price)/z.price*100;
+    if(d<0.05&&(!nz||d<Math.abs(last-nz.price)/last*100)){nz=z;nt=z.rd>z.ru?"RESISTANCE":"SUPPORT";ns=Math.min(100,z.touches*20);}
+  });
+  const atZone=!!nz,score=atZone?(nt==="SUPPORT"?2:-2):0;
+  return {nearZone:nz,nearType:nt,nearStrength:ns,atZone,score,label:atZone?`${nt} zone (${nz.touches}x) at ${nz.price.toFixed(5)}`:"No rejection zone nearby"};
+}
+
+function volProfile(H,L,C,V) {
+  const n=C.length,minP=Math.min(...L),maxP=Math.max(...H),range=maxP-minP,buckets=20;
+  const prof=Array.from({length:buckets},(_,b)=>({mid:minP+(b+0.5)*range/buckets,vol:0}));
+  for(let i=0;i<n;i++){
+    const v=V&&V[i]?V[i]:1;
+    for(let b=0;b<buckets;b++)if(L[i]<=minP+(b+1)*range/buckets&&H[i]>=minP+b*range/buckets)prof[b].vol+=v;
+  }
+  const poc=prof.reduce((a,b)=>b.vol>a.vol?b:a);
+  const avg=prof.reduce((a,b)=>a+b.vol,0)/buckets;
+  const last=C[n-1];
+  const atHVN=prof.some(z=>z.vol>avg*1.5&&Math.abs(last-z.mid)/last<0.0008);
+  const atLVN=prof.some(z=>z.vol<avg*0.4&&z.vol>0&&Math.abs(last-z.mid)/last<0.0008);
+  const nearPOC=Math.abs(last-poc.mid)/last<0.0005;
+  const label=atLVN?"EXPLOSION ZONE":atHVN?"HVN - Institutional":nearPOC?`Near POC ${poc.mid.toFixed(5)}`:`POC: ${poc.mid.toFixed(5)}`;
+  return {atHVN,atLVN,nearPOC,label};
+}
+
+function smartTripleCheck(O,H,L,C,rz,vp,sig) {
+  const n=C.length;
+  let lu=0,ld=0;
+  for(let i=n-5;i<n;i++){lu+=(C[i]>C[i-1]?1:0);ld+=(C[i]<C[i-1]?1:0);}
+  let ab=0;for(let i=n-10;i<n-1;i++)ab+=Math.abs(C[i]-O[i]);ab/=9;
+  const strongCnd=Math.abs(C[n-1]-O[n-1])>ab*0.8;
+  const clearEma=Math.abs(C[n-1]-calcEma(C.slice(-20),20))/calcEma(C.slice(-20),20)*100>0.01;
+  const momAcc=Math.abs(C[n-1]-C[n-2])>Math.abs(C[n-2]-C[n-3]);
+  const cndCons=Math.max(lu,ld);
+  let mcs=0;
+  if(cndCons>=3)mcs++;if(strongCnd)mcs++;if(clearEma)mcs++;if(momAcc)mcs++;
+  const check1=mcs>=3;
+
+  const rzOk=!rz.atZone||(rz.nearType==="SUPPORT"&&sig==="UP")||(rz.nearType==="RESISTANCE"&&sig==="DOWN");
+  const vpOk=vp.atLVN || (!vp.atHVN);
+  const check2=rzOk&&vpOk;
+
+  const rsiV=calcRsi(C);
+  const macdV=calcMacd(C);
+  const e20=calcEma(C.slice(-20),20),e50=calcEma(C.slice(-50),50);
+  const last=C[n-1];
+  let agree=0;
+  if(sig==="UP"){
+    if(rsiV<60&&rsiV>30)agree++;
+    if(macdV>0)agree++;
+    if(last>e20)agree++;
+  } else if(sig==="DOWN"){
+    if(rsiV>40&&rsiV<70)agree++;
+    if(macdV<0)agree++;
+    if(last<e20)agree++;
+  }
+  const check3=sig==="WAIT" ? true : (agree>=2);
+
+  const passed=[check1,check2,check3].filter(Boolean).length;
+  const allPassed=passed===3;
+
+  return {
+    check1,check2,check3,passed,allPassed,
+    mcs,mcsDetails:`Candles:${cndCons}/5 | Body:${strongCnd?"Strong":"Weak"} | Clear:${clearEma?"Yes":"No"} | Accel:${momAcc?"Yes":"No"}`,
+    agree,rzOk,vpOk
+  };
+}
+
+function analyze(O,H,L,C,V) {
   const n=C.length,last=C[n-1];
   const e20=calcEma(C.slice(-20),20),e50=calcEma(C.slice(-50),50);
   const r=calcRsi(C),m=calcMacd(C),k=calcStoch(H,L,C);
   const ms=marketStr(C),cp=candleP(O,H,L,C);
   const rz=rejZones(H,L,C),vp=volProfile(H,L,C,V);
   
-  let perspectives = [];
-  let score = 0;
-  
-  // Perspective 1: Trend Follow (EMA + Structure)
-  let tfScore = 0;
-  if(last>e20&&e20>e50) tfScore+=2;
-  else if(last<e20&&e20<e50) tfScore-=2;
-  else if(last>e20) tfScore+=1;
-  else tfScore-=1;
-  tfScore += ms.score;
-  if(tfScore>=2) { perspectives.push({name:"Trend",signal:"UP",weight:2}); score+=2; }
-  else if(tfScore<=-2) { perspectives.push({name:"Trend",signal:"DOWN",weight:2}); score-=2; }
-  else { perspectives.push({name:"Trend",signal:"NEUTRAL",weight:0}); }
-  
-  // Perspective 2: Momentum (RSI + MACD + Stoch)
-  let momScore = 0;
-  if(r<30) momScore+=2; else if(r<45) momScore+=1; else if(r>70) momScore-=2; else if(r>55) momScore-=1;
-  if(m>0) momScore+=1; else momScore-=1;
-  if(k<20) momScore+=2; else if(k>80) momScore-=2; else if(k<40) momScore+=1; else if(k>60) momScore-=1;
-  if(momScore>=2) { perspectives.push({name:"Momentum",signal:"UP",weight:2}); score+=2; }
-  else if(momScore<=-2) { perspectives.push({name:"Momentum",signal:"DOWN",weight:2}); score-=2; }
-  else { perspectives.push({name:"Momentum",signal:"NEUTRAL",weight:0}); }
-  
-  // Perspective 3: Structure (Rejection + Volume)
-  let structScore = 0;
-  if(rz.atZone) { structScore += (rz.nearType==="SUPPORT"?2:-2); }
-  if(vp.atLVN) { structScore += 2; }
-  if(vp.atHVN) { structScore -= 1; }
-  if(vp.nearPOC) { structScore = Math.round(structScore*0.5); }
-  if(structScore>=2) { perspectives.push({name:"Structure",signal:"UP",weight:2}); score+=2; }
-  else if(structScore<=-2) { perspectives.push({name:"Structure",signal:"DOWN",weight:2}); score-=2; }
-  else { perspectives.push({name:"Structure",signal:"NEUTRAL",weight:0}); }
-  
-  // Perspective 4: Patterns (Candles + Breakout)
-  let patScore = cp.score;
-  const prev=C[n-2], prev2=C[n-3];
-  if(prev>prev2&&last>prev) patScore+=2;
-  else if(prev<prev2&&last<prev) patScore-=2;
-  if(patScore>=2) { perspectives.push({name:"Patterns",signal:"UP",weight:2}); score+=2; }
-  else if(patScore<=-2) { perspectives.push({name:"Patterns",signal:"DOWN",weight:2}); score-=2; }
-  else { perspectives.push({name:"Patterns",signal:"NEUTRAL",weight:0}); }
-  
-  // Quad Matrix Decision
-  const upVotes = perspectives.filter(p=>p.signal==="UP").length;
-  const downVotes = perspectives.filter(p=>p.signal==="DOWN").length;
-  let direction = "NEUTRAL";
-  if(upVotes>=3) direction="UP";
-  else if(downVotes>=3) direction="DOWN";
-  
-  return {
-    perspectives,
-    score,
-    upVotes,
-    downVotes,
-    direction,
-    details: perspectives.map(p=>`${p.name}:${p.signal}`).join(" | ")
-  };
-}
+  // ===== ZERO REVERSAL DETECTION =====
+  const zr = detectZeroReversal(O,H,L,C);
 
-// ============================================================
-// LAYER 2: CONTRARIAN INDEX (Smart Money Flow)
-// ============================================================
-function contrarianIndex(O,H,L,C,V) {
-  const n=C.length;
-  let buyVol=0, sellVol=0, totalVol=0;
-  for(let i=0;i<n;i++) {
-    const vol = V[i]||1;
-    const body = C[i]-O[i];
-    if(body>0) buyVol += vol;
-    else if(body<0) sellVol += vol;
-    totalVol += vol;
-  }
-  const buyRatio = totalVol>0 ? buyVol/totalVol : 0.5;
-  const avgRange = (Math.max(...H)-Math.min(...L))/C[C.length-1];
-  const volatility = avgRange;
+  let total=0;
+  if(last>e20&&e20>e50)total+=2;else if(last<e20&&e20<e50)total-=2;else if(last>e20)total+=1;else total-=1;
+  if(r<25)total+=3;else if(r<35)total+=2;else if(r<45)total+=1;
+  else if(r>75)total-=3;else if(r>65)total-=2;else if(r>55)total-=1;
+  total+=m>0?1:-1;
+  if(k<20)total+=2;else if(k>80)total-=2;
+  total+=ms.score+cp.score+rz.score;
   
-  let signal = "NEUTRAL";
-  let confidence = 0;
-  if(buyRatio>0.65) { signal="BUY"; confidence = Math.round((buyRatio-0.5)*200); }
-  else if(buyRatio<0.35) { signal="SELL"; confidence = Math.round((0.5-buyRatio)*200); }
-  
-  return {
-    buyRatio: Math.round(buyRatio*100),
-    signal,
-    confidence: Math.min(100,confidence),
-    label: signal==="BUY"?"Smart Money BUYing":signal==="SELL"?"Smart Money SELLing":"Neutral Flow",
-    score: signal==="BUY"?2:signal==="SELL"?-2:0
-  };
-}
+  if(vp.atLVN)total+=(total>0?1:-1);
 
-// ============================================================
-// LAYER 3: GOLDEN WINDOW (Time Analysis)
-// ============================================================
-function goldenWindow() {
-  const now = new Date();
-  const hour = now.getHours();
-  const day = now.getDay();
-  
-  const goldenHours = [10,11,14,15,20,21];
-  const blackoutHours = [0,1,2,23,22];
-  
-  let isGolden = false;
-  let isBlackout = false;
-  let nextGolden = null;
-  
-  if(goldenHours.includes(hour)) isGolden = true;
-  if(blackoutHours.includes(hour)) isBlackout = true;
-  
-  for(let i=1;i<=24;i++) {
-    const nextH = (hour+i)%24;
-    if(goldenHours.includes(nextH)) { nextGolden = nextH; break; }
-  }
-  
-  let recommendation = "Neutral";
-  if(isGolden) recommendation = "GOLDEN WINDOW - Optimal Entry";
-  else if(isBlackout) recommendation = "BLACKOUT - Avoid Trading";
-  else recommendation = `Next Golden: ${nextGolden}:00 UTC`;
-  
-  return {
-    isGolden,
-    isBlackout,
-    nextGolden,
-    recommendation,
-    score: isGolden?2:isBlackout?-2:0
-  };
-}
+  let conflicts=0;
+  if(last>e20&&e20>e50&&ms.score<0)conflicts++;
+  if(last<e20&&e20<e50&&ms.score>0)conflicts++;
+  if(rz.atZone&&rz.nearType==="RESISTANCE"&&total>0)conflicts+=1;
+  if(rz.atZone&&rz.nearType==="SUPPORT"&&total<0)conflicts+=1;
 
-// ============================================================
-// LAYER 4: TRINITY SHIELD (Risk Protection)
-// ============================================================
-function trinityShield(O,H,L,C) {
-  const n=C.length,last=C[n-1];
-  const atr = calcAtr(H,L,C);
-  const avgRange = (Math.max(...H.slice(-20))-Math.min(...L.slice(-20)))/last;
-  
-  const stopLoss = last - (atr * 1.5);
-  const stopLossPct = ((last - stopLoss)/last)*100;
-  
-  const resistance = Math.max(...H.slice(-20));
-  const takeProfit = Math.min(last + (atr * 2.5), resistance);
-  const takeProfitPct = ((takeProfit - last)/last)*100;
-  
-  let earlyExit = false;
-  let earlyExitReason = "";
-  const mom = C[n-1]-C[n-2];
-  const prevMom = C[n-2]-C[n-3];
-  if((mom>0 && prevMom<0 && Math.abs(mom)>Math.abs(prevMom)*1.5) ||
-     (mom<0 && prevMom>0 && Math.abs(mom)>Math.abs(prevMom)*1.5)) {
-    earlyExit = true;
-    earlyExitReason = "Momentum reversal detected";
+  let direction="WAIT",dcls="wait";
+  if(conflicts<2&&Math.abs(total)>=2){
+    direction=total>0?"UP":"DOWN";
+    dcls=total>0?"up":"down";
   }
-  const bbUpper = calcEma(C.slice(-20),20) + (Math.sqrt(calcEma(C.map((x,i)=>Math.pow(x-calcEma(C.slice(-20),20),2)).slice(-20),20)) * 2);
-  const bbLower = calcEma(C.slice(-20),20) - (Math.sqrt(calcEma(C.map((x,i)=>Math.pow(x-calcEma(C.slice(-20),20),2)).slice(-20),20)) * 2);
-  if(last>bbUpper*1.01 || last<bbLower*0.99) {
-    earlyExit = true;
-    earlyExitReason = "Price outside Bollinger Bands";
-  }
-  
-  const shieldLevel = (stopLossPct + takeProfitPct) / 2;
-  let grade = "A";
-  if(shieldLevel>2) grade="A";
-  else if(shieldLevel>1) grade="B";
-  else grade="C";
-  
-  return {
-    stopLoss: stopLoss.toFixed(5),
-    stopLossPct: stopLossPct.toFixed(2),
-    takeProfit: takeProfit.toFixed(5),
-    takeProfitPct: takeProfitPct.toFixed(2),
-    earlyExit,
-    earlyExitReason,
-    shieldLevel: shieldLevel.toFixed(2),
-    grade,
-    score: earlyExit? -2 : (grade==="A"?2:grade==="B"?1:0)
-  };
-}
 
-// ============================================================
-// LAYER 5: AI PREDICTOR (Pattern Recognition)
-// ============================================================
-function aiPredictor(O,H,L,C) {
-  const n=C.length;
-  if(n<30) return {signal:"NEUTRAL",probability:0,score:0};
-  
-  const recent = C.slice(-20);
-  const patternHistory = [];
-  
-  let dbCount=0, dtCount=0;
-  for(let i=5;i<recent.length-5;i++) {
-    if(recent[i] < recent[i-2] && recent[i] < recent[i+2]) dbCount++;
-    if(recent[i] > recent[i-2] && recent[i] > recent[i+2]) dtCount++;
-  }
-  
-  let trendUp=0, trendDown=0;
-  for(let i=1;i<recent.length;i++) {
-    if(recent[i]>recent[i-1]) trendUp++;
-    else trendDown++;
-  }
-  
-  const range = Math.max(...recent) - Math.min(...recent);
-  const avgRange = (Math.max(...C.slice(-50))-Math.min(...C.slice(-50)));
-  const isConsolidating = range/avgRange < 0.3;
-  
-  let signal = "NEUTRAL";
-  let probability = 50;
-  
-  if(dbCount>=2 && trendUp>trendDown) {
-    signal = "UP";
-    probability = 75 + Math.min(10, dbCount*2);
-  } else if(dtCount>=2 && trendDown>trendUp) {
-    signal = "DOWN";
-    probability = 75 + Math.min(10, dtCount*2);
-  } else if(isConsolidating && trendUp>trendDown*1.5) {
-    signal = "UP";
-    probability = 68;
-  } else if(isConsolidating && trendDown>trendUp*1.5) {
-    signal = "DOWN";
-    probability = 68;
-  } else if(trendUp>trendDown*2 && recent[recent.length-1]>recent[recent.length-2]) {
-    signal = "UP";
-    probability = 65;
-  } else if(trendDown>trendUp*2 && recent[recent.length-1]<recent[recent.length-2]) {
-    signal = "DOWN";
-    probability = 65;
-  }
-  
-  return {
-    signal,
-    probability: Math.min(95,probability),
-    patterns: `${dbCount>=2?"Double Bottom ":""}${dtCount>=2?"Double Top ":""}${isConsolidating?"Consolidation ":""}`.trim()||"No clear pattern",
-    score: signal==="UP"?2:signal==="DOWN"?-2:0
-  };
-}
+  const stc=smartTripleCheck(O,H,L,C,rz,vp,direction);
+  if(direction!=="WAIT"&&!stc.allPassed){direction="WAIT";dcls="wait";}
 
-// ============================================================
-// ?????? PENTA SYSTEM - FINAL DECISION ??????
-// ============================================================
-function pentaSystem(O,H,L,C,V) {
-  const quad = quadMatrix(O,H,L,C,V);
-  const contrarian = contrarianIndex(O,H,L,C,V);
-  const golden = goldenWindow();
-  const shield = trinityShield(O,H,L,C);
-  const ai = aiPredictor(O,H,L,C);
-  
-  const layers = [
-    { name: "Quad Matrix", signal: quad.direction, score: quad.score, details: quad.details },
-    { name: "Contrarian", signal: contrarian.signal, score: contrarian.score, details: `${contrarian.buyRatio}% ${contrarian.label}` },
-    { name: "Golden Window", signal: golden.isGolden?"UP":golden.isBlackout?"DOWN":"NEUTRAL", score: golden.score, details: golden.recommendation },
-    { name: "Trinity Shield", signal: shield.earlyExit?"DOWN":shield.grade==="A"?"UP":"NEUTRAL", score: shield.score, details: `SL:${shield.stopLossPct}% TP:${shield.takeProfitPct}%` },
-    { name: "AI Predictor", signal: ai.signal, score: ai.score, details: `${ai.probability}% ${ai.patterns}` }
-  ];
-  
-  const upVotes = layers.filter(l=>l.signal==="UP").length;
-  const downVotes = layers.filter(l=>l.signal==="DOWN").length;
-  const neutralVotes = layers.filter(l=>l.signal==="NEUTRAL").length;
-  
-  const totalScore = layers.reduce((sum,l)=>sum+(l.score||0),0);
-  
-  let finalDirection = "WAIT";
-  let finalConfidence = 0;
-  let finalVerdict = "";
-  let passedLayers = [];
-  let failedLayers = [];
-  
-  layers.forEach(l=> {
-    if(l.signal!=="NEUTRAL" && l.signal!==null) passedLayers.push(l.name);
-    else failedLayers.push(l.name);
-  });
-  
-  // ===== المدة الصريحة =====
-  let duration = "5 دقائق";
-  let entryTime = "N/A";
-  
-  if(upVotes===5 || downVotes===5) {
-    finalDirection = upVotes===5 ? "CALL" : "PUT";
-    finalConfidence = 99;
-    finalVerdict = "?? PENTA GOLD - 5/5 Layers Agree!";
-    duration = "30 دقيقة";
-    entryTime = "Immediate";
-  } else if(upVotes>=4 || downVotes>=4) {
-    finalDirection = upVotes>=4 ? "CALL" : "PUT";
-    finalConfidence = 90 + (Math.max(upVotes, downVotes) - 3) * 3;
-    finalVerdict = `?? STRONG - ${Math.max(upVotes, downVotes)}/5 Layers Agree`;
-    duration = "15 دقيقة";
-    entryTime = "Now";
-  } else if(upVotes>=3 || downVotes>=3) {
-    finalDirection = upVotes>=3 ? "CALL" : "PUT";
-    finalConfidence = 75 + (Math.max(upVotes, downVotes) - 2) * 5;
-    finalVerdict = `? GOOD - ${Math.max(upVotes, downVotes)}/5 Layers Agree`;
-    duration = "10 دقائق";
-    entryTime = "Soon";
+  const absScore=Math.abs(total);
+  const accuracy=Math.min(95,Math.round(60+absScore*4));
+  const strength=Math.min(98,Math.round(52+absScore*5));
+
+  const atrVal=calcAtr(H,L,C);
+  const atrPct=(atrVal/last)*100;
+  let duration="No Entry";
+  if(direction!=="WAIT"){
+    if(atrPct>0.15)duration="5 min";
+    else if(atrPct>0.08)duration="15 min";
+    else if(atrPct>0.04)duration="30 min";
+    else duration="1 hour";
+  }
+
+  // ===== Zero Reversal تأثير على الأسباب والقرار =====
+  const reasons=[];
+  if(direction!=="WAIT"){
+    const up=direction==="UP";
+    if(up&&last>e20||!up&&last<e20) reasons.push(`Price ${up?"above":"below"} EMA20 & EMA50`);
+    if(r<45&&up) reasons.push(`RSI ${r.toFixed(0)} – support dynamic alignment`);
+    if(r>55&&!up) reasons.push(`RSI ${r.toFixed(0)} – resistance dynamic alignment`);
+    if(ms.score!==0) reasons.push(`${ms.trend} Structure Aligned`);
+    if(cp.patterns.length>0) reasons.push(`${cp.patterns[0]} confirmed`);
+    if(zr.isZeroReversal) reasons.push(`⚡ Zero Reversal Detected (${zr.score}/5)`);
+    while(reasons.length<3) reasons.push(`${up?"Bullish":"Bearish"} momentum aligned`);
   } else {
-    finalDirection = "WAIT";
-    finalConfidence = 0;
-    finalVerdict = `? WAIT - Only ${Math.max(upVotes, downVotes)}/5 Layers Agree`;
-    duration = "5 دقائق";
-    entryTime = "N/A";
+    reasons.push("Mixed signals – monitoring market structure");
+    reasons.push(`Smart Triple Check: ${stc.passed}/3 checks passed`);
+    if(zr.isZeroReversal) reasons.push(`⚡ Zero Reversal: ${zr.score}/5 – wait for confirmation`);
+    else reasons.push("Wait for system confluence");
   }
-  
-  if(shield.earlyExit && finalDirection!=="WAIT") {
-    finalDirection = "WAIT";
-    finalConfidence = 0;
-    finalVerdict = `?? BLOCKED - ${shield.earlyExitReason}`;
-    duration = "5 دقائق";
-    entryTime = "N/A";
-  }
-  
-  if(golden.isBlackout && finalDirection!=="WAIT") {
-    finalDirection = "WAIT";
-    finalConfidence = 0;
-    finalVerdict = `?? BLACKOUT - Market closed/volatile`;
-    duration = "5 دقائق";
-    entryTime = "N/A";
-  }
-  
+
   return {
-    layers,
-    upVotes,
-    downVotes,
-    neutralVotes,
-    totalScore,
-    finalDirection,
-    finalConfidence,
-    finalVerdict,
-    passedLayers: passedLayers.join(", "),
-    failedLayers: failedLayers.join(", "),
-    duration,
-    entryTime,
-    quad,
-    contrarian,
-    golden,
-    shield,
-    ai
+    direction,dcls,accuracy,strength,duration,total,
+    rsi:r.toFixed(1),macd:m.toFixed(5),stoch:k.toFixed(0),
+    e20:e20.toFixed(5),last:last.toFixed(5),
+    ms,cp,rz,vp,stc,zr,reasons:reasons.slice(0,3)
   };
 }
 
 // ============================================================
-// INDICATORS & HELPERS
-// ============================================================
-function calcEma(d,p){const k=2/(p+1);let e=d[0];for(let i=1;i<d.length;i++)e=d[i]*k+e*(1-k);return e;}
-function calcRsi(d,p=14){if(d.length<p+1)return 50;let g=0,l=0;for(let i=d.length-p;i<d.length;i++){const x=d[i]-d[i-1];x>0?g+=x:l+=Math.abs(x);}return 100-100/(1+(g/p)/((l/p)||0.0001));}
-function calcMacd(d){return calcEma(d.slice(-26),12)-calcEma(d.slice(-26),26);}
-function calcStoch(H,L,C,p=14){const hh=Math.max(...H.slice(-p)),ll=Math.min(...L.slice(-p));return ((C[C.length-1]-ll)/((hh-ll)||0.0001))*100;}
-function calcAtr(H,L,C,p=14){const tr=[];for(let i=1;i<C.length;i++)tr.push(Math.max(H[i]-L[i],Math.abs(H[i]-C[i-1]),Math.abs(L[i]-C[i-1])));return tr.slice(-p).reduce((a,b)=>a+b,0)/p;}
-
-function marketStr(C){let u=0,d=0;for(let i=3;i<Math.min(C.length,25);i++){if(C[i]>C[i-1]&&C[i-1]>C[i-2]&&C[i-2]>C[i-3])u++;if(C[i]<C[i-1]&&C[i-1]<C[i-2]&&C[i-2]<C[i-3])d++;}if(u>d+1)return{trend:"UPTREND",score:2};if(d>u+1)return{trend:"DOWNTREND",score:-2};return{trend:"SIDEWAYS",score:0};}
-
-function candleP(O,H,L,C){const n=C.length-1,o=O[n],h=H[n],l=L[n],c=C[n];const body=Math.abs(c-o),range=h-l,bull=c>o;const up=h-Math.max(o,c),dn=Math.min(o,c)-l;const p=[];let s=0;if(body<range*0.1)p.push("Doji");if(dn>body*2.5&&up<body*0.5){p.push(bull?"Hammer":"Hanging Man");s+=bull?2:-1;}if(up>body*2.5&&dn<body*0.5){p.push(bull?"Shooting Star":"Inv Hammer");s+=bull?-2:1;}if(body>range*0.75){p.push(bull?"Marubozu Bull":"Marubozu Bear");s+=bull?2:-2;}if(n>0){const po=O[n-1],pc=C[n-1];if(pc<po&&c>o&&c>po&&o<pc){p.push("Bullish Engulfing");s+=3;}if(pc>po&&c<o&&c<po&&o>pc){p.push("Bearish Engulfing");s-=3;}if(n>1){const ppc=C[n-2],ppo=O[n-2];if(ppc<ppo&&Math.abs(pc-po)<Math.abs(ppc-ppo)*0.3&&c>o&&c>(ppo+ppc)/2){p.push("Morning Star");s+=4;}if(ppc>ppo&&Math.abs(pc-po)<Math.abs(ppc-ppo)*0.3&&c<o&&c<(ppo+ppc)/2){p.push("Evening Star");s-=4;}}}return{patterns:p,score:s};}
-
-function rejZones(H,L,C){const n=C.length,levels=[],tol=0.0003;for(let i=5;i<n-5;i++){if(H[i]>H[i-1]&&H[i]>H[i-2]&&H[i]>H[i+1]&&H[i]>H[i+2])levels.push({price:H[i],type:"R"});if(L[i]<L[i-1]&&L[i]<L[i-2]&&L[i]<L[i+1]&&L[i]<L[i+2])levels.push({price:L[i],type:"S"});}const cl=[];levels.forEach(lv=>{let found=false;cl.forEach(c=>{if(Math.abs(c.price-lv.price)/lv.price<tol){c.touches++;lv.type==="R"?c.ru++:c.rd++;found=true;}});if(!found)cl.push({price:lv.price,touches:1,ru:lv.type==="R"?1:0,rd:lv.type==="S"?1:0});});const strong=cl.filter(c=>c.touches>=3).sort((a,b)=>b.touches-a.touches);const last=C[n-1];let nz=null,nt="",ns=0;strong.forEach(z=>{const d=Math.abs(last-z.price)/z.price*100;if(d<0.05&&(!nz||d<Math.abs(last-nz.price)/last*100)){nz=z;nt=z.rd>z.ru?"RESISTANCE":"SUPPORT";ns=Math.min(100,z.touches*20);}});const atZone=!!nz,score=atZone?(nt==="SUPPORT"?2:-2):0;return{nearZone:nz,nearType:nt,nearStrength:ns,atZone,score,label:atZone?`${nt} zone (${nz.touches}x) at ${nz.price.toFixed(5)}`:"No rejection zone nearby"};}
-
-function volProfile(H,L,C,V){const n=C.length,minP=Math.min(...L),maxP=Math.max(...H),range=maxP-minP,buckets=20;const prof=Array.from({length:buckets},(_,b)=>({mid:minP+(b+0.5)*range/buckets,vol:0}));for(let i=0;i<n;i++){const v=V&&V[i]?V[i]:1;for(let b=0;b<buckets;b++)if(L[i]<=minP+(b+1)*range/buckets&&H[i]>=minP+b*range/buckets)prof[b].vol+=v;}const poc=prof.reduce((a,b)=>b.vol>a.vol?b:a);const avg=prof.reduce((a,b)=>a+b.vol,0)/buckets;const last=C[n-1];const atHVN=prof.some(z=>z.vol>avg*1.5&&Math.abs(last-z.mid)/last<0.0008);const atLVN=prof.some(z=>z.vol<avg*0.4&&z.vol>0&&Math.abs(last-z.mid)/last<0.0008);const nearPOC=Math.abs(last-poc.mid)/last<0.0005;const label=atLVN?"EXPLOSION ZONE":atHVN?"HVN - Institutional":nearPOC?`Near POC ${poc.mid.toFixed(5)}`:`POC: ${poc.mid.toFixed(5)}`;return{atHVN,atLVN,nearPOC,label};}
-
-// ============================================================
-// CACHING
-// ============================================================
-const CACHE_KEY = 'polygon_cache';
-const CACHE_DURATION = 5 * 60 * 1000;
-
-function getCachedData(symbol, interval) {
-    const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
-    const key = `${symbol}_${interval}`;
-    const entry = cache[key];
-    if (entry && (Date.now() - entry.timestamp) < CACHE_DURATION) {
-        return entry.data;
-    }
-    return null;
-}
-
-function setCachedData(symbol, interval, data) {
-    const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
-    const key = `${symbol}_${interval}`;
-    cache[key] = { data, timestamp: Date.now() };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-}
-
-// ============================================================
-// FETCH
+// TWELVE DATA FETCH
 // ============================================================
 async function fetchTF(symbol, interval) {
-    const cached = getCachedData(symbol, interval);
-    if (cached) return cached;
+  const map = {
+    "5min": "5min",
+    "15min": "15min",
+    "30min": "30min",
+    "1h": "1h",
+    "4h": "4h"
+  };
+  const inter = map[interval] || "5min";
 
-    const ticker = "C:" + symbol.replace("/", "");
-    const map = {"5min":"5","15min":"15","30min":"30","1h":"60","4h":"240"};
-    const mins = map[interval] || "5";
-    const to = new Date().toISOString().split("T")[0];
-    const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-    const url = `https://api.polygon.io/v2/aggs/ticker/${ticker}/range/${mins}/minute/${from}/${to}?adjusted=true&sort=asc&limit=100&apiKey=${POLYGON_KEY}`;
+  const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${inter}&outputsize=100&apikey=${TWELVE_KEY}`;
 
-    await new Promise(r => setTimeout(r, 500));
+  const res = await fetch(url);
+  const data = await res.json();
 
-    const res = await fetch(url);
-    if (!res.ok) {
-        if (res.status === 403 || res.status === 429) {
-            throw new Error(`API Limit Reached (${res.status}). Please wait.`);
-        }
-        throw new Error(`HTTP ${res.status}`);
-    }
-    
-    const data = await res.json();
-    if (!data.results || !data.results.length) {
-        throw new Error("No data from Polygon. Check symbol or market hours.");
-    }
-    
-    const v = data.results.slice(0, -1);
-    const result = {
-        O: v.map(x => x.o),
-        H: v.map(x => x.h),
-        L: v.map(x => x.l),
-        C: v.map(x => x.c),
-        V: v.map(x => x.v || 0)
-    };
+  if (data.status === "error") {
+    throw new Error(data.message || "Twelve Data error");
+  }
 
-    setCachedData(symbol, interval, result);
-    return result;
+  if (!data.values || data.values.length === 0) {
+    throw new Error("No data returned from Twelve Data");
+  }
+
+  const vals = data.values.reverse().slice(0, -1);
+
+  return {
+    O: vals.map(v => parseFloat(v.open)),
+    H: vals.map(v => parseFloat(v.high)),
+    L: vals.map(v => parseFloat(v.low)),
+    C: vals.map(v => parseFloat(v.close)),
+    V: vals.map(v => parseFloat(v.volume || 0))
+  };
 }
 
 function quickBias(O,H,L,C){
@@ -466,7 +350,7 @@ function quickBias(O,H,L,C){
   const r=calcRsi(C),m=calcMacd(C);
   let s=0;
   if(last>e20)s++;else s--;if(last>e50)s++;else s--;
-  if(r<45)s++;else if(r>55)s--;if(m>0)s++;else s--;
+  if(r<48)s++;else if(r>52)s--;if(m>0)s++;else s--;
   if(s>=2)return"UP";if(s<=-2)return"DOWN";return"NEUTRAL";
 }
 
@@ -474,28 +358,24 @@ function loadH(){try{return JSON.parse(localStorage.getItem("sbh")||"[]");}catch
 function saveH(h){try{localStorage.setItem("sbh",JSON.stringify(h));}catch{}}
 
 // ============================================================
-// COLORS
+// COLORS & STYLES
 // ============================================================
 const C={
-  bg:"#08090f",card:"#10121e",box:"#0d0f1a",border:"#1e2235",
-  text:"#e0e0f0",dim:"#444",dim2:"#2a2d45",
+  bg:"transparent",card:"rgba(16, 18, 30, 0.85)",box:"rgba(13, 15, 26, 0.7)",border:"#1e2235",
+  text:"#e0e0f0",dim:"#707898",dim2:"#444a68",
   up:"#00e096",down:"#ff4d6d",wait:"#f0c040",accent:"#7c83ff",
   accentB:"#4fc3f7",gold:"#ffd700"
 };
 
-// ============================================================
-// STYLES
-// ============================================================
 const S={
-  app:{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"-apple-system,BlinkMacSystemFont,sans-serif",display:"flex",justifyContent:"center"},
-  wrap:{width:"100%",maxWidth:400,padding:"0 16px 60px"},
-  hdr:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"50px 0 20px"},
+  app:{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"-apple-system,BlinkMacSystemFont,sans-serif",display:"flex",justifyContent:"center",position:"relative"},
+  wrap:{width:"100%",maxWidth:400,padding:"0 16px 80px"},
+  hdr:{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"40px 0 25px",textAlign:"center"},
   row:{display:"flex",alignItems:"center",justifyContent:"space-between"},
-  ibox:{background:C.box,borderRadius:10,padding:"11px 13px",marginBottom:8},
+  ibox:{background:C.box,borderRadius:10,padding:"11px 13px",marginBottom:8,backdropFilter:"blur(4px)"},
   lbl:{fontSize:10,color:C.dim,fontWeight:600,marginBottom:3,textTransform:"uppercase",letterSpacing:"0.5px"},
-  g2:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8},
-  g3:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:8},
   g4:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:6,marginBottom:8},
+  footer:{position:"absolute",bottom:55,left:0,right:0,textAlign:"center",fontSize:10,color:"#525a7a",letterSpacing:"1px",fontWeight:500,pointerEvents:"none"}
 };
 
 // ============================================================
@@ -506,70 +386,20 @@ function App(){
   const [showDD,setShowDD]=useState(false);
   const [loading,setLoading]=useState(false);
   const [sig,setSig]=useState(null);
-  const [penta,setPenta]=useState(null);
   const [mtf,setMtf]=useState([]);
+  const [verdict,setVerdict]=useState(null);
   const [err,setErr]=useState("");
   const [page,setPage]=useState("signals");
   const [history,setHistory]=useState(loadH);
   const [lastId,setLastId]=useState(null);
   const [taken,setTaken]=useState(false);
-  const [scanResults,setScanResults]=useState([]);
-  const [scanning,setScanning]=useState(false);
+  const [lastSignalTime,setLastSignalTime]=useState(0);
+  const [signalCount,setSignalCount]=useState(0);
 
-  // ===== SCAN ALL PAIRS =====
-  const scanAllPairs = useCallback(async()=>{
-    setScanning(true);
-    setScanResults([]);
-    setErr("");
-    const results = [];
+  const dc=sig?.direction==="UP"?C.up:sig?.direction==="DOWN"?C.down:C.wait;
 
-    try {
-      for (const p of PAIRS) {
-        try {
-          const main = await fetchTF(p, "5min");
-          const pentaResult = pentaSystem(main.O, main.H, main.L, main.C, main.V);
-          
-          results.push({
-            pair: p,
-            signal: pentaResult.finalDirection,
-            confidence: pentaResult.finalConfidence,
-            verdict: pentaResult.finalVerdict,
-            layers: pentaResult.upVotes,
-            price: main.C[main.C.length - 1].toFixed(5),
-            duration: pentaResult.duration,
-            penta: pentaResult
-          });
-        } catch (e) {
-          results.push({
-            pair: p,
-            signal: "ERROR",
-            confidence: 0,
-            verdict: e.message,
-            layers: 0,
-            price: "---",
-            duration: "---"
-          });
-        }
-      }
-
-      const sorted = results.sort((a, b) => {
-        const order = { "CALL": 3, "PUT": 3, "WAIT": 1, "ERROR": 0 };
-        const aScore = order[a.signal] || 0;
-        const bScore = order[b.signal] || 0;
-        if (aScore !== bScore) return bScore - aScore;
-        return b.confidence - a.confidence;
-      });
-
-      setScanResults(sorted);
-      setScanning(false);
-    } catch (e) {
-      setErr(e.message);
-      setScanning(false);
-    }
-  }, []);
-
-  const getSignal = useCallback(async()=>{
-    setLoading(true);setSig(null);setPenta(null);setErr("");setMtf([]);setTaken(false);setScanResults([]);
+  const getSignal=useCallback(async()=>{
+    setLoading(true);setSig(null);setErr("");setMtf([]);setVerdict(null);setTaken(false);
     try{
       const main=await fetchTF(pair,"5min");
       const tfs=[["5min","5M"],["15min","15M"],["1h","1H"]];
@@ -584,51 +414,122 @@ function App(){
         }catch{mtfArr.push({lbl,bias:"N/A",active:tf==="5min"});}
       }
       setMtf(mtfArr);
+      const align=Math.max(up,dn);
+      const mtfDir=up>dn?"UP":dn>up?"DOWN":"NEUTRAL";
+      const result=analyze(main.O,main.H,main.L,main.C,main.V);
+      if(mtfDir!=="NEUTRAL"&&mtfDir!==result.direction&&result.direction!=="WAIT"){
+        result.direction="WAIT";result.dcls="wait";result.duration="No Entry";
+      }
+      if(mtfDir===result.direction&&result.direction!=="WAIT"){
+        result.accuracy=Math.min(96,result.accuracy+align*2);
+        if(align>=3)result.reasons[2]=`${align}/3 timeframes aligned – strong confirmation`;
+      }
       
-      const pentaResult = pentaSystem(main.O,main.H,main.L,main.C,main.V);
-      setPenta(pentaResult);
+      // ===== ZERO REVERSAL FILTER =====
+      // لو في Zero Reversal، الإشارة مش هتكون GO إلا لو درجة الـ Zero Reversal أقل من 3
+      const zrSafe = !result.zr.isZeroReversal || result.zr.score < 3;
       
-      const result = {
-        direction: pentaResult.finalDirection==="CALL"?"UP":pentaResult.finalDirection==="PUT"?"DOWN":"WAIT",
-        dcls: pentaResult.finalDirection==="CALL"?"up":pentaResult.finalDirection==="PUT"?"down":"wait",
-        accuracy: pentaResult.finalConfidence,
-        strength: pentaResult.finalConfidence,
-        duration: pentaResult.duration,
-        entryTime: pentaResult.entryTime,
-        total: pentaResult.totalScore,
-        last: main.C[main.C.length-1].toFixed(5),
-        reasons: [
-          `Penta: ${pentaResult.upVotes}/${pentaResult.downVotes}/${pentaResult.neutralVotes}`,
-          pentaResult.finalVerdict,
-          `Layers: ${pentaResult.passedLayers}`
-        ],
-        ms: {trend:marketStr(main.C).trend},
-        cp: {patterns:[]},
-        rz: {atZone:false,nearZone:null,nearType:"",label:""},
-        vp: {atLVN:false,atHVN:false,nearPOC:false,label:""},
-        stc: {passed:0,allPassed:false},
-        penta: pentaResult
-      };
+      // ===== TIME FILTER =====
+      const now = Date.now();
+      const timeSinceLastSignal = now - lastSignalTime;
+      const minSignalInterval = 60 * 60 * 1000; // 1 ساعة
+      const timeOk = timeSinceLastSignal >= minSignalInterval || signalCount === 0;
       
-      const r=calcRsi(main.C);
-      const m=calcMacd(main.C);
-      const k=calcStoch(main.H,main.L,main.C);
-      result.rsi = r.toFixed(1);
-      result.macd = m.toFixed(5);
-      result.stoch = k.toFixed(0);
+      // ===== FINAL DECISION =====
+      const stcOk = result.stc.allPassed;
+      const mtfOk = align>=2;
+      const confOk = result.accuracy>=80;
+      const isGo = result.direction!=="WAIT" && stcOk && mtfOk && confOk && zrSafe && timeOk;
       
+      setVerdict({label:isGo?"GO":"AVOID",dir:result.direction,time:result.duration,color:result.direction==="UP"?C.up:C.down});
       setSig(result);
+      
+      if(isGo){
+        setLastSignalTime(now);
+        setSignalCount(prev => prev + 1);
+      }
       
     }catch(e){setErr(e.message||"Error");}
     setLoading(false);
-  },[pair]);
+  },[pair, lastSignalTime, signalCount]);
+
+  const skipToNext=useCallback(async()=>{
+    setSig(null);setVerdict(null);setErr("");
+    const startIdx=PAIRS.indexOf(pair);
+    for(let i=1;i<PAIRS.length;i++){
+      const nextPair=PAIRS[(startIdx+i)%PAIRS.length];
+      setPair(nextPair);
+      setLoading(true);
+      try{
+        const main=await fetchTF(nextPair,"5min");
+        const tfs=[["5min","5M"],["15min","15M"],["1h","1H"]];
+        const mtfArr=[];let up=0,dn=0;
+        for(const [tf,lbl] of tfs){
+          try{
+            if(tf!=="5min")await new Promise(r=>setTimeout(r,250));
+            const d=tf==="5min"?main:await fetchTF(nextPair,tf);
+            const b=quickBias(d.O,d.H,d.L,d.C);
+            mtfArr.push({lbl,bias:b,active:tf==="5min"});
+            if(b==="UP")up++;else if(b==="DOWN")dn++;
+          }catch{mtfArr.push({lbl,bias:"N/A",active:tf==="5min"});}
+        }
+        setMtf(mtfArr);
+        const align=Math.max(up,dn);
+        const mtfDir=up>dn?"UP":dn>up?"DOWN":"NEUTRAL";
+        const result=analyze(main.O,main.H,main.L,main.C,main.V);
+        if(mtfDir!=="NEUTRAL"&&mtfDir!==result.direction&&result.direction!=="WAIT"){
+          result.direction="WAIT";result.dcls="wait";result.duration="No Entry";
+        }
+        if(mtfDir===result.direction&&result.direction!=="WAIT"){
+          result.accuracy=Math.min(96,result.accuracy+align*2);
+        }
+        
+        const zrSafe = !result.zr.isZeroReversal || result.zr.score < 3;
+        const now = Date.now();
+        const timeSinceLastSignal = now - lastSignalTime;
+        const minSignalInterval = 60 * 60 * 1000;
+        const timeOk = timeSinceLastSignal >= minSignalInterval || signalCount === 0;
+        
+        const stcOk=result.stc.allPassed;
+        const mtfOk=align>=2;
+        const confOk=result.accuracy>=80;
+        const isGo=result.direction!=="WAIT" && stcOk && mtfOk && confOk && zrSafe && timeOk;
+        const v={label:isGo?"GO":"AVOID",dir:result.direction,time:result.duration,color:result.direction==="UP"?C.up:C.down};
+        setVerdict(v);setSig(result);setLoading(false);
+        if(isGo){
+          setLastSignalTime(now);
+          setSignalCount(prev => prev + 1);
+          return;
+        }
+      }catch(e){setErr(e.message);}
+    }
+    setLoading(false);
+  },[pair, lastSignalTime, signalCount]);
 
   const takeTrade=()=>{
     if(!sig)return;
     const id=Date.now();
-    const t={id,pair,dir:sig.direction,dur:sig.duration,time:new Date().toLocaleTimeString(),date:new Date().toLocaleDateString(),result:null,accuracy:sig.accuracy,entryPrice:parseFloat(sig.last),pentaVerdict:penta?.finalVerdict||""};
+    const durationMs={"5 min":5*60*1000,"15 min":15*60*1000,"30 min":30*60*1000,"1 hour":60*60*1000}[sig.duration]||5*60*1000;
+    const t={id,pair,dir:sig.direction,dur:sig.duration,time:new Date().toLocaleTimeString(),date:new Date().toLocaleDateString(),result:null,accuracy:sig.accuracy,entryPrice:parseFloat(sig.last),expiryTime:Date.now()+durationMs};
     const h=[t,...history].slice(0,100);
     setHistory(h);saveH(h);setLastId(id);setTaken(true);
+    const durationMs2={"5 min":5*60*1000,"15 min":15*60*1000,"30 min":30*60*1000,"1 hour":60*60*1000}[sig.duration]||5*60*1000;
+    const entryP=parseFloat(sig.last);
+    const tradeDir=sig.direction;
+    const tradePair=pair;
+    setTimeout(async()=>{
+      try{
+        const data=await fetchTF(tradePair,"5min");
+        const exitPrice=data.C[data.C.length-1];
+        const autoResult=tradeDir==="UP"?(exitPrice>entryP?"WIN":"LOSS"):(exitPrice<entryP?"WIN":"LOSS");
+        setHistory(prev=>{
+          const updated=prev.map(tr=>tr.id===id&&tr.result===null?{...tr,result:autoResult,exitPrice,auto:true}:tr);
+          saveH(updated);
+          return updated;
+        });
+        setTaken(false);setSig(null);
+      }catch(e){console.log("Auto-track failed:",e);}
+    },durationMs2);
   };
 
   const markResult=(result)=>{
@@ -641,82 +542,32 @@ function App(){
     setHistory(h);saveH(h);
   };
 
-  const skipToNext=useCallback(async()=>{
-    setSig(null);setPenta(null);setErr("");
-    const startIdx=PAIRS.indexOf(pair);
-    for(let i=1;i<PAIRS.length;i++){
-      const nextPair=PAIRS[(startIdx+i)%PAIRS.length];
-      setPair(nextPair);
-      setLoading(true);
-      try{
-        const main=await fetchTF(nextPair,"5min");
-        const pentaResult = pentaSystem(main.O,main.H,main.L,main.C,main.V);
-        const result = {
-          direction: pentaResult.finalDirection==="CALL"?"UP":pentaResult.finalDirection==="PUT"?"DOWN":"WAIT",
-          dcls: pentaResult.finalDirection==="CALL"?"up":pentaResult.finalDirection==="PUT"?"down":"wait",
-          accuracy: pentaResult.finalConfidence,
-          strength: pentaResult.finalConfidence,
-          duration: pentaResult.duration,
-          entryTime: pentaResult.entryTime,
-          total: pentaResult.totalScore,
-          last: main.C[main.C.length-1].toFixed(5),
-          reasons: [
-            `Penta: ${pentaResult.upVotes}/${pentaResult.downVotes}/${pentaResult.neutralVotes}`,
-            pentaResult.finalVerdict,
-            `Layers: ${pentaResult.passedLayers}`
-          ],
-          ms: {trend:marketStr(main.C).trend},
-          cp: {patterns:[]},
-          rz: {atZone:false,nearZone:null,nearType:"",label:""},
-          vp: {atLVN:false,atHVN:false,nearPOC:false,label:""},
-          stc: {passed:0,allPassed:false},
-          penta: pentaResult
-        };
-        const r=calcRsi(main.C);
-        const m=calcMacd(main.C);
-        const k=calcStoch(main.H,main.L,main.C);
-        result.rsi = r.toFixed(1);
-        result.macd = m.toFixed(5);
-        result.stoch = k.toFixed(0);
-        setPenta(pentaResult);
-        setSig(result);
-        setLoading(false);
-        if(pentaResult.finalDirection!=="WAIT")return;
-      }catch(e){setErr(e.message);}
-    }
-    setLoading(false);
-  },[pair]);
-
   const done=history.filter(t=>t.result);
   const wins=done.filter(t=>t.result==="WIN").length;
   const losses=done.filter(t=>t.result==="LOSS").length;
   const rate=done.length>0?Math.round(wins/done.length*100):0;
 
-  // ============================================================
-  // HISTORY PAGE
-  // ============================================================
   if(page==="history") return(
     <div style={S.app}>
       <div style={S.wrap}>
-        <div style={{...S.hdr}}>
-          <div style={{fontSize:18,fontWeight:800,color:C.text}}>?? Trade History</div>
-          <button onClick={()=>setPage("signals")} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"8px 14px",color:C.accent,fontSize:13,fontWeight:600,cursor:"pointer"}}>? Back</button>
+        <div style={{...S.hdr, flexDirection:"row", justifyContent:"space-between", padding:"40px 0 20px"}}>
+          <div style={{fontSize:18,fontWeight:800,color:C.text}}>📊 Trade History</div>
+          <button onClick={()=>setPage("signals")} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"8px 14px",color:C.accent,fontSize:13,fontWeight:600,cursor:"pointer"}}>← Back</button>
         </div>
         <div style={{...S.g4,marginBottom:16}}>
           {[{n:history.length,l:"TOTAL",c:C.accent},{n:wins,l:"WINS",c:C.up},{n:losses,l:"LOSSES",c:C.down},{n:`${rate}%`,l:"WIN RATE",c:rate>=65?C.up:rate>=50?C.wait:C.down}].map(x=>(
-            <div key={x.l} style={{background:C.card,borderRadius:10,padding:"10px 6px",textAlign:"center"}}>
+            <div key={x.l} style={{background:C.card,borderRadius:10,padding:"10px 6px",textAlign:"center", backdropFilter:"blur(4px)", border:`1px solid #1a1c2e`}}>
               <div style={{fontSize:18,fontWeight:800,color:x.c}}>{x.n}</div>
               <div style={{fontSize:9,color:C.dim,marginTop:2}}>{x.l}</div>
             </div>
           ))}
         </div>
-        {history.length===0?<div style={{textAlign:"center",color:C.dim2,padding:"40px 0",fontSize:13}}>No trades yet.<br/>Take a Penta signal to start tracking.</div>:
+        {history.length===0?<div style={{textAlign:"center",color:C.dim2,padding:"40px 0",fontSize:13}}>No trades yet.<br/>Take a GO signal to start tracking.</div>:
           history.slice(0,30).map(t=>(
-            <div key={t.id} style={{background:C.card,borderRadius:10,padding:"12px 14px",marginBottom:8,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <div key={t.id} style={{background:C.card,borderRadius:10,padding:"12px 14px",marginBottom:8,display:"flex",alignItems:"center",justifyContent:"space-between", backdropFilter:"blur(4px)", border:`1px solid #1a1c2e`}}>
               <div>
                 <div style={{fontSize:13,fontWeight:700,color:C.text}}>{t.pair}</div>
-                <div style={{fontSize:10,color:C.dim}}>{t.date} {t.time} | {t.dir} | {t.accuracy}% | ?? {t.dur}</div>
-                {t.pentaVerdict&&<div style={{fontSize:8,color:C.gold,marginTop:1}}>{t.pentaVerdict}</div>}
+                <div style={{fontSize:10,color:C.dim}}>{t.date} {t.time} | {t.dir} | {t.accuracy}%</div>
               </div>
               {t.result===null?(
                 <div style={{display:"flex",gap:6}}>
@@ -729,19 +580,12 @@ function App(){
             </div>
           ))
         }
-        {history.length>0&&<button onClick={()=>{if(window.confirm("Clear all trade history?")){const h=[];setHistory(h);saveH(h);}}} style={{width:"100%",marginTop:12,padding:10,background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.dim,fontSize:11,cursor:"pointer"}}>?? Clear All History</button>}
+        {history.length>0&&<button onClick={()=>{if(window.confirm("Clear all trade history?")){const h=[];setHistory(h);saveH(h);}}} style={{width:"100%",marginTop:12,padding:10,background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.dim,fontSize:11,cursor:"pointer"}}>🗑 Clear All History</button>}
       </div>
+      <div style={S.footer}>MADE BY: ABDALLAH MAHER</div>
     </div>
   );
 
-  // ============================================================
-  // SCAN RESULTS COMPONENT
-  // ============================================================
-  const hasSignal = scanResults.some(r => r.signal === "CALL" || r.signal === "PUT");
-
-  // ============================================================
-  // MAIN SIGNALS PAGE
-  // ============================================================
   return(
     <div style={S.app}>
       <style>{`
@@ -752,48 +596,33 @@ function App(){
         @keyframes pulseGold{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.4)}50%{box-shadow:0 0 0 12px rgba(255,215,0,0)}}
         *{box-sizing:border-box;-webkit-tap-highlight-color:rgba(0,0,0,0);}
         .gold-border{border-color:#ffd700 !important;box-shadow:0 0 20px rgba(255,215,0,0.15) !important;}
-        .gold-text{color:#ffd700 !important;}
       `}</style>
       <div style={S.wrap}>
 
         {/* Header */}
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"48px 0 20px"}}>
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <div style={{width:38,height:38,borderRadius:10,background:"linear-gradient(135deg,#0d0f1a,#1a1c2e)",border:"1px solid #1e2235",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 0 12px rgba(124,131,255,0.15)"}}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <polyline points="2,18 8,11 13,15 22,5" stroke="#4fc3f7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="22" cy="5" r="2.5" fill="#ffd700"/>
-              </svg>
-            </div>
-            <div>
-              <div style={{display:"flex",alignItems:"center",gap:6}}>
-                <span style={{fontSize:21,fontWeight:900,background:"linear-gradient(135deg,#4fc3f7,#7c83ff)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",letterSpacing:"-0.5px"}}>SpriNg</span>
-                <span style={{fontSize:10,fontWeight:700,color:"#f0c040",background:"rgba(240,192,64,0.12)",padding:"2px 6px",borderRadius:4,letterSpacing:"0.5px"}}>PENTA</span>
-              </div>
-              <div style={{fontSize:8,color:"#ffd700",letterSpacing:"1.5px",marginTop:1}}>5-LAYER GUARANTEED</div>
-            </div>
+        <div style={S.hdr}>
+          <div style={{position:"relative", display:"inline-block"}}>
+            <span style={{fontSize:28,fontWeight:900,background:`linear-gradient(135deg, #ffffff, ${C.accent})`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",letterSpacing:"1px", filter: "drop-shadow(0px 2px 8px rgba(124,131,255,0.3))"}}>SpriNg Bot</span>
+            <span style={{fontSize:9,fontWeight:800,color:"#fff",background:`linear-gradient(135deg, #ff9800, #f44336)`,padding:"2px 6px",borderRadius:4,verticalAlign:"middle",marginLeft:8,boxShadow:"0 2px 10px rgba(244,67,54,0.3)"}}>PRO</span>
           </div>
-          <div style={{textAlign:"right"}}>
-            <div style={{fontSize:8,color:"#1e2235",letterSpacing:"0.5px",marginBottom:1}}>Made By</div>
-            <div style={{fontSize:9,color:"#2a2d45",fontWeight:700,letterSpacing:"0.5px"}}>Abdallah Maher</div>
-          </div>
+          <div style={{fontSize:11, color:C.dim, marginTop:4, fontWeight:500, letterSpacing:"0.5px"}}>ZERO REVERSAL FILTER</div>
         </div>
 
         {/* Pair Selector */}
         <div style={{position:"relative",marginBottom:14}}>
           <button
             onClick={()=>setShowDD(v=>!v)}
-            style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:"12px 14px",color:C.text,fontSize:14,fontWeight:600,cursor:"pointer"}}
+            style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:"12px 14px",color:C.text,fontSize:14,fontWeight:600,cursor:"pointer",backdropFilter:"blur(4px)"}}
           >
             <span>{pair}</span>
-            <span style={{color:C.dim,fontSize:11,marginLeft:4}}>?</span>
+            <span style={{color:C.dim,fontSize:10}}>▼</span>
           </button>
           {showDD&&(
-            <div style={{position:"absolute",top:50,left:0,right:0,zIndex:999,background:C.card,border:`1px solid ${C.border}`,borderRadius:10,maxHeight:220,overflowY:"auto",boxShadow:"0 8px 32px #000"}}>
+            <div style={{position:"absolute",top:50,left:0,right:0,zIndex:999,background:"#0f111a",border:`1px solid ${C.border}`,borderRadius:10,maxHeight:220,overflowY:"auto",boxShadow:"0 12px 40px rgba(0,0,0,0.7)"}}>
               {PAIRS.map(p=>(
                 <div
                   key={p}
-                  onClick={()=>{setPair(p);setShowDD(false);setSig(null);setPenta(null);setScanResults([]);}}
+                  onClick={()=>{setPair(p);setShowDD(false);setSig(null);setVerdict(null);}}
                   style={{padding:"11px 14px",fontSize:13,cursor:"pointer",color:p===pair?C.accent:C.text,background:p===pair?"#1a1c2e":"transparent",borderBottom:"1px solid #0d0f1a"}}
                 >{p}</div>
               ))}
@@ -801,149 +630,134 @@ function App(){
           )}
         </div>
 
-        {/* ===== SCAN RESULTS ===== */}
-        {scanResults.length > 0 && (
-          <div style={{...S.ibox, marginBottom: 12, border: hasSignal ? `1px solid ${C.gold}` : `1px solid ${C.border}`}}>
-            <div style={S.row}>
-              <div style={S.lbl}>?? Scan Results ({PAIRS.length} pairs)</div>
-              <span style={{fontSize:10, color: hasSignal ? C.gold : C.dim}}>
-                {hasSignal ? "? Signals found!" : "? No signals"}
-              </span>
-            </div>
-            
-            {scanResults.map((r, i) => {
-              const isSignal = r.signal === "CALL" || r.signal === "PUT";
-              const isError = r.signal === "ERROR";
-              const color = r.signal === "CALL" ? C.up : r.signal === "PUT" ? C.down : C.dim;
-              const bg = isSignal ? `${color}22` : "transparent";
-              const border = isSignal ? `1px solid ${color}` : isError ? `1px solid ${C.down}` : "1px solid transparent";
-              
-              return (
-                <div key={i} style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "6px 8px",
-                  marginBottom: 4,
-                  background: bg,
-                  border: border,
-                  borderRadius: 6,
-                }}>
-                  <span style={{fontSize: 12, fontWeight: isSignal ? 700 : 400, color: isSignal ? C.text : C.dim}}>
-                    {r.pair}
-                  </span>
-                  <span style={{fontSize: 11, fontWeight: 700, color: color}}>
-                    {r.signal === "CALL" ? "?? CALL" : r.signal === "PUT" ? "?? PUT" : r.signal === "ERROR" ? "??" : "? WAIT"}
-                  </span>
-                  <span style={{fontSize: 9, color: C.dim}}>
-                    {r.confidence > 0 ? `${r.confidence}%` : "---"}
-                  </span>
-                  <span style={{fontSize: 9, color: C.accent, fontWeight: 600}}>
-                    {r.duration !== "No Entry" ? r.duration : ""}
-                  </span>
-                </div>
-              );
-            })}
-            
-            {/* Auto-select best signal */}
-            {hasSignal && (
-              <div style={{marginTop: 8, padding: 8, background: `${C.gold}22`, borderRadius: 6, border: `1px solid ${C.gold}`}}>
-                <div style={{fontSize: 11, color: C.gold, fontWeight: 700}}>
-                  ?? Best Signal: {scanResults.filter(r => r.signal === "CALL" || r.signal === "PUT").sort((a,b) => b.confidence - a.confidence)[0]?.pair} 
-                  ({scanResults.filter(r => r.signal === "CALL" || r.signal === "PUT").sort((a,b) => b.confidence - a.confidence)[0]?.signal}) 
-                  {scanResults.filter(r => r.signal === "CALL" || r.signal === "PUT").sort((a,b) => b.confidence - a.confidence)[0]?.confidence}%
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Card */}
-        <div style={{background:C.card,border:`1px solid ${penta?.finalConfidence>=95?"#ffd700":sig?.direction==="UP"?C.up:sig?.direction==="DOWN"?C.down:"#1a1c2e"}`,borderRadius:16,padding:18,marginBottom:12,minHeight:100,transition:"border-color 0.5s"}}>
-          {!sig&&!loading&&!err&&!scanning&&scanResults.length===0&&<div style={{textAlign:"center",color:C.dim2,fontSize:14,padding:"20px 0"}}>Press Scan All or Get Signal to start</div>}
-          {(loading||scanning)&&<div style={{textAlign:"center",padding:"20px 0"}}><div style={{width:36,height:36,border:`3px solid ${C.border}`,borderTop:`3px solid ${C.gold}`,borderRadius:"50%",animation:"spin 0.8s linear infinite",margin:"0 auto 10px"}}/><div style={{color:C.dim,fontSize:12}}>{scanning ? "Scanning all pairs..." : "Analyzing 5 Penta Layers..."}</div></div>}
-          {err&&<div style={{textAlign:"center",color:C.down,fontSize:13,padding:"20px 0"}}>? {err}</div>}
+        <div style={{background:C.card,border:`1px solid ${verdict?.label==="GO"?C.gold:"#1a1c2e"}`,backdropFilter:"blur(10px)",borderRadius:16,padding:18,marginBottom:12,minHeight:100, boxShadow:verdict?.label==="GO"?"0 0 30px rgba(255,215,0,0.1)":"0 8px 32px rgba(0,0,0,0.25)"}}>
+          {!sig&&!loading&&!err&&<div style={{textAlign:"center",color:C.dim,fontSize:14,padding:"30px 0",fontWeight:500}}>Press <span style={{color:C.accent}}>Get Signal</span> to scan the market</div>}
+          {loading&&<div style={{textAlign:"center",padding:"20px 0"}}><div style={{width:36,height:36,border:`3px solid ${C.border}`,borderTop:`3px solid ${C.accent}`,borderRadius:"50%",animation:"spin 0.8s linear infinite",margin:"0 auto 10px"}}/><div style={{color:C.dim,fontSize:12}}>Analyzing market vectors...</div></div>}
+          {err&&<div style={{textAlign:"center",color:C.down,fontSize:13,padding:"20px 0"}}>❌ {err}</div>}
 
-          {sig&&!loading&&penta&&(
+          {sig&&!loading&&(
             <div style={{animation:"fadeUp 0.4s ease"}}>
 
-              {/* PENTA VERDICT */}
-              <div style={{...S.ibox,background:penta.finalConfidence>=95?"rgba(255,215,0,0.08)":"transparent",border:penta.finalConfidence>=95?"1px solid #ffd700":"1px solid transparent",marginBottom:10}}>
-                <div style={S.row}>
-                  <div>
-                    <div style={S.lbl}>?? PENTA SYSTEM</div>
-                    <div style={{fontSize:15,fontWeight:800,color:penta.finalConfidence>=95?C.gold:penta.finalDirection==="CALL"?C.up:penta.finalDirection==="PUT"?C.down:C.wait}}>
-                      {penta.finalVerdict}
-                    </div>
-                  </div>
-                  <div style={{textAlign:"right"}}>
-                    <div style={S.lbl}>Confidence</div>
-                    <div style={{fontSize:22,fontWeight:900,color:penta.finalConfidence>=95?C.gold:penta.finalConfidence>=90?C.up:penta.finalConfidence>=75?C.wait:C.down}}>
-                      {penta.finalConfidence}%
-                    </div>
-                  </div>
-                </div>
+              {/* Confidence */}
+              <div style={{...S.ibox,...S.row,marginBottom:8}}>
+                <div><div style={S.lbl}>Confidence</div><div style={{fontSize:22,fontWeight:800,color:C.accent}}>{sig.direction==="WAIT"?"---":`${sig.accuracy}%`}</div></div>
+                <div style={{textAlign:"right"}}><div style={S.lbl}>Market</div><div style={{fontSize:13,fontWeight:700,color:"#a0a8c8"}}>{sig.ms.trend}</div></div>
               </div>
 
-              {/* Direction + Duration */}
-              <div style={{...S.ibox, marginBottom:8}}>
+              {/* ZERO REVERSAL INDICATOR */}
+              <div style={{...S.ibox, border: sig.zr.isZeroReversal ? `1px solid ${C.gold}` : `1px solid transparent`, marginBottom:8}}>
                 <div style={S.row}>
-                  <div>
-                    <div style={S.lbl}>Decision</div>
-                    <div style={{fontSize:20,fontWeight:900,color:penta.finalDirection==="CALL"?C.up:penta.finalDirection==="PUT"?C.down:C.wait}}>
-                      {penta.finalDirection==="CALL"?"?? CALL":penta.finalDirection==="PUT"?"?? PUT":"? WAIT"}
-                    </div>
-                  </div>
-                  <div style={{textAlign:"right"}}>
-                    <div style={S.lbl}>?? Duration</div>
-                    <div style={{fontSize:16,fontWeight:700,color:C.accent}}>{penta.duration}</div>
-                  </div>
+                  <span style={S.lbl}>⚡ ZERO REVERSAL</span>
+                  <span style={{fontSize:11,fontWeight:700,color:sig.zr.isZeroReversal?C.gold:C.dim}}>
+                    {sig.zr.isZeroReversal ? `DETECTED (${sig.zr.score}/5)` : "CLEAR"}
+                  </span>
                 </div>
+                <div style={{fontSize:10,color:C.dim,marginTop:2}}>{sig.zr.details}</div>
               </div>
 
-              {/* 5 LAYERS */}
+              {/* MTF */}
               <div style={{...S.ibox,marginBottom:8}}>
-                <div style={S.lbl}>?? 5 Layers Analysis ({penta.upVotes} UP / {penta.downVotes} DOWN / {penta.neutralVotes} NEUTRAL)</div>
-                {penta.layers.map((layer,i)=>(
-                  <div key={i} style={{display:"flex",alignItems:"center",padding:"4px 0",borderBottom:i<4?"1px solid #0a0c14":"none"}}>
-                    <span style={{fontSize:9,color:C.dim,width:12}}>L{i+1}</span>
-                    <span style={{fontSize:10,color:C.text,width:80,fontWeight:600}}>{layer.name}</span>
-                    <div style={{flex:1,display:"flex",justifyContent:"center"}}>
-                      <span style={{
-                        fontSize:9,
-                        fontWeight:700,
-                        color:layer.signal==="UP"?C.up:layer.signal==="DOWN"?C.down:C.wait,
-                        padding:"2px 8px",
-                        borderRadius:4,
-                        background:layer.signal==="UP"?"rgba(0,224,150,0.1)":layer.signal==="DOWN"?"rgba(255,77,109,0.1)":"rgba(240,192,64,0.05)"
-                      }}>
-                        {layer.signal}
-                      </span>
+                <div style={S.lbl}>Multi-Timeframe</div>
+                {mtf.map(d=>{
+                  const c=d.bias==="UP"?C.up:d.bias==="DOWN"?C.down:C.wait;
+                  return <div key={d.lbl} style={{display:"flex",alignItems:"center",padding:"4px 0",borderBottom:"1px solid rgba(255,255,255,0.02)"}}>
+                    <span style={{fontSize:11,color:d.active?C.accent:C.dim,fontWeight:d.active?700:400,width:35}}>{d.lbl}</span>
+                    <div style={{flex:1,height:4,background:"#1a1c2e",borderRadius:100,overflow:"hidden",margin:"0 8px"}}>
+                      <div style={{width:d.bias!=="N/A"?"70%":"0%",height:"100%",background:c,borderRadius:100}}/>
                     </div>
-                    <span style={{fontSize:8,color:C.dim,width:70,textAlign:"right"}}>{layer.details}</span>
+                    <span style={{fontSize:11,fontWeight:700,color:c,width:60,textAlign:"right"}}>{d.bias}</span>
+                  </div>;
+                })}
+              </div>
+
+              {/* Indicators */}
+              <div style={S.g4}>
+                {[{l:"RSI",v:sig.rsi,c:sig.rsi<40?C.up:sig.rsi>60?C.down:C.wait},{l:"Stoch",v:sig.stoch,c:sig.stoch<30?C.up:sig.stoch>70?C.down:C.wait},{l:"MACD",v:(parseFloat(sig.macd)>0?"+":"")+parseFloat(sig.macd).toFixed(4),c:parseFloat(sig.macd)>0?C.up:C.down},{l:"Score",v:sig.total,c:Math.abs(sig.total)>=3?C.up:Math.abs(sig.total)>=1?C.wait:C.dim}].map(x=>(
+                <div key={x.l} style={{...S.ibox,marginBottom:0,padding:"6px 8px"}}>
+                  <div style={{...S.lbl,fontSize:8}}>{x.l}</div>
+                  <div style={{fontSize:12,fontWeight:700,color:x.c}}>{x.v}</div>
+                </div>
+              ))}
+              </div>
+
+              {/* SMART TRIPLE CHECK */}
+              <div style={{...S.ibox,border:`1px solid ${sig.stc.allPassed?"rgba(0,224,150,0.25)":"rgba(255,77,109,0.25)"}`,marginBottom:8}}>
+                <div style={S.row}>
+                  <span style={{...S.lbl,color:sig.stc.allPassed?C.up:C.down}}>🧠 SMART TRIPLE CHECK</span>
+                  <span style={{fontSize:12,fontWeight:700,color:sig.stc.allPassed?C.up:C.down}}>{sig.stc.passed}/3 {sig.stc.allPassed?"✅":"❌"}</span>
+                </div>
+              </div>
+
+              {/* Direction Box */}
+              <div style={{borderRadius:11,padding:"14px 16px",marginBottom:10,display:"flex",alignItems:"center",justifyContent:"space-between",background:sig.dcls==="up"?"rgba(0,224,150,0.07)":sig.dcls==="down"?"rgba(255,77,109,0.07)":"rgba(240,192,64,0.07)",border:`1px solid ${sig.dcls==="up"?"rgba(0,224,150,0.2)":sig.dcls==="down"?"rgba(255,77,109,0.2)":"rgba(240,192,64,0.2)"}`}}>
+                <div>
+                  <div style={S.lbl}>Signal</div>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <span style={{fontSize:24}}>{sig.direction==="UP"?"📈":sig.direction==="DOWN"?"📉":"⏳"}</span>
+                    <span style={{fontSize:26,fontWeight:900,color:dc}}>{sig.direction}</span>
+                  </div>
+                </div>
+                <div style={{textAlign:"right"}}>
+                  <div style={S.lbl}>Duration</div>
+                  <div style={{fontSize:16,fontWeight:700,color:C.accent}}>{sig.duration}</div>
+                </div>
+              </div>
+
+              {/* Reasons */}
+              <div style={{...S.ibox,marginBottom:12}}>
+                <div style={{...S.lbl,marginBottom:8}}>✨ TOP 3 REASONS</div>
+                {sig.reasons.map((r,i)=>(
+                  <div key={i} style={{display:"flex",gap:8,marginBottom:7,alignItems:"flex-start"}}>
+                    <div style={{width:18,height:18,borderRadius:"50%",background:`${dc}22`,color:dc,fontSize:10,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{i+1}</div>
+                    <div style={{fontSize:12,color:"#a0a8c8",lineHeight:1.5}}>{r}</div>
                   </div>
                 ))}
               </div>
 
-              {/* Actions */}
-              {!taken && penta.finalDirection!=="WAIT" ? (
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-                  <button onClick={takeTrade} style={{padding:13,border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",background:penta.finalDirection==="CALL"?C.up:C.down,animation:penta.finalConfidence>=95?"pulseGold 2s infinite":penta.finalDirection==="CALL"?"pulseG 2s infinite":"pulseR 2s infinite"}}>
-                    {penta.finalConfidence>=95?"?? TAKE (GOLD)":"? TAKE"}
-                  </button>
-                  <button onClick={skipToNext} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.dim,fontWeight:700,fontSize:14,cursor:"pointer"}}>? Next Pair</button>
+              {/* GO / AVOID */}
+              {verdict&&(
+                <div style={{borderRadius:12,border:`2px solid ${verdict.label==="GO"?C.gold:C.border}`,marginBottom:12,background:verdict.label==="GO"?`${C.gold}11`:"transparent"}}>
+                  <div style={{padding:14,display:"flex",alignItems:"center",justifyContent:"space-between",borderRadius:10}}>
+                    <div style={{display:"flex",alignItems:"center",gap:10}}>
+                      <div style={{width:40,height:40,borderRadius:"50%",background:verdict.label==="GO"?C.gold:"#1b1e30",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:verdict.label==="GO"?"#000":"#444"}}>{verdict.label==="GO"?"GO":"NO"}</div>
+                      <div>
+                        <div style={{fontSize:22,fontWeight:900,letterSpacing:2,color:verdict.label==="GO"?C.gold:C.dim2}}>{verdict.label}</div>
+                        <div style={{fontSize:10,color:C.dim}}>{verdict.label==="GO"?"Zero Reversal: CLEAR":"Zero Reversal: DETECTED or Time Filter"}</div>
+                      </div>
+                    </div>
+                    {verdict.label==="GO"&&<div style={{textAlign:"right"}}>
+                      <div style={{fontSize:18,fontWeight:800,color:C.gold}}>{verdict.dir}</div>
+                      <div style={{fontSize:12,color:C.dim}}>{verdict.time}</div>
+                    </div>}
+                  </div>
                 </div>
-              ) : !taken && penta.finalDirection==="WAIT" ? (
+              )}
+
+              {/* Actions */}
+              {!taken && verdict?.label==="GO" ? (
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-                  <button style={{padding:13,border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:14,background:"#1e2235",cursor:"not-allowed",opacity:0.5}}>? WAIT</button>
-                  <button onClick={skipToNext} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.dim,fontWeight:700,fontSize:14,cursor:"pointer"}}>? Next Pair</button>
+                  <button onClick={takeTrade} style={{padding:13,border:"none",borderRadius:10,color:"#000",fontWeight:700,fontSize:14,cursor:"pointer",background:`linear-gradient(135deg, #ffd700, #f0a500)`,animation:"pulseGold 2s infinite"}}>
+                    💎 TAKE (GOLD)
+                  </button>
+                  <button onClick={skipToNext} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.text,fontWeight:700,fontSize:14,cursor:"pointer"}}>⏭ Next</button>
+                </div>
+              ) : !taken && sig.direction!=="WAIT" ? (
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                  <button style={{padding:13,border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:14,background:"#1e2235",cursor:"not-allowed",opacity:0.5}}>⏳ WAIT</button>
+                  <button onClick={skipToNext} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.text,fontWeight:700,fontSize:14,cursor:"pointer"}}>⏭ Next</button>
+                </div>
+              ) : !taken ? (
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                  <button style={{padding:13,border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:14,background:"#1e2235",cursor:"not-allowed",opacity:0.5}}>⏳ WAIT</button>
+                  <button onClick={skipToNext} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.text,fontWeight:700,fontSize:14,cursor:"pointer"}}>⏭ Next</button>
                 </div>
               ) : (
                 <div style={{background:"rgba(255,215,0,0.06)",border:"1px solid rgba(255,215,0,0.18)",borderRadius:10,padding:14,textAlign:"center"}}>
-                  <div style={{fontSize:13,color:C.gold,fontWeight:600,marginBottom:10}}>?? Mark result:</div>
+                  <div style={{fontSize:13,color:C.gold,fontWeight:600,marginBottom:10}}>💎 Mark result:</div>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-                    <button onClick={()=>markResult("WIN")} style={{padding:10,background:"rgba(0,224,150,0.15)",border:`1px solid ${C.up}60`,borderRadius:8,color:C.up,fontWeight:700,fontSize:13,cursor:"pointer"}}>? WIN</button>
-                    <button onClick={()=>markResult("LOSS")} style={{padding:10,background:"rgba(255,77,109,0.15)",border:`1px solid ${C.down}60`,borderRadius:8,color:C.down,fontWeight:700,fontSize:13,cursor:"pointer"}}>? LOSS</button>
+                    <button onClick={()=>markResult("WIN")} style={{padding:10,background:"rgba(0,224,150,0.15)",border:`1px solid ${C.up}60`,borderRadius:8,color:C.up,fontWeight:700,fontSize:13,cursor:"pointer"}}>✅ WIN</button>
+                    <button onClick={()=>markResult("LOSS")} style={{padding:10,background:"rgba(255,77,109,0.15)",border:`1px solid ${C.down}60`,borderRadius:8,color:C.down,fontWeight:700,fontSize:13,cursor:"pointer"}}>❌ LOSS</button>
                   </div>
                 </div>
               )}
@@ -951,53 +765,31 @@ function App(){
           )}
         </div>
 
-        {/* Buttons */}
-        {!loading && !sig && !scanning && (
-          <div style={{display:"grid", gridTemplateColumns: "1fr 1fr", gap: 10}}>
-            <button 
-              onClick={scanAllPairs}
-              style={{
-                padding: 15,
-                background: "linear-gradient(135deg,#ffd700,#f0a500)",
-                border: "none",
-                borderRadius: 12,
-                color: "#000",
-                fontWeight: 800,
-                fontSize: 14,
-                cursor: "pointer"
-              }}
-            >
-              ?? Scan All
-            </button>
-            <button 
-              onClick={getSignal}
-              style={{
-                padding: 15,
-                background: "linear-gradient(135deg,#4fc3f7,#7c83ff)",
-                border: "none",
-                borderRadius: 12,
-                color: "#fff",
-                fontWeight: 700,
-                fontSize: 14,
-                cursor: "pointer"
-              }}
-            >
-              ?? Single
-            </button>
-          </div>
+        {/* Get Signal Button */}
+        {!loading&&!sig&&(
+          <button onClick={getSignal} style={{width:"100%",padding:15,background:`linear-gradient(135deg,${C.accentB},${C.accent})`,border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",boxShadow:`0 4px 24px ${C.accent}44`}}>
+            🚀 Get Signal
+          </button>
         )}
 
         {/* Nav */}
-        <div style={{display:"flex",justifyContent:"space-around",marginTop:24,borderTop:`1px solid ${C.card}`,paddingTop:14}}>
-          {[{ic:"??",lb:"Profile"},{ic:"??",lb:"History",action:()=>setPage("history")},{ic:"??",lb:"Signals"},{ic:"??",lb:"AI"},{ic:"??",lb:"Support"}].map((x,i)=>(
-            <div key={x.lb} onClick={x.action} style={{textAlign:"center",cursor:x.action?"pointer":"default",opacity:x.lb==="Signals"||x.lb==="History"?1:0.25}}>
-              <div style={{fontSize:17,marginBottom:2}}>{x.ic}</div>
-              <div style={{fontSize:9,color:x.lb==="Signals"?C.accent:"#333",fontWeight:x.lb==="Signals"?700:400}}>{x.lb}</div>
+        <div style={{display:"flex",justifyContent:"space-around",marginTop:24,borderTop:`1px solid rgba(255,255,255,0.05)`,paddingTop:14}}>
+          {[
+            {ic:"👤",lb:"Profile"},
+            {ic:"📊",lb:"History",action:()=>setPage("history")},
+            {ic:"📈",lb:"Signals"},
+            {ic:"🧠",lb:"AI"},
+            {ic:"🎧",lb:"Support"}
+          ].map((x,i)=>(
+            <div key={x.lb} onClick={x.action} style={{textAlign:"center",cursor:x.action?"pointer":"default",opacity:x.lb==="Signals"||x.lb==="History"?1:0.35}}>
+              <div style={{fontSize:18,marginBottom:2}}>{x.ic}</div>
+              <div style={{fontSize:9,color:x.lb==="Signals"?C.accent:C.dim,fontWeight:x.lb==="Signals"?700:400}}>{x.lb}</div>
             </div>
           ))}
         </div>
 
       </div>
+      <div style={S.footer}>MADE BY: ABDALLAH MAHER</div>
     </div>
   );
 }
