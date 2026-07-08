@@ -23,13 +23,11 @@ body{background:#08090f;color:#e0e0f0;font-family:-apple-system,BlinkMacSystemFo
 const { useState, useCallback } = React;
 
 const PAIRS = [
-  "EUR/USD","USD/JPY","AUD/USD","USD/CAD","USD/CHF",
-  "EUR/GBP","EUR/JPY","GBP/JPY","NZD/USD","AUD/JPY","EUR/CHF",
-  "GBP/CHF","EUR/AUD","GBP/AUD","AUD/CAD","AUD/NZD","NZD/JPY",
-  "CAD/JPY","CHF/JPY","EUR/NZD","GBP/NZD","EUR/CAD","GBP/CAD",
+  "EUR/USD","USD/JPY","AUD/USD","EUR/GBP","EUR/JPY","GBP/JPY","AUD/JPY",
+"AUD/CAD"
 ];
 
-const POLYGON_KEY = "r3zbbjSWp_a7XiCQo8SsDz1dYYTQ6Fed";
+const POLYGON_KEY = "YDudWV1AgMOAWok9EphEjE2Fs_mCbm48";
 
 // ?? Indicators ??????????????????????????????????????????????
 function calcEma(d, p) {
@@ -230,15 +228,15 @@ function analyze(O,H,L,C,V) {
   if(direction!=="WAIT"){
     const up=direction==="UP";
     if(up&&last>e20||!up&&last<e20) reasons.push(`Price ${up?"above":"below"} EMA20 & EMA50`);
-    if(r<40&&up) reasons.push(`RSI ${r.toFixed(0)} ? oversold reversal`);
-    if(r>60&&!up) reasons.push(`RSI ${r.toFixed(0)} ? overbought reversal`);
-    if(ms.score!==0) reasons.push(`${ms.trend} ? ${up?"HH/HL":"LH/LL"} confirmed`);
-    if(cp.patterns.length>0) reasons.push(`${cp.patterns[0]} ? ${up?"bullish":"bearish"} pattern`);
+    if(r<40&&up) reasons.push(`RSI ${r.toFixed(0)} — oversold reversal`);
+    if(r>60&&!up) reasons.push(`RSI ${r.toFixed(0)} — overbought reversal`);
+    if(ms.score!==0) reasons.push(`${ms.trend} — ${up?"HH/HL":"LH/LL"} confirmed`);
+    if(cp.patterns.length>0) reasons.push(`${cp.patterns[0]} — ${up?"bullish":"bearish"} pattern`);
     if(rz.atZone) reasons.push(`${rz.nearType} zone ${rz.nearZone.touches}x confirmed`);
-    if(vp.atLVN) reasons.push("LVN ? explosive move zone");
+    if(vp.atLVN) reasons.push("LVN — explosive move zone");
     while(reasons.length<3) reasons.push(`${up?"Bullish":"Bearish"} momentum aligned`);
   } else {
-    reasons.push("Mixed signals ? no clear bias");
+    reasons.push("Mixed signals — no clear bias");
     reasons.push(`Smart Triple Check: ${stc.passed}/3 checks passed`);
     reasons.push("Wait for stronger confirmation");
   }
@@ -338,7 +336,7 @@ function App(){
       }
       if(mtfDir===result.direction&&result.direction!=="WAIT"){
         result.accuracy=Math.min(96,result.accuracy+align*2);
-        if(align>=3)result.reasons[2]=`${align}/3 timeframes aligned ? strong confirmation`;
+        if(align>=3)result.reasons[2]=`${align}/3 timeframes aligned — strong confirmation`;
       }
       // Final verdict
       const stcOk=result.stc.allPassed;
@@ -624,7 +622,7 @@ function App(){
                 <div>
                   <div style={S.lbl}>Signal</div>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    <span style={{fontSize:24}}>{sig.direction==="UP"?"?":sig.direction==="DOWN"?"?":"?"}</span>
+                    <span style={{fontSize:24}}>{sig.direction==="UP"?"?":sig.direction==="DOWN"?"?":"—"}</span>
                     <span style={{fontSize:26,fontWeight:900,color:dc}}>{sig.direction}</span>
                   </div>
                 </div>
