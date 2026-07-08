@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="SpriNg Bot Pro"/>
 <meta name="theme-color" content="#08090f"/>
-<title>SpriNg Bot Pro</title>
+<title>SpriNg Bot Pro – Twelve Data</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
@@ -29,8 +29,10 @@ const PAIRS = [
   "CAD/JPY","CHF/JPY","EUR/NZD","GBP/NZD","EUR/CAD","GBP/CAD",
 ];
 
-const POLYGON_KEY = "r3zbbjSWp_a7XiCQo8SsDz1dYYTQ6Fed";
-let ws = null;
+// ============================================================
+// 🔑 TWELVE DATA API KEY (جديد)
+// ============================================================
+const TWELVE_KEY = "30a1cd1a62274ed29c7fb8d8e41c1f00";
 
 // ============================================================
 // INDICATORS
@@ -245,55 +247,40 @@ function analyze(O,H,L,C,V) {
 }
 
 // ============================================================
-// FETCH (REST + WebSocket)
+// TWELVE DATA FETCH
 // ============================================================
 async function fetchTF(symbol, interval) {
-  const ticker="C:"+symbol.replace("/","");
-  const map={"5min":"5","15min":"15","30min":"30","1h":"60","4h":"240"};
-  const mins=map[interval]||"5";
-  const to=new Date().toISOString().split("T")[0];
-  const from=new Date(Date.now()-7*24*60*60*1000).toISOString().split("T")[0];
-  const url=`https://api.polygon.io/v2/aggs/ticker/${ticker}/range/${mins}/minute/${from}/${to}?adjusted=true&sort=asc&limit=100&apiKey=${POLYGON_KEY}`;
-  const res=await fetch(url);
-  const data=await res.json();
-  if(!data.results||!data.results.length)throw new Error("No data");
-  const v=data.results.slice(0,-1);
-  return{O:v.map(x=>x.o),H:v.map(x=>x.h),L:v.map(x=>x.l),C:v.map(x=>x.c),V:v.map(x=>x.v||0)};
-}
+  const map = {
+    "5min": "5min",
+    "15min": "15min",
+    "30min": "30min",
+    "1h": "1h",
+    "4h": "4h"
+  };
+  const inter = map[interval] || "5min";
 
-// ============================================================
-// WEBSOCKET (Live Prices)
-// ============================================================
-function connectWebSocket(pair, onMessage) {
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.close();
+  const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${inter}&outputsize=100&apikey=${TWELVE_KEY}`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (data.status === "error") {
+    throw new Error(data.message || "Twelve Data error");
   }
-  const ticker = "C:" + pair.replace("/","");
-  ws = new WebSocket(`wss://socket.polygon.io/forex`);
-  
-  ws.onopen = () => {
-    ws.send(JSON.stringify({
-      action: "auth",
-      params: POLYGON_KEY
-    }));
-    ws.send(JSON.stringify({
-      action: "subscribe",
-      params: ticker
-    }));
+
+  if (!data.values || data.values.length === 0) {
+    throw new Error("No data returned from Twelve Data");
+  }
+
+  const vals = data.values.reverse().slice(0, -1);
+
+  return {
+    O: vals.map(v => parseFloat(v.open)),
+    H: vals.map(v => parseFloat(v.high)),
+    L: vals.map(v => parseFloat(v.low)),
+    C: vals.map(v => parseFloat(v.close)),
+    V: vals.map(v => parseFloat(v.volume || 0))
   };
-  
-  ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    if (data[0]?.p) {
-      onMessage(data[0].p);
-    }
-  };
-  
-  ws.onerror = (err) => {
-    console.log("WebSocket error:", err);
-  };
-  
-  return ws;
 }
 
 function quickBias(O,H,L,C){
@@ -344,27 +331,12 @@ function App(){
   const [history,setHistory]=useState(loadH);
   const [lastId,setLastId]=useState(null);
   const [taken,setTaken]=useState(false);
-  const [livePrice,setLivePrice]=useState(null);
   const [scanResults,setScanResults]=useState([]);
-  const [scanning,setScanning]=useState(false);
+  const [scanAllLoading,setScanAllLoading]=useState(false);
   const [autoRefresh,setAutoRefresh] = useState(false);
-  const [scanAllLoading,setScanAllLoading] = useState(false);
   const intervalRef = useRef(null);
 
   const dc=sig?.direction==="UP"?C.up:sig?.direction==="DOWN"?C.down:C.wait;
-
-  // ============================================================
-  // WEBSOCKET CONNECTION
-  // ============================================================
-  useEffect(() => {
-    if (!pair) return;
-    const ws = connectWebSocket(pair, (price) => {
-      setLivePrice(price);
-    });
-    return () => {
-      if (ws) ws.close();
-    };
-  }, [pair]);
 
   // ============================================================
   // AUTO-REFRESH (كل 5 دقائق)
@@ -373,7 +345,7 @@ function App(){
     if (autoRefresh) {
       intervalRef.current = setInterval(() => {
         getSignal();
-      }, 5 * 60 * 1000); // 5 دقائق
+      }, 5 * 60 * 1000);
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -394,7 +366,6 @@ function App(){
   const getSignal = useCallback(async()=>{
     setLoading(true);setSig(null);setErr("");setMtf([]);setVerdict(null);setTaken(false);
     try{
-      // ===== 5 أطراف زمنية =====
       const tfs = [
         ["5min","5M"],
         ["15min","15M"],
@@ -566,16 +537,7 @@ function App(){
             <span style={{fontSize:22,fontWeight:800,background:`linear-gradient(135deg,${C.accentB},${C.accent})`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>SpriNg</span>
             <span style={{fontSize:11,fontWeight:700,color:C.wait,background:"rgba(240,192,64,0.12)",padding:"2px 7px",borderRadius:5,marginLeft:6}}>PRO</span>
           </div>
-          <div style={{fontSize:9,color:C.dim}}>🔴 LIVE</div>
         </div>
-
-        {/* Live Price */}
-        {livePrice && (
-          <div style={{...S.ibox, marginBottom:8, border: `1px solid ${C.accent}44`, textAlign: "center"}}>
-            <span style={S.lbl}>Live Price</span>
-            <div style={{fontSize:20,fontWeight:800,color:C.accent}}>{livePrice.toFixed(5)}</div>
-          </div>
-        )}
 
         {/* Pair Selector */}
         <div style={{position:"relative",marginBottom:14}}>
