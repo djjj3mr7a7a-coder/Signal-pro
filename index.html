@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>محرك إشارات OTC الأسطوري – OCR</title>
+<title>محرك إشارات OTC – OCR</title>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 :root{--bg:#0e1117;--sf:#161b26;--sf2:#1e2535;--bd:#2a3247;--bds:#374160;--tx:#e8eaf0;--sc:#8b93a8;--mt:#5a6380;--buy:#4ade80;--buyb:#0d2818;--buybr:#166534;--sel:#f87171;--selb:#2b0f0f;--selbr:#7f1d1d;--ac:#3b82f6;--acd:#1e3a5f;--wn:#f59e0b;--r:10px;--fn:'Segoe UI',system-ui,sans-serif;--mo:'SF Mono','Fira Code',monospace}
@@ -20,6 +20,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 .upload-area input{display:none}
 .upload-label{font-size:14px;color:var(--mt);cursor:pointer}
 .upload-label span{color:var(--ac);font-weight:600}
+.upload-label select{background:var(--sf2);color:var(--tx);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;margin-top:6px;cursor:pointer}
 #ocr-status{font-size:12px;color:var(--mt);margin-top:8px;display:none}
 .tf-block{background:var(--sf);border:.5px solid var(--bd);border-radius:12px;margin-bottom:8px;overflow:hidden}
 .tf-head{display:flex;align-items:center;gap:10px;padding:.65rem .9rem;background:var(--sf2);border-bottom:.5px solid var(--bd)}
@@ -146,14 +147,24 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 <body>
 <div class="hdr">
   <div class="hico">📊</div>
-  <div><div class="htit">محرك إشارات OTC الأسطوري</div><div class="hsub">5 فريمات · 25 معادلة · OCR · AI · إدارة مخاطرة</div></div>
+  <div><div class="htit">محرك إشارات OTC – OCR</div><div class="hsub">5 فريمات · 25 معادلة · رفع صورة لكل فريم</div></div>
   <div class="hbdg">⚡ ULTIMATE</div>
 </div>
 <div class="main">
 
 <!-- ===== OCR UPLOAD ===== -->
 <div class="upload-area" onclick="document.getElementById('screenshot').click()">
-  <div class="upload-label">📸 <span>ارفع سكرين شوت</span> للشارت<br><small style="color:var(--mt)">(سيستخرج الأرقام تلقائياً ويملأ الحقول)</small></div>
+  <div class="upload-label">
+    📸 <span>ارفع سكرين شوت</span> للفريم<br>
+    <small style="color:var(--mt)">(اختار الفريم أولاً)</small><br>
+    <select id="tfSelect" style="background:var(--sf2);color:var(--tx);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;margin-top:6px;cursor:pointer;" onclick="event.stopPropagation();">
+      <option value="1">M5</option>
+      <option value="2">M15</option>
+      <option value="3">M30</option>
+      <option value="4">H1</option>
+      <option value="5">H4</option>
+    </select>
+  </div>
   <input type="file" id="screenshot" accept="image/*" onchange="extractFromImage(event)"/>
   <div id="ocr-status">⏳ جاري استخراج الأرقام...</div>
 </div>
@@ -341,11 +352,11 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 
 </div>
 </div>
-<div class="ftr">محرك إشارات OTC الأسطوري · 5 فريمات · 25 معادلة · OCR · أنماط شموع · تحليل زمني · إدارة مخاطرة</div>
+<div class="ftr">محرك إشارات OTC · 5 فريمات · 25 معادلة · OCR لكل فريم · أنماط شموع · تحليل زمني · إدارة مخاطرة</div>
 
 <script>
 // ============================================================
-// OCR FUNCTION
+// OCR FUNCTION – PER FRAME
 // ============================================================
 async function extractFromImage(event){
   const file=event.target.files[0];
@@ -353,7 +364,7 @@ async function extractFromImage(event){
   const status=document.getElementById('ocr-status');
   status.style.display='block';
   status.textContent='⏳ جاري قراءة الصورة...';
-  
+
   try{
     const img=URL.createObjectURL(file);
     const result=await Tesseract.recognize(img,'ara+eng',{
@@ -362,22 +373,24 @@ async function extractFromImage(event){
     const text=result.data.text;
     status.textContent='✅ تم الاستخراج! جاري ملء الحقول...';
     console.log('النص المستخرج:',text);
-    
+
     // استخراج الأرقام (أرقام عشرية)
     const numbers=text.match(/\d+\.\d{4,5}/g)||[];
     // استخراج أرقام صحيحة (للـ Volume)
     const ints=text.match(/\b\d{3,5}\b/g)||[];
     const allNumbers=[...numbers,...ints];
-    
-    // الحقول بالترتيب
-    const fields=['o1','h1','l1','c1','p1','v1',
-                  'o2','h2','l2','c2','p2','v2',
-                  'o3','h3','l3','c3','p3','v3',
-                  'o4','h4','l4','c4','p4','v4',
-                  'o5','h5','l5','c5','p5','v5',
-                  'co1','ch1','cl1','cc1','cv1',
-                  'co2','ch2','cl2','cc2','cv2'];
-    
+
+    // الحقول حسب الفريم المختار
+    const tfIndex=parseInt(document.getElementById('tfSelect').value);
+    const fieldMap={
+      1:['o1','h1','l1','c1','p1','v1'],
+      2:['o2','h2','l2','c2','p2','v2'],
+      3:['o3','h3','l3','c3','p3','v3'],
+      4:['o4','h4','l4','c4','p4','v4'],
+      5:['o5','h5','l5','c5','p5','v5']
+    };
+    const fields=fieldMap[tfIndex]||[];
+
     let idx=0;
     for(const f of fields){
       const el=document.getElementById(f);
@@ -385,7 +398,8 @@ async function extractFromImage(event){
         el.value=allNumbers[idx++];
       }
     }
-    status.textContent='✅ تم ملء الحقول تلقائياً! اضغط "احسب"';
+    const tfName=document.getElementById('tfSelect').options[tfIndex-1].text;
+    status.textContent=`✅ تم ملء فريم ${tfName} تلقائياً! اضغط "احسب"`;
   }catch(e){
     status.textContent='❌ فشل الاستخراج: '+e.message;
     console.error(e);
