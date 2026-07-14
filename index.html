@@ -1,457 +1,356 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>محرك إشارات OTC</title>
-  <style>
-    :root {
-      --bg: #0e1117;
-      --surface: #161b26;
-      --surface2: #1e2535;
-      --border: #2a3247;
-      --border-strong: #374160;
-      --text: #e8eaf0;
-      --text-sec: #8b93a8;
-      --text-muted: #5a6380;
-      --buy: #4ade80;
-      --buy-bg: #0d2818;
-      --buy-border: #166534;
-      --sell: #f87171;
-      --sell-bg: #2b0f0f;
-      --sell-border: #7f1d1d;
-      --accent: #3b82f6;
-      --accent-dim: #1e3a5f;
-      --warn: #f59e0b;
-      --radius: 10px;
-      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      --mono: 'SF Mono', 'Fira Code', monospace;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font);
-      min-height: 100vh;
-      padding: 0;
-    }
-
-    /* Header */
-    .header {
-      background: var(--surface);
-      border-bottom: 0.5px solid var(--border);
-      padding: 1rem 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-    .header-icon {
-      width: 36px; height: 36px;
-      background: var(--accent-dim);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-    }
-    .header-title { font-size: 16px; font-weight: 600; color: var(--text); }
-    .header-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
-    .header-badge {
-      margin-right: auto;
-      font-size: 10px;
-      padding: 3px 8px;
-      border-radius: 20px;
-      background: var(--accent-dim);
-      color: var(--accent);
-      border: 0.5px solid var(--accent);
-      font-weight: 500;
-    }
-
-    /* Main layout */
-    .main {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 1.25rem 1rem 3rem;
-    }
-
-    /* Section label */
-    .sec-label {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: .8px;
-      margin-bottom: 8px;
-    }
-
-    /* Input grid */
-    .input-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .input-grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 1rem;
-    }
-
-    .field {
-      background: var(--surface);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: .7rem;
-      transition: border-color .15s;
-    }
-    .field:focus-within { border-color: var(--accent); }
-    .field label {
-      display: block;
-      font-size: 10px;
-      color: var(--text-muted);
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
-    .field input, .field select {
-      width: 100%;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 14px;
-      font-family: var(--mono);
-      outline: none;
-    }
-    .field select option { background: var(--surface2); }
-
-    .calc-btn {
-      width: 100%;
-      padding: 13px;
-      background: var(--accent);
-      border: none;
-      border-radius: var(--radius);
-      color: #fff;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: var(--font);
-      transition: opacity .15s;
-      margin-bottom: 1.25rem;
-    }
-    .calc-btn:hover { opacity: .88; }
-    .calc-btn:active { opacity: .75; }
-
-    /* Result box */
-    .result { display: none; }
-
-    .direction-card {
-      border-radius: 14px;
-      padding: 1.25rem;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .direction-card.buy  { background: var(--buy-bg);  border: 0.5px solid var(--buy-border);  }
-    .direction-card.sell { background: var(--sell-bg); border: 0.5px solid var(--sell-border); }
-    .direction-card.wait { background: var(--surface);  border: 0.5px solid var(--border);       }
-    .dir-text { font-size: 26px; font-weight: 700; }
-    .dir-text.buy  { color: var(--buy);  }
-    .dir-text.sell { color: var(--sell); }
-    .dir-text.wait { color: var(--text-sec); }
-    .dir-right { text-align: left; }
-    .dir-dur { font-size: 28px; font-weight: 700; color: var(--text); }
-    .dir-dur-lbl { font-size: 10px; color: var(--text-muted); margin-top: 2px; text-align: left; }
-
-    /* Metrics row */
-    .metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
-    .metric {
-      background: var(--surface);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: .75rem;
-    }
-    .metric.hi { border-color: var(--accent); }
-    .metric-lbl { font-size: 10px; color: var(--text-muted); margin-bottom: 5px; }
-    .metric-val { font-size: 22px; font-weight: 600; color: var(--text); }
-    .metric-sub { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
-
-    /* Score bars */
-    .score-section { margin-bottom: 1rem; }
-    .score-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .score-lbl { font-size: 11px; color: var(--text-sec); min-width: 105px; }
-    .score-track {
-      flex: 1; height: 7px; border-radius: 4px;
-      background: var(--surface2); overflow: hidden;
-    }
-    .score-fill { height: 100%; border-radius: 4px; transition: width .5s; }
-    .score-num { font-size: 11px; color: var(--text); min-width: 36px; text-align: left; font-family: var(--mono); }
-
-    /* Count pills */
-    .count-row { display: flex; gap: 8px; margin-bottom: 1rem; }
-    .count-pill {
-      flex: 1; background: var(--surface); border: 0.5px solid var(--border);
-      border-radius: 8px; padding: .6rem; text-align: center;
-    }
-    .count-num { font-size: 22px; font-weight: 600; }
-    .count-num.buy  { color: var(--buy);  }
-    .count-num.sell { color: var(--sell); }
-    .count-num.neu  { color: var(--text-sec); }
-    .count-lbl { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-
-    /* Noise box */
-    .noise-box {
-      background: var(--surface);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: .9rem;
-      margin-bottom: 1rem;
-    }
-    .noise-title { font-size: 11px; font-weight: 600; color: var(--text-sec); margin-bottom: .65rem; }
-    .noise-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .noise-bar-lbl { font-size: 11px; color: var(--text-muted); min-width: 100px; }
-    .noise-track { flex:1; height:6px; border-radius:3px; background:var(--surface2); overflow:hidden; }
-    .noise-fill { height:100%; border-radius:3px; }
-    .noise-num { font-size: 11px; color: var(--text); min-width: 48px; text-align: left; font-family: var(--mono); }
-    .noise-verdict {
-      margin-top: .6rem;
-      font-size: 11px;
-      color: var(--text-sec);
-      padding: 6px 10px;
-      background: var(--surface2);
-      border-radius: 6px;
-      line-height: 1.5;
-    }
-    .noise-verdict.low    { border-right: 3px solid var(--buy);  }
-    .noise-verdict.mid    { border-right: 3px solid var(--warn); }
-    .noise-verdict.high   { border-right: 3px solid var(--sell); }
-    .noise-verdict.danger { border-right: 3px solid #dc2626;     }
-
-    /* Groups */
-    .groups { display: flex; flex-direction: column; gap: 8px; }
-    .grp {
-      background: var(--surface);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-    .grp-head {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: .6rem .9rem;
-      border-bottom: 0.5px solid var(--border);
-      background: var(--surface2);
-    }
-    .grp-name { font-size: 12px; font-weight: 600; color: var(--text); }
-    .grp-right { display: flex; align-items: center; gap: 6px; }
-    .weight-tag {
-      font-size: 10px; color: var(--text-muted);
-      background: var(--bg); padding: 1px 6px;
-      border-radius: 4px; border: 0.5px solid var(--border);
-    }
-    .grp-badge { font-size: 11px; padding: 2px 9px; border-radius: 4px; font-weight: 600; }
-    .grp-badge.buy  { background: var(--buy-bg);  color: var(--buy);  border: 0.5px solid var(--buy-border);  }
-    .grp-badge.sell { background: var(--sell-bg); color: var(--sell); border: 0.5px solid var(--sell-border); }
-    .grp-badge.neu  { background: var(--surface2); color: var(--text-muted); border: 0.5px solid var(--border); }
-
-    .eq-row {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: .55rem .9rem;
-      border-bottom: 0.5px solid var(--border);
-    }
-    .eq-row:last-child { border-bottom: none; }
-    .eq-icon { font-size: 13px; min-width: 18px; margin-top: 2px; }
-    .eq-body { flex: 1; }
-    .eq-name { font-size: 12px; font-weight: 500; color: var(--text); }
-    .eq-formula { font-size: 10px; color: var(--text-muted); margin-top: 2px; font-family: var(--mono); direction: ltr; text-align: left; }
-    .eq-val { font-size: 11px; margin-top: 2px; }
-    .eq-val.up   { color: var(--buy);  }
-    .eq-val.down { color: var(--sell); }
-    .eq-val.neu  { color: var(--text-muted); }
-
-    /* Pivot table */
-    .pvt-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 4px; padding: .6rem .9rem;
-      border-top: 0.5px solid var(--border);
-      background: var(--bg);
-    }
-    .pvt-cell { text-align: center; }
-    .pvt-lbl  { font-size: 10px; color: var(--text-muted); }
-    .pvt-val  { font-size: 11px; font-weight: 600; font-family: var(--mono); }
-    .pvt-val.r { color: var(--sell); }
-    .pvt-val.s { color: var(--buy);  }
-    .pvt-val.p { color: var(--accent); }
-
-    /* Divider */
-    .divider { height: 0.5px; background: var(--border); margin: .85rem 0; }
-
-    /* Footer */
-    .footer {
-      text-align: center;
-      padding: 1.5rem 1rem;
-      font-size: 11px;
-      color: var(--text-muted);
-      border-top: 0.5px solid var(--border);
-      margin-top: 2rem;
-    }
-
-    /* Mobile tweaks */
-    @media(max-width: 480px) {
-      .input-grid { grid-template-columns: repeat(2, 1fr); }
-      .metrics { grid-template-columns: 1fr 1fr; }
-      .metrics .metric:last-child { grid-column: span 2; }
-      .dir-dur { font-size: 22px; }
-      .dir-text { font-size: 20px; }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>محرك إشارات OTC</title>
+<style>
+:root{--bg:#0e1117;--surface:#161b26;--surface2:#1e2535;--border:#2a3247;--border-s:#374160;--text:#e8eaf0;--sec:#8b93a8;--muted:#5a6380;--buy:#4ade80;--buy-bg:#0d2818;--buy-br:#166534;--sell:#f87171;--sell-bg:#2b0f0f;--sell-br:#7f1d1d;--acc:#3b82f6;--acc-dim:#1e3a5f;--warn:#f59e0b;--r:10px;--fn:'Segoe UI',system-ui,sans-serif;--mo:'SF Mono','Fira Code',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--fn);min-height:100vh}
+.hdr{background:var(--surface);border-bottom:.5px solid var(--border);padding:1rem 1.5rem;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.hdr-icon{width:36px;height:36px;background:var(--acc-dim);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.hdr-title{font-size:16px;font-weight:600}
+.hdr-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.hdr-badge{margin-right:auto;font-size:10px;padding:3px 8px;border-radius:20px;background:var(--acc-dim);color:var(--acc);border:.5px solid var(--acc);font-weight:500}
+.main{max-width:700px;margin:0 auto;padding:1.25rem 1rem 3rem}
+.slbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.ig{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.fd{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:.7rem;transition:border-color .15s}
+.fd:focus-within{border-color:var(--acc)}
+.fd label{display:block;font-size:10px;color:var(--muted);margin-bottom:5px;font-weight:500}
+.fd input,.fd select{width:100%;background:transparent;border:none;color:var(--text);font-size:14px;font-family:var(--mo);outline:none}
+.fd select option{background:var(--surface2)}
+/* MTF */
+.mtf-wrap{background:var(--surface);border:.5px solid var(--border);border-radius:14px;margin-bottom:1rem;overflow:hidden}
+.mtf-hdr{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;cursor:pointer;user-select:none}
+.mtf-hdr-l{display:flex;align-items:center;gap:8px}
+.mtf-t{font-size:13px;font-weight:600}
+.mtf-s{font-size:11px;color:var(--muted)}
+.mtf-tog{font-size:12px;color:var(--muted);transition:transform .2s}
+.mtf-tog.open{transform:rotate(180deg)}
+.mtf-bd{display:none;padding:0 1rem 1rem}
+.mtf-bd.open{display:block}
+.mtf-tip{font-size:11px;color:var(--muted);margin-bottom:10px;padding:8px;background:var(--surface2);border-radius:8px}
+.mtf-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.mtf-rn{font-size:10px;color:var(--muted);min-width:16px}
+.mtf-flds{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;flex:1}
+.mtf-f{background:var(--surface2);border:.5px solid var(--border);border-radius:7px;padding:.4rem .5rem}
+.mtf-f label{display:block;font-size:9px;color:var(--muted);margin-bottom:2px}
+.mtf-f input,.mtf-f select{width:100%;background:transparent;border:none;color:var(--text);font-size:12px;font-family:var(--mo);outline:none}
+.mtf-f select option{background:var(--surface2)}
+.mtf-rm{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:0 3px}
+.mtf-add{background:transparent;border:.5px dashed var(--border-s);border-radius:8px;color:var(--muted);font-size:12px;padding:.45rem;cursor:pointer;width:100%;margin-top:4px;transition:all .15s}
+.mtf-add:hover{border-color:var(--acc);color:var(--acc)}
+.btn{width:100%;padding:13px;background:var(--acc);border:none;border-radius:var(--r);color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--fn);transition:opacity .15s;margin-bottom:1.25rem}
+.btn:hover{opacity:.88}
+.result{display:none}
+/* MTF result */
+.mtf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:1rem}
+.mtf-card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:.7rem;text-align:center}
+.mtf-card.buy{border-color:var(--buy-br);background:var(--buy-bg)}
+.mtf-card.sell{border-color:var(--sell-br);background:var(--sell-bg)}
+.mtf-card-tf{font-size:10px;color:var(--muted);margin-bottom:4px}
+.mtf-card-dir{font-size:15px;font-weight:700;margin-bottom:2px}
+.mtf-card-dir.buy{color:var(--buy)}.mtf-card-dir.sell{color:var(--sell)}.mtf-card-dir.neu{color:var(--muted)}
+.mtf-card-pct{font-size:10px;color:var(--muted)}
+.mtf-agree-box{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:.85rem;margin-bottom:1rem}
+.mtf-at{font-size:11px;font-weight:600;color:var(--sec);margin-bottom:.6rem}
+.mtf-ar{display:flex;align-items:center;gap:8px}
+.mtf-atr{flex:1;height:10px;border-radius:5px;background:var(--surface2);overflow:hidden}
+.mtf-af{height:100%;border-radius:5px;transition:width .5s}
+.mtf-an{font-size:13px;font-weight:600;min-width:40px;text-align:left}
+.mtf-vd{margin-top:.6rem;font-size:12px;padding:6px 10px;border-radius:6px;background:var(--surface2)}
+.mtf-vd.all{color:var(--buy);border-right:3px solid var(--buy)}
+.mtf-vd.most{color:var(--warn);border-right:3px solid var(--warn)}
+.mtf-vd.conflict{color:var(--sell);border-right:3px solid var(--sell)}
+/* Direction card */
+.dcard{border-radius:14px;padding:1.25rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.dcard.buy{background:var(--buy-bg);border:.5px solid var(--buy-br)}
+.dcard.sell{background:var(--sell-bg);border:.5px solid var(--sell-br)}
+.dcard.wait{background:var(--surface);border:.5px solid var(--border)}
+.dtext{font-size:24px;font-weight:700}
+.dtext.buy{color:var(--buy)}.dtext.sell{color:var(--sell)}.dtext.wait{color:var(--sec)}
+.dbadge{display:inline-flex;align-items:center;gap:4px;font-size:11px;margin-top:6px;padding:3px 9px;border-radius:20px;font-weight:500}
+.dbadge.all{background:rgba(74,222,128,.15);color:var(--buy);border:.5px solid var(--buy-br)}
+.dbadge.most{background:rgba(245,158,11,.12);color:var(--warn);border:.5px solid #78460a}
+.dbadge.conflict{background:var(--sell-bg);color:var(--sell);border:.5px solid var(--sell-br)}
+.dbadge.none{display:none}
+.ddur{font-size:28px;font-weight:700;color:var(--text)}
+.ddur-l{font-size:10px;color:var(--muted);margin-top:2px;text-align:left}
+/* Metrics */
+.mets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.met{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:.75rem}
+.met.hi{border-color:var(--acc)}
+.met-l{font-size:10px;color:var(--muted);margin-bottom:5px}
+.met-v{font-size:22px;font-weight:600}
+.met-s{font-size:10px;color:var(--muted);margin-top:3px}
+/* Counts */
+.crow{display:flex;gap:8px;margin-bottom:1rem}
+.cpill{flex:1;background:var(--surface);border:.5px solid var(--border);border-radius:8px;padding:.6rem;text-align:center}
+.cnum{font-size:22px;font-weight:600}
+.cnum.buy{color:var(--buy)}.cnum.sell{color:var(--sell)}.cnum.neu{color:var(--sec)}
+.clbl{font-size:10px;color:var(--muted);margin-top:2px}
+/* Score bars */
+.sbw{margin-bottom:1rem}
+.sbr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.sbl2{font-size:11px;color:var(--sec);min-width:120px}
+.sbt{flex:1;height:7px;border-radius:4px;background:var(--surface2);overflow:hidden}
+.sbf{height:100%;border-radius:4px;transition:width .5s}
+.sbn{font-size:11px;color:var(--text);min-width:36px;text-align:left;font-family:var(--mo)}
+/* Noise */
+.nbox{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:.9rem;margin-bottom:1rem}
+.nt{font-size:11px;font-weight:600;color:var(--sec);margin-bottom:.65rem}
+.nbr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.nbl{font-size:11px;color:var(--muted);min-width:100px}
+.nbt{flex:1;height:6px;border-radius:3px;background:var(--surface2);overflow:hidden}
+.nbf{height:100%;border-radius:3px}
+.nbn{font-size:11px;color:var(--text);min-width:48px;text-align:left;font-family:var(--mo)}
+.nvd{margin-top:.6rem;font-size:11px;color:var(--sec);padding:6px 10px;background:var(--surface2);border-radius:6px;line-height:1.5}
+.nvd.low{border-right:3px solid var(--buy)}.nvd.mid{border-right:3px solid var(--warn)}
+.nvd.high{border-right:3px solid var(--sell)}.nvd.danger{border-right:3px solid #dc2626}
+/* Groups */
+.grps{display:flex;flex-direction:column;gap:8px}
+.grp{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);overflow:hidden}
+.ghd{display:flex;align-items:center;justify-content:space-between;padding:.6rem .9rem;border-bottom:.5px solid var(--border);background:var(--surface2)}
+.gnm{font-size:12px;font-weight:600}
+.grt{display:flex;align-items:center;gap:6px}
+.wtag{font-size:10px;color:var(--muted);background:var(--bg);padding:1px 6px;border-radius:4px;border:.5px solid var(--border)}
+.gbdg{font-size:11px;padding:2px 9px;border-radius:4px;font-weight:600}
+.gbdg.buy{background:var(--buy-bg);color:var(--buy);border:.5px solid var(--buy-br)}
+.gbdg.sell{background:var(--sell-bg);color:var(--sell);border:.5px solid var(--sell-br)}
+.gbdg.neu{background:var(--surface2);color:var(--muted);border:.5px solid var(--border)}
+.eqr{display:flex;align-items:flex-start;gap:10px;padding:.55rem .9rem;border-bottom:.5px solid var(--border)}
+.eqr:last-child{border-bottom:none}
+.eqi{font-size:13px;min-width:18px;margin-top:2px}
+.eqb{flex:1}
+.eqn{font-size:12px;font-weight:500}
+.eqf{font-size:10px;color:var(--muted);margin-top:2px;font-family:var(--mo);direction:ltr;text-align:left}
+.eqv{font-size:11px;margin-top:2px}
+.eqv.up{color:var(--buy)}.eqv.down{color:var(--sell)}.eqv.neu{color:var(--muted)}
+.pvg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:.6rem .9rem;border-top:.5px solid var(--border);background:var(--bg)}
+.pvc{text-align:center}
+.pvl{font-size:10px;color:var(--muted)}
+.pvv{font-size:11px;font-weight:600;font-family:var(--mo)}
+.pvv.r{color:var(--sell)}.pvv.s{color:var(--buy)}.pvv.p{color:var(--acc)}
+.div{height:.5px;background:var(--border);margin:.85rem 0}
+.ftr{text-align:center;padding:1.5rem 1rem;font-size:11px;color:var(--muted);border-top:.5px solid var(--border);margin-top:2rem}
+@media(max-width:500px){.ig{grid-template-columns:repeat(2,1fr)}.mets{grid-template-columns:1fr 1fr}.mets .met:last-child{grid-column:span 2}.mtf-flds{grid-template-columns:repeat(3,1fr)}.ddur{font-size:22px}}
+</style>
 </head>
 <body>
-
-<!-- Header -->
-<div class="header">
-  <div class="header-icon">📊</div>
+<div class="hdr">
+  <div class="hdr-icon">📊</div>
   <div>
-    <div class="header-title">محرك إشارات OTC</div>
-    <div class="header-sub">Camarilla · Woodie · Classic · ATR</div>
+    <div class="hdr-title">محرك إشارات OTC</div>
+    <div class="hdr-sub">Camarilla · Woodie · Classic · ATR · MTF</div>
   </div>
-  <div class="header-badge">14 معادلة</div>
+  <div class="hdr-badge">14 معادلة + MTF</div>
 </div>
-
 <div class="main">
-
-  <!-- Inputs -->
-  <div class="sec-label" style="margin-top:.5rem">بيانات الشمعة</div>
-  <div class="input-grid">
-    <div class="field"><label>Open</label><input type="number" id="op" placeholder="1.23450" step="0.00001"/></div>
-    <div class="field"><label>High</label><input type="number" id="hi" placeholder="1.23510" step="0.00001"/></div>
-    <div class="field"><label>Low</label> <input type="number" id="lo" placeholder="1.23420" step="0.00001"/></div>
-    <div class="field"><label>Close</label><input type="number" id="cl" placeholder="1.23480" step="0.00001"/></div>
-    <div class="field"><label>Prev Close (اختياري)</label><input type="number" id="pc" placeholder="1.23440" step="0.00001"/></div>
-    <div class="field"><label>Timeframe</label>
+  <div class="slbl" style="margin-top:.5rem">فريم الدخول الرئيسي</div>
+  <div class="ig">
+    <div class="fd"><label>Open</label><input type="number" id="op" placeholder="1.23450" step="0.00001"/></div>
+    <div class="fd"><label>High</label><input type="number" id="hi" placeholder="1.23510" step="0.00001"/></div>
+    <div class="fd"><label>Low</label><input type="number" id="lo" placeholder="1.23420" step="0.00001"/></div>
+    <div class="fd"><label>Close</label><input type="number" id="cl" placeholder="1.23480" step="0.00001"/></div>
+    <div class="fd"><label>Prev Close (اختياري)</label><input type="number" id="pc" placeholder="1.23440" step="0.00001"/></div>
+    <div class="fd"><label>Timeframe</label>
       <select id="tf">
-        <option value="1">M1 — دقيقة</option>
-        <option value="5" selected>M5 — 5 دقائق</option>
-        <option value="15">M15 — 15 دقيقة</option>
-        <option value="30">M30 — 30 دقيقة</option>
-        <option value="60">H1 — ساعة</option>
-        <option value="240">H4 — 4 ساعات</option>
+        <option value="1">M1</option><option value="5" selected>M5</option>
+        <option value="15">M15</option><option value="30">M30</option>
+        <option value="60">H1</option><option value="240">H4</option>
       </select>
     </div>
   </div>
-
-  <button class="calc-btn" onclick="calc()">احسب الإشارة ↗</button>
-
+  <!-- MTF -->
+  <div class="mtf-wrap">
+    <div class="mtf-hdr" onclick="toggleMTF()">
+      <div class="mtf-hdr-l">
+        <span style="font-size:16px">🔗</span>
+        <div>
+          <div class="mtf-t">تأكيد متعدد الفريمات (MTF)</div>
+          <div class="mtf-s">أضف فريمات أعلى لزيادة دقة الإشارة</div>
+        </div>
+      </div>
+      <div class="mtf-tog" id="mtf-tog">▼</div>
+    </div>
+    <div class="mtf-bd" id="mtf-bd">
+      <div class="mtf-tip">💡 أدخل بيانات فريمات أعلى من فريم الدخول — لو كلهم اتفقوا على نفس الاتجاه، الدقة بترتفع تلقائياً</div>
+      <div id="mtf-rows"></div>
+      <button class="mtf-add" onclick="addMTF()">+ أضف فريم تأكيد</button>
+    </div>
+  </div>
+  <button class="btn" onclick="calc()">احسب الإشارة الكاملة ↗</button>
   <!-- Result -->
   <div class="result" id="result">
-
-    <!-- Direction + Duration -->
-    <div class="direction-card" id="dir-card">
-      <div class="dir-text" id="dir-text"></div>
-      <div class="dir-right">
-        <div class="dir-dur" id="dir-dur"></div>
-        <div class="dir-dur-lbl">مدة الصفقة المثلى</div>
+    <!-- MTF Summary -->
+    <div id="mtf-sum" style="display:none">
+      <div class="slbl">تأكيد متعدد الفريمات</div>
+      <div class="mtf-grid" id="mtf-cards"></div>
+      <div class="mtf-agree-box">
+        <div class="mtf-at">اتفاق الفريمات على الاتجاه</div>
+        <div class="mtf-ar">
+          <div class="mtf-atr"><div class="mtf-af" id="mtf-af"></div></div>
+          <div class="mtf-an" id="mtf-an"></div>
+        </div>
+        <div class="mtf-vd" id="mtf-vd"></div>
+      </div>
+      <div class="div"></div>
+    </div>
+    <!-- Direction -->
+    <div class="dcard" id="dc">
+      <div>
+        <div class="dtext" id="dtext"></div>
+        <div class="dbadge" id="dbadge"></div>
+      </div>
+      <div style="text-align:left">
+        <div class="ddur" id="ddur"></div>
+        <div class="ddur-l">مدة الصفقة المثلى</div>
       </div>
     </div>
-
     <!-- Metrics -->
-    <div class="metrics">
-      <div class="metric hi">
-        <div class="metric-lbl">🎯 دقة مرجَّحة</div>
-        <div class="metric-val" id="m-wacc"></div>
-        <div class="metric-sub">Pivots أثقل وزناً</div>
-      </div>
-      <div class="metric">
-        <div class="metric-lbl">📐 شموع المدة</div>
-        <div class="metric-val" id="m-candles"></div>
-        <div class="metric-sub" id="m-candles-sub"></div>
-      </div>
-      <div class="metric">
-        <div class="metric-lbl">🔊 مستوى الضجيج</div>
-        <div class="metric-val" id="m-noise"></div>
-        <div class="metric-sub" id="m-noise-sub"></div>
-      </div>
+    <div class="mets">
+      <div class="met hi"><div class="met-l">🎯 دقة مرجَّحة</div><div class="met-v" id="mw"></div><div class="met-s" id="mws">Pivots أثقل وزناً</div></div>
+      <div class="met"><div class="met-l">📐 شموع المدة</div><div class="met-v" id="mc"></div><div class="met-s" id="mcs"></div></div>
+      <div class="met"><div class="met-l">🔊 مستوى الضجيج</div><div class="met-v" id="mn"></div><div class="met-s" id="mns"></div></div>
     </div>
-
-    <!-- Count pills -->
-    <div class="count-row">
-      <div class="count-pill"><div class="count-num buy"  id="c-buy">0</div><div class="count-lbl">شراء</div></div>
-      <div class="count-pill"><div class="count-num sell" id="c-sell">0</div><div class="count-lbl">بيع</div></div>
-      <div class="count-pill"><div class="count-num neu"  id="c-neu">0</div><div class="count-lbl">محايد</div></div>
+    <!-- Counts -->
+    <div class="crow">
+      <div class="cpill"><div class="cnum buy" id="cb">0</div><div class="clbl">شراء</div></div>
+      <div class="cpill"><div class="cnum sell" id="cs">0</div><div class="clbl">بيع</div></div>
+      <div class="cpill"><div class="cnum neu" id="cn">0</div><div class="clbl">محايد</div></div>
     </div>
-
     <!-- Score bars -->
-    <div class="score-section">
-      <div class="score-row">
-        <div class="score-lbl">اتفاق بسيط</div>
-        <div class="score-track"><div class="score-fill" id="sb-raw"></div></div>
-        <div class="score-num" id="sn-raw"></div>
-      </div>
-      <div class="score-row">
-        <div class="score-lbl">اتفاق مرجَّح ✦</div>
-        <div class="score-track"><div class="score-fill" id="sb-w"></div></div>
-        <div class="score-num" id="sn-w"></div>
-      </div>
+    <div class="sbw">
+      <div class="sbr"><div class="sbl2">اتفاق بسيط</div><div class="sbt"><div class="sbf" id="sr"></div></div><div class="sbn" id="snr"></div></div>
+      <div class="sbr"><div class="sbl2">اتفاق مرجَّح ✦</div><div class="sbt"><div class="sbf" id="sw"></div></div><div class="sbn" id="snw"></div></div>
+      <div class="sbr" id="mtf-srow" style="display:none"><div class="sbl2">بعد تأكيد MTF 🔗</div><div class="sbt"><div class="sbf" id="sm"></div></div><div class="sbn" id="snm"></div></div>
     </div>
-
-    <div class="divider"></div>
-
-    <!-- Noise analysis -->
-    <div class="noise-box">
-      <div class="noise-title">📊 تحليل منطقة الضجيج (Noise Zone)</div>
-      <div class="noise-bar-row">
-        <div class="noise-bar-lbl">جسم الشمعة</div>
-        <div class="noise-track"><div class="noise-fill" id="nb-body" style="background:var(--accent)"></div></div>
-        <div class="noise-num" id="nv-body"></div>
-      </div>
-      <div class="noise-bar-row">
-        <div class="noise-bar-lbl" id="noise-dir-lbl">ضجيج الاتجاه</div>
-        <div class="noise-track"><div class="noise-fill" id="nb-noise" style="background:var(--warn)"></div></div>
-        <div class="noise-num" id="nv-noise"></div>
-      </div>
-      <div class="noise-bar-row">
-        <div class="noise-bar-lbl">النطاق الكامل</div>
-        <div class="noise-track"><div class="noise-fill" id="nb-range" style="background:var(--border-strong);width:100%"></div></div>
-        <div class="noise-num" id="nv-range"></div>
-      </div>
-      <div class="noise-verdict" id="noise-verdict"></div>
+    <div class="div"></div>
+    <!-- Noise -->
+    <div class="nbox">
+      <div class="nt">📊 تحليل منطقة الضجيج (Noise Zone)</div>
+      <div class="nbr"><div class="nbl">جسم الشمعة</div><div class="nbt"><div class="nbf" id="nbb" style="background:var(--acc)"></div></div><div class="nbn" id="nvb"></div></div>
+      <div class="nbr"><div class="nbl" id="ndl">ضجيج الاتجاه</div><div class="nbt"><div class="nbf" id="nbn2" style="background:var(--warn)"></div></div><div class="nbn" id="nvn"></div></div>
+      <div class="nbr"><div class="nbl">النطاق الكامل</div><div class="nbt"><div class="nbf" style="background:var(--border-s);width:100%"></div></div><div class="nbn" id="nvr"></div></div>
+      <div class="nvd" id="nvd"></div>
     </div>
-
-    <div class="divider"></div>
-
-    <!-- Signal groups -->
-    <div class="sec-label">تفاصيل المعادلات</div>
-    <div class="groups" id="groups"></div>
-
-  </div><!-- end result -->
-</div><!-- end main -->
-
-<div class="footer">محرك إشارات OTC · Camarilla · Woodie · Classic Pivot · ATR · 14 معادلة</div>
-
+    <div class="div"></div>
+    <div class="slbl">تفاصيل المعادلات — فريم الدخول</div>
+    <div class="grps" id="grps"></div>
+  </div>
+</div>
+<div class="ftr">محرك إشارات OTC · Camarilla · Woodie · Classic Pivot · ATR · Multi-Timeframe</div>
 <script>
+const TFL={1:'M1',5:'M5',15:'M15',30:'M30',60:'H1',240:'H4'};
+let mtfN=0;
 function f5(n){return parseFloat(n).toFixed(5)}
 function pct(n){return(n*100).toFixed(1)+'%'}
-function icon(v){return v>0?'▲':v<0?'▼':'—'}
-function ecls(v){return v>0?'up':v<0?'down':'neu'}
-function bcls(v){return v>0?'buy':v<0?'sell':'neu'}
-function blbl(v){return v>0?'شراء':v<0?'بيع':'محايد'}
-
-function fmtMins(m){
+function ico(v){return v>0?'▲':v<0?'▼':'—'}
+function ec(v){return v>0?'up':v<0?'down':'neu'}
+function bc(v){return v>0?'buy':v<0?'sell':'neu'}
+function bl(v){return v>0?'شراء':v<0?'بيع':'محايد'}
+function fmt(m){
   if(m<60)return m+' دقيقة';
-  if(m===60)return 'ساعة واحدة';
-  if(m===120)return 'ساعتين';
-  if(m===180)return '3 ساعات';
-  if(m===240)return '4 ساعات';
-  if(m===480)return '8 ساعات';
-  if(m===720)return '12 ساعة';
-  if(m===960)return '16 ساعة';
-  if(m%60===0)return(m/60)+' ساعات';
-  return m+' دقيقة';
+  if(m===60)return 'ساعة';if(m===120)return 'ساعتين';
+  if(m===180)return '3 ساعات';if(m===240)return '4 ساعات';
+  if(m===480)return '8 ساعات';if(m===720)return '12 ساعة';
+  if(m%60===0)return(m/60)+' ساعات';return m+' دقيقة';
 }
-
+function toggleMTF(){
+  document.getElementById('mtf-bd').classList.toggle('open');
+  document.getElementById('mtf-tog').classList.toggle('open');
+}
+function addMTF(){
+  if(mtfN>=4){alert('الحد الأقصى 4 فريمات');return;}
+  const id='mr'+mtfN++;
+  const d=document.createElement('div');
+  d.className='mtf-row';d.id=id;
+  d.innerHTML=`<div class="mtf-rn">${mtfN}</div>
+  <div class="mtf-flds">
+    <div class="mtf-f"><label>TF</label><select class="mTF">
+      <option value="5">M5</option><option value="15">M15</option>
+      <option value="30">M30</option><option value="60">H1</option>
+      <option value="240">H4</option></select></div>
+    <div class="mtf-f"><label>Open</label><input type="number" class="mO" placeholder="0" step="0.00001"/></div>
+    <div class="mtf-f"><label>High</label><input type="number" class="mH" placeholder="0" step="0.00001"/></div>
+    <div class="mtf-f"><label>Low</label><input type="number" class="mL" placeholder="0" step="0.00001"/></div>
+    <div class="mtf-f"><label>Close</label><input type="number" class="mC" placeholder="0" step="0.00001"/></div>
+  </div>
+  <button class="mtf-rm" onclick="this.parentElement.remove()">✕</button>`;
+  document.getElementById('mtf-rows').appendChild(d);
+}
+function qdir(O,H,L,C){
+  if([O,H,L,C].some(isNaN)||H<=L)return null;
+  const rng=H-L,body=Math.abs(C-O),d=C>O?1:C<O?-1:0;
+  const cp=rng>0?(C-L)/rng:0.5,br=rng>0?body/rng:0;
+  const PP=(H+L+C)/3,PPw=(H+L+2*C)/4;
+  const sigs=[d,cp>=0.65?1:cp<=0.35?-1:0,br>0.5?d:0,C>PP?1:-1,C>PPw?1:-1,C>PP?1:-1];
+  const buy=sigs.filter(s=>s>0).length,sell=sigs.filter(s=>s<0).length;
+  const net=buy-sell,agree=Math.max(buy,sell)/sigs.length;
+  return{dir:net>0?1:net<0?-1:0,agree,buy,sell,total:sigs.length};
+}
+function fullAn(O,H,L,C,PC){
+  const hpc=!isNaN(PC),rng=H-L,body=Math.abs(C-O);
+  const upS=H-Math.max(O,C),loS=Math.min(O,C)-L;
+  const TR=hpc?Math.max(rng,Math.abs(H-PC),Math.abs(L-PC)):rng;
+  const PPc=(H+L+C)/3,R1c=2*PPc-L,S1c=2*PPc-H,R2c=PPc+rng,S2c=PPc-rng;
+  const PPw=(H+L+2*C)/4,R1w=2*PPw-L,S1w=2*PPw-H,R2w=PPw+rng,S2w=PPw-rng;
+  const k=1.1;
+  const r1=C+(rng*k/12),s1=C-(rng*k/12),r2=C+(rng*k/6),s2=C-(rng*k/6);
+  const r3=C+(rng*k/4),s3=C-(rng*k/4),r4=C+(rng*k/2),s4=C-(rng*k/2),PPm=(H+L+C)/3;
+  const d1=C>O?1:C<O?-1:0,bR=rng>0?body/rng:0,cP=rng>0?(C-L)/rng:0.5;
+  let sv=0,sd='ذيول متوازنة';
+  if(loS>body*1.8&&upS<body*0.5){sv=1;sd='مطرقة → ارتداد صعودي';}
+  else if(upS>body*1.8&&loS<body*0.5){sv=-1;sd='شهاب → ارتداد هبوطي';}
+  else if(loS>upS*1.5){sv=1;sd='ذيل سفلي أطول → ضغط صعودي';}
+  else if(upS>loS*1.5){sv=-1;sd='ذيل علوي أطول → ضغط هبوطي';}
+  const cpD=cP>=0.75?1:cP<=0.25?-1:0;
+  const stK=rng>0?(C-L)/rng*100:50,stD=stK<25?1:stK>75?-1:0;
+  const mom=(C-O)/O*100,momD=Math.abs(mom)>0.03?d1:0;
+  const aD=TR>0&&body/TR>0.45?d1:0;
+  const cpT=C>PPc?1:C<PPc?-1:0;
+  const cpP=C<=S1c&&C>=S2c?1:C>=R1c&&C<=R2c?-1:C<S2c?1:C>R2c?-1:cpT;
+  const wT=C>PPw?1:C<PPw?-1:0,wP=C<=S1w?1:C>=R1w?-1:wT;
+  let cL=0,cD='بين المستويات';
+  if(C>=r3){cL=-1;cD='فوق H3 → بيع على مقاومة';}
+  else if(C<=s3){cL=1;cD='تحت L3 → شراء على دعم';}
+  else if(C>=r2){cL=-1;cD='قرب H2 → ضغط هبوطي';}
+  else if(C<=s2){cL=1;cD='قرب L2 → دعم صعودي';}
+  else{cL=C>PPm?1:-1;cD='يتبع الاتجاه العام';}
+  const cB=C>r4?1:C<s4?-1:0;
+  const groups=[
+    {name:'تحليل الشمعة',wtag:'وزن ×1.0',pvt:null,sigs:[
+      {name:'اتجاه الشمعة',formula:'C−O = '+(C>O?'+':'')+f5(C-O),val:d1,w:1,desc:d1>0?'صعودي':d1<0?'هبوطي':'دوجي'},
+      {name:'قوة الجسم',formula:'|C−O|÷(H−L) = '+pct(bR),val:bR>0.55?d1:0,w:1,desc:bR>0.7?'قوي جداً':bR>0.55?'متوسط':'ضعيف/دوجي'},
+      {name:'تحليل الذيول',formula:'↓'+f5(loS)+' | ↑'+f5(upS),val:sv,w:1,desc:sd},
+      {name:'موضع الإغلاق',formula:'(C−L)÷Range = '+pct(cP),val:cpD,w:1,desc:pct(cP)+' من النطاق'},
+    ]},
+    {name:'ATR والزخم',wtag:'وزن ×1.2',pvt:null,sigs:[
+      {name:'ATR — قوة الحركة',formula:'Body÷TR = '+pct(TR>0?body/TR:0),val:aD,w:1.2,desc:body/TR>0.6?'قوي → تأكيد':body/TR>0.35?'متوسط':'ضعيف'},
+      {name:'Stochastic',formula:'(C−L)÷Range×100 = '+stK.toFixed(1),val:stD,w:1.2,desc:stK<25?'تشبع بيع → شراء':stK>75?'تشبع شراء → بيع':'محايد'},
+      {name:'Momentum %',formula:'(C−O)÷O×100 = '+(mom>0?'+':'')+mom.toFixed(4)+'%',val:momD,w:1.2,desc:'زخم '+(mom>=0?'صعودي':'هبوطي')},
+    ]},
+    {name:'Classic Pivot',wtag:'وزن ×1.8',pvt:{R2:R2c,R1:R1c,PP:PPc,S1:S1c,S2:S2c},sigs:[
+      {name:'اتجاه vs Classic PP',formula:'PP=(H+L+C)÷3 = '+f5(PPc),val:cpT,w:1.8,desc:C>PPc?'فوق PP → صاعد':'تحت PP → هابط'},
+      {name:'قرب S1/R1',formula:'S1='+f5(S1c)+' | R1='+f5(R1c),val:cpP,w:1.8,desc:C<=S1c?'قرب S1 → ارتداد صعودي':C>=R1c?'قرب R1 → ارتداد هبوطي':'بين المستويات'},
+    ]},
+    {name:'Woodie Pivot',wtag:'وزن ×1.8',pvt:{R2:R2w,R1:R1w,PP:PPw,S1:S1w,S2:S2w},sigs:[
+      {name:'اتجاه vs Woodie PP',formula:'PP=(H+L+2C)÷4 = '+f5(PPw),val:wT,w:1.8,desc:C>PPw?'فوق PP → صاعد':'تحت PP → هابط'},
+      {name:'قرب S1/R1 Woodie',formula:'S1='+f5(S1w)+' | R1='+f5(R1w),val:wP,w:1.8,desc:C<=S1w?'قرب S1':C>=R1w?'قرب R1':'بين المستويات'},
+    ]},
+    {name:'Camarilla Pivot',wtag:'وزن ×1.8',pvt:{H4:r4,H3:r3,H2:r2,H1:r1,PP:PPm,L1:s1,L2:s2,L3:s3,L4:s4},sigs:[
+      {name:'اتجاه vs Camarilla PP',formula:'PP='+f5(PPm),val:C>PPm?1:-1,w:1.8,desc:C>PPm?'فوق PP → صاعد':'تحت PP → هابط'},
+      {name:'H3/L3 — أقوى مستوى',formula:'H3='+f5(r3)+' | L3='+f5(s3),val:cL,w:1.8,desc:cD},
+      {name:'H4/L4 — اختراق',formula:'H4='+f5(r4)+' | L4='+f5(s4),val:cB,w:1.8,desc:C>r4?'اختراق H4 → صعودي':C<s4?'كسر L4 → هبوطي':'لا اختراق'},
+    ]},
+  ];
+  let all=[];groups.forEach(g=>g.sigs.forEach(s=>all.push(s)));
+  let rB=0,rS=0,rN=0,wB=0,wS=0,wT2=0;
+  all.forEach(s=>{if(s.val>0){rB++;wB+=s.w;}else if(s.val<0){rS++;wS+=s.w;}else rN++;wT2+=s.w;});
+  return{groups,rB,rS,rN,wB,wS,wT:wT2,body,upS,loS,rng,TR};
+}
 function calc(){
   const O=parseFloat(document.getElementById('op').value);
   const H=parseFloat(document.getElementById('hi').value);
@@ -459,215 +358,115 @@ function calc(){
   const C=parseFloat(document.getElementById('cl').value);
   const PC=parseFloat(document.getElementById('pc').value);
   const TF=parseInt(document.getElementById('tf').value);
-
-  if([O,H,L,C].some(isNaN)||H<L||H<O||H<C||L>O||L>C){
-    alert('تأكد من البيانات:\n• High لازم يكون أعلى قيمة\n• Low لازم يكون أدنى قيمة');
-    return;
-  }
-
-  const hasPrevC=!isNaN(PC);
-  const range=H-L;
-  const body=Math.abs(C-O);
-  const upSh=H-Math.max(O,C);
-  const loSh=Math.min(O,C)-L;
-  const TR=hasPrevC?Math.max(range,Math.abs(H-PC),Math.abs(L-PC)):range;
-
-  // Classic Pivot
-  const PP_c=(H+L+C)/3;
-  const R1_c=2*PP_c-L, S1_c=2*PP_c-H;
-  const R2_c=PP_c+range, S2_c=PP_c-range;
-
-  // Woodie
-  const PP_w=(H+L+2*C)/4;
-  const R1_w=2*PP_w-L, S1_w=2*PP_w-H;
-  const R2_w=PP_w+range, S2_w=PP_w-range;
-
-  // Camarilla
-  const k=1.1;
-  const R1c=C+(range*k/12), S1c=C-(range*k/12);
-  const R2c=C+(range*k/6),  S2c=C-(range*k/6);
-  const R3c=C+(range*k/4),  S3c=C-(range*k/4);
-  const R4c=C+(range*k/2),  S4c=C-(range*k/2);
-  const PP_cam=(H+L+C)/3;
-
-  // ===== SIGNALS =====
-  let groups=[];
-
-  // G1: Candle (w=1.0)
-  const d1=C>O?1:C<O?-1:0;
-  const bodyRatio=range>0?body/range:0;
-  const closePos=range>0?(C-L)/range:0.5;
-  let shadVal=0, shadDesc='ذيول متوازنة';
-  if(loSh>body*1.8&&upSh<body*0.5){shadVal=1;shadDesc='مطرقة → ارتداد صعودي';}
-  else if(upSh>body*1.8&&loSh<body*0.5){shadVal=-1;shadDesc='شهاب → ارتداد هبوطي';}
-  else if(loSh>upSh*1.5){shadVal=1;shadDesc='ذيل سفلي أطول → ضغط صعودي';}
-  else if(upSh>loSh*1.5){shadVal=-1;shadDesc='ذيل علوي أطول → ضغط هبوطي';}
-  const cpDir=closePos>=0.75?1:closePos<=0.25?-1:0;
-  groups.push({name:'تحليل الشمعة',wtag:'وزن ×1.0',pvt:null,sigs:[
-    {name:'اتجاه الشمعة',formula:'Close − Open = '+(C>O?'+':'')+f5(C-O),val:d1,w:1,desc:d1>0?'إغلاق فوق الافتتاح → صعودي':d1<0?'إغلاق تحت الافتتاح → هبوطي':'دوجي → محايد'},
-    {name:'قوة الجسم',formula:'|C−O| ÷ (H−L) = '+pct(bodyRatio),val:bodyRatio>0.55?d1:0,w:1,desc:bodyRatio>0.7?'جسم قوي جداً ('+pct(bodyRatio)+')':bodyRatio>0.55?'جسم متوسط':'جسم ضعيف / دوجي محتمل'},
-    {name:'تحليل الذيول',formula:'ذيل↓ = '+f5(loSh)+' | ذيل↑ = '+f5(upSh),val:shadVal,w:1,desc:shadDesc},
-    {name:'موضع الإغلاق في النطاق',formula:'(C−L) ÷ (H−L) × 100 = '+pct(closePos),val:cpDir,w:1,desc:'الإغلاق عند '+pct(closePos)+' من النطاق الكامل'},
-  ]});
-
-  // G2: ATR & Momentum (w=1.2)
-  const stochK=range>0?(C-L)/range*100:50;
-  const stDir=stochK<25?1:stochK>75?-1:0;
-  const mom=(C-O)/O*100;
-  const momDir=Math.abs(mom)>0.03?d1:0;
-  const atrDir=TR>0&&body/TR>0.45?d1:0;
-  groups.push({name:'ATR والزخم',wtag:'وزن ×1.2',pvt:null,sigs:[
-    {name:'ATR — قوة الحركة',formula:'Body ÷ TrueRange = '+pct(TR>0?body/TR:0)+(hasPrevC?' (TR حقيقي)':' (Range فقط)'),val:atrDir,w:1.2,desc:body/TR>0.6?'شمعة قوية → تأكيد الاتجاه':body/TR>0.35?'زخم متوسط':'ضعيف / indecision'},
-    {name:'Stochastic من الشمعة',formula:'(C−L) ÷ (H−L) × 100 = '+stochK.toFixed(1),val:stDir,w:1.2,desc:stochK<25?'تشبع بيع ('+stochK.toFixed(1)+') → شراء':stochK>75?'تشبع شراء ('+stochK.toFixed(1)+') → بيع':'محايد ('+stochK.toFixed(1)+')'},
-    {name:'Momentum %',formula:'(C−O) ÷ O × 100 = '+(mom>0?'+':'')+mom.toFixed(4)+'%',val:momDir,w:1.2,desc:'زخم '+(mom>=0?'صعودي':'هبوطي')+': '+mom.toFixed(4)+'%'},
-  ]});
-
-  // G3: Classic Pivot (w=1.8)
-  const cpTrend=C>PP_c?1:C<PP_c?-1:0;
-  const cpProx=C<=S1_c&&C>=S2_c?1:C>=R1_c&&C<=R2_c?-1:C<S2_c?1:C>R2_c?-1:cpTrend;
-  groups.push({name:'Classic Pivot Points',wtag:'وزن ×1.8',pvt:{R2:R2_c,R1:R1_c,PP:PP_c,S1:S1_c,S2:S2_c},sigs:[
-    {name:'اتجاه vs Classic PP',formula:'PP = (H+L+C) ÷ 3 = '+f5(PP_c),val:cpTrend,w:1.8,desc:C>PP_c?'السعر فوق الـ Pivot → صاعد':'السعر تحت الـ Pivot → هابط'},
-    {name:'قرب مستويات S1 / R1',formula:'S1 = '+f5(S1_c)+' | R1 = '+f5(R1_c),val:cpProx,w:1.8,desc:C<=S1_c?'قرب S1 → ارتداد صعودي محتمل':C>=R1_c?'قرب R1 → ارتداد هبوطي محتمل':'بين المستويات'},
-  ]});
-
-  // G4: Woodie (w=1.8)
-  const wTrend=C>PP_w?1:C<PP_w?-1:0;
-  const wProx=C<=S1_w?1:C>=R1_w?-1:wTrend;
-  groups.push({name:'Woodie Pivot Points',wtag:'وزن ×1.8',pvt:{R2:R2_w,R1:R1_w,PP:PP_w,S1:S1_w,S2:S2_w},sigs:[
-    {name:'اتجاه vs Woodie PP',formula:'PP = (H+L+2C) ÷ 4 = '+f5(PP_w),val:wTrend,w:1.8,desc:C>PP_w?'فوق Woodie PP → صاعد':'تحت Woodie PP → هابط'},
-    {name:'قرب S1 / R1 Woodie',formula:'S1 = '+f5(S1_w)+' | R1 = '+f5(R1_w),val:wProx,w:1.8,desc:C<=S1_w?'قرب Woodie S1 → دعم':C>=R1_w?'قرب Woodie R1 → مقاومة':'بين المستويات'},
-  ]});
-
-  // G5: Camarilla (w=1.8)
-  let camLvl=0, camDesc='بين المستويات';
-  if(C>=R3c){camLvl=-1;camDesc='فوق H3 ('+f5(R3c)+') → بيع على مقاومة قوية';}
-  else if(C<=S3c){camLvl=1;camDesc='تحت L3 ('+f5(S3c)+') → شراء على دعم قوي';}
-  else if(C>=R2c){camLvl=-1;camDesc='قرب H2 → ضغط هبوطي';}
-  else if(C<=S2c){camLvl=1;camDesc='قرب L2 → دعم صعودي';}
-  else{camLvl=C>PP_cam?1:-1;camDesc='يتبع الاتجاه العام';}
-  const camBreak=C>R4c?1:C<S4c?-1:0;
-  groups.push({name:'Camarilla Pivot',wtag:'وزن ×1.8',pvt:{H4:R4c,H3:R3c,H2:R2c,H1:R1c,PP:PP_cam,L1:S1c,L2:S2c,L3:S3c,L4:S4c},sigs:[
-    {name:'اتجاه vs Camarilla PP',formula:'PP = (H+L+C) ÷ 3 = '+f5(PP_cam),val:C>PP_cam?1:-1,w:1.8,desc:C>PP_cam?'فوق PP → صاعد':'تحت PP → هابط'},
-    {name:'H3 / L3 — أقوى مستوى',formula:'H3 = '+f5(R3c)+' | L3 = '+f5(S3c),val:camLvl,w:1.8,desc:camDesc},
-    {name:'H4 / L4 — اختراق',formula:'H4 = '+f5(R4c)+' | L4 = '+f5(S4c),val:camBreak,w:1.8,desc:C>R4c?'اختراق H4 → موجة صعودية قوية':C<S4c?'كسر L4 → موجة هبوطية قوية':'لا اختراق'},
-  ]});
-
-  // ===== TALLY =====
-  let allSigs=[];
-  groups.forEach(g=>g.sigs.forEach(s=>allSigs.push(s)));
-
-  let rawBuy=0,rawSell=0,rawNeu=0,wBuy=0,wSell=0,wTotal=0;
-  allSigs.forEach(s=>{
-    if(s.val>0){rawBuy++;wBuy+=s.w;}
-    else if(s.val<0){rawSell++;wSell+=s.w;}
-    else rawNeu++;
-    wTotal+=s.w;
+  if([O,H,L,C].some(isNaN)||H<L||H<O||H<C||L>O||L>C){alert('تأكد: High أعلى قيمة، Low أدنى قيمة');return;}
+  // MTF
+  const mtfR=[];
+  document.querySelectorAll('.mtf-row').forEach(row=>{
+    const tf=parseInt(row.querySelector('.mTF').value);
+    const mo=parseFloat(row.querySelector('.mO').value);
+    const mh=parseFloat(row.querySelector('.mH').value);
+    const ml=parseFloat(row.querySelector('.mL').value);
+    const mc=parseFloat(row.querySelector('.mC').value);
+    if([mo,mh,ml,mc].some(isNaN)||mh<ml)return;
+    const r=qdir(mo,mh,ml,mc);
+    if(r)mtfR.push({tf,label:TFL[tf]||tf+'م',...r});
   });
-  const total=allSigs.length;
-  const net=rawBuy-rawSell;
-  const isBuy=net>0;
-  const rawAgree=Math.max(rawBuy,rawSell)/total;
-  const wAgree=Math.max(wBuy,wSell)/wTotal;
-
-  // ===== NOISE =====
-  const relNoise=isBuy?loSh:upSh;
-  const noiseRatio=body>0?relNoise/body:0;
-  let noiseLevel,noiseClass,noiseMsg,noiseExtra;
-  if(noiseRatio<0.3){noiseLevel='منخفض';noiseClass='low';noiseMsg='شمعة نظيفة — السعر سيبتعد بسرعة عن نقطة الدخول';noiseExtra=0;}
-  else if(noiseRatio<0.7){noiseLevel='متوسط';noiseClass='mid';noiseMsg='ضجيج معقول — السعر محتاج شمعة إضافية للابتعاد';noiseExtra=1;}
-  else if(noiseRatio<1.3){noiseLevel='مرتفع';noiseClass='high';noiseMsg='ضجيج عالي — السعر قد يرجع لنقطة الدخول، زود المدة';noiseExtra=2;}
-  else{noiseLevel='خطر';noiseClass='danger';noiseMsg='ضجيج خطير — خطر الخروج بدون اتجاه واضح، فكر مرتين';noiseExtra=3;}
-
-  // ===== DURATION =====
-  let baseCandles=wAgree>=0.9?3:wAgree>=0.8?2:1;
-  const totalCandles=Math.min(baseCandles+noiseExtra,6);
-  const durationMins=Math.min(totalCandles*TF,TF*6);
-
-  // ===== RENDER =====
-  const col=isBuy?'#4ade80':'#f87171';
-  const accCol=isBuy?'var(--buy)':'var(--sell)';
-
-  // Direction card
-  const dc=document.getElementById('dir-card');
-  const dt=document.getElementById('dir-text');
-  const dd=document.getElementById('dir-dur');
-  if(net>0&&wAgree>=0.65){
-    dc.className='direction-card buy';dt.className='dir-text buy';
-    dt.textContent='▲ CALL (شراء)';dd.textContent=fmtMins(durationMins);
-  } else if(net<0&&wAgree>=0.65){
-    dc.className='direction-card sell';dt.className='dir-text sell';
-    dt.textContent='▼ PUT (بيع)';dd.textContent=fmtMins(durationMins);
-  } else {
-    dc.className='direction-card wait';dt.className='dir-text wait';
-    dt.textContent='— انتظر';dd.textContent='—';
+  const an=fullAn(O,H,L,C,PC);
+  const{groups,rB,rS,rN,wB,wS,wT,body,upS,loS,rng,TR}=an;
+  const tot=rB+rS+rN,net=rB-rS,isBuy=net>0;
+  const rA=Math.max(rB,rS)/tot,wA=Math.max(wB,wS)/wT,mDir=net>0?1:net<0?-1:0;
+  // MTF agree
+  let mBoost=0,mClass='none',mBadge='',mAgree=null;
+  if(mtfR.length>0){
+    const same=mtfR.filter(r=>r.dir===mDir).length;
+    mAgree=same/mtfR.length;
+    if(mAgree===1){mBoost=0.10;mClass='all';mBadge='✅ كل الفريمات متفقة +10%';}
+    else if(mAgree>=0.6){mBoost=0.05;mClass='most';mBadge='⚠️ أغلب الفريمات متفقة +5%';}
+    else{mBoost=-0.05;mClass='conflict';mBadge='❌ الفريمات متعارضة — احذر';}
   }
-
+  const fA=Math.min(0.99,wA+mBoost);
+  // Noise
+  const relN=isBuy?loS:upS,nR=body>0?relN/body:0;
+  let nLv,nCl,nMsg,nEx;
+  if(nR<0.3){nLv='منخفض';nCl='low';nMsg='شمعة نظيفة — السعر سيبتعد بسرعة عن نقطة الدخول';nEx=0;}
+  else if(nR<0.7){nLv='متوسط';nCl='mid';nMsg='ضجيج معقول — محتاج شمعة إضافية للابتعاد';nEx=1;}
+  else if(nR<1.3){nLv='مرتفع';nCl='high';nMsg='ضجيج عالي — السعر قد يرجع لنقطة الدخول، زود المدة';nEx=2;}
+  else{nLv='خطر';nCl='danger';nMsg='ضجيج خطير — فكر مرتين قبل الدخول';nEx=3;}
+  const bC=fA>=0.9?3:fA>=0.8?2:1,tC=Math.min(bC+nEx,6),dur=Math.min(tC*TF,TF*6);
+  const col=isBuy?'#4ade80':'#f87171';
+  // MTF render
+  const ms=document.getElementById('mtf-sum');
+  if(mtfR.length>0){
+    ms.style.display='block';
+    const allC=[{tf:TF,label:TFL[TF]||TF+'م',dir:mDir,agree:rA},...mtfR];
+    document.getElementById('mtf-cards').innerHTML=allC.map(r=>`
+      <div class="mtf-card ${r.dir>0?'buy':r.dir<0?'sell':''}">
+        <div class="mtf-card-tf">${r.label}${r.tf===TF?' ★':''}</div>
+        <div class="mtf-card-dir ${r.dir>0?'buy':r.dir<0?'sell':'neu'}">${r.dir>0?'▲ شراء':r.dir<0?'▼ بيع':'— محايد'}</div>
+        <div class="mtf-card-pct">${Math.round(r.agree*100)}% اتفاق</div>
+      </div>`).join('');
+    const af=document.getElementById('mtf-af');
+    af.style.width=Math.round(mAgree*100)+'%';
+    af.style.background=mClass==='all'?'#4ade80':mClass==='most'?'#f59e0b':'#f87171';
+    document.getElementById('mtf-an').textContent=Math.round(mAgree*100)+'%';
+    const mv=document.getElementById('mtf-vd');mv.className='mtf-vd '+mClass;
+    const same2=mtfR.filter(r=>r.dir===mDir).length;
+    mv.textContent=mClass==='all'?`✅ كل الفريمات (${mtfR.length}/${mtfR.length}) في نفس الاتجاه — إشارة ممتازة`:
+      mClass==='most'?`⚠️ ${same2} من ${mtfR.length} فريمات متفقة — اتجاه جيد`:
+      `❌ ${same2} من ${mtfR.length} فريمات متفقة — تعارض، انتبه`;
+  } else ms.style.display='none';
+  // Direction card
+  const dc=document.getElementById('dc'),dt=document.getElementById('dtext'),dd=document.getElementById('ddur'),db=document.getElementById('dbadge');
+  if(net>0&&wA>=0.65){dc.className='dcard buy';dt.className='dtext buy';dt.textContent='▲ CALL (شراء)';dd.textContent=fmt(dur);}
+  else if(net<0&&wA>=0.65){dc.className='dcard sell';dt.className='dtext sell';dt.textContent='▼ PUT (بيع)';dd.textContent=fmt(dur);}
+  else{dc.className='dcard wait';dt.className='dtext wait';dt.textContent='— انتظر';dd.textContent='—';}
+  db.className='dbadge '+(mtfR.length>0?mClass:'none');
+  if(mtfR.length>0)db.textContent=mBadge;
   // Metrics
-  document.getElementById('m-wacc').textContent=Math.round(wAgree*100)+'%';
-  document.getElementById('m-candles').textContent=totalCandles+' شموع';
-  document.getElementById('m-candles-sub').textContent=baseCandles+' إشارة + '+noiseExtra+' ضجيج';
-  document.getElementById('m-noise').textContent=noiseLevel;
-  document.getElementById('m-noise-sub').textContent='نسبة '+Math.round(noiseRatio*100)+'% من الجسم';
-
-  // Count pills
-  document.getElementById('c-buy').textContent=rawBuy;
-  document.getElementById('c-sell').textContent=rawSell;
-  document.getElementById('c-neu').textContent=rawNeu;
-
-  // Score bars
-  const rawPct=Math.round(rawAgree*100);
-  const wPct=Math.round(wAgree*100);
-  document.getElementById('sb-raw').style.cssText='width:'+rawPct+'%;background:'+col;
-  document.getElementById('sb-w').style.cssText='width:'+wPct+'%;background:'+col;
-  document.getElementById('sn-raw').textContent=rawPct+'%';
-  document.getElementById('sn-w').textContent=wPct+'%';
-
+  document.getElementById('mw').textContent=Math.round(fA*100)+'%';
+  document.getElementById('mws').textContent=mtfR.length>0?'بعد تأكيد MTF':'Pivots أثقل وزناً';
+  document.getElementById('mc').textContent=tC+' شموع';
+  document.getElementById('mcs').textContent=bC+' إشارة + '+nEx+' ضجيج';
+  document.getElementById('mn').textContent=nLv;
+  document.getElementById('mns').textContent='نسبة '+Math.round(nR*100)+'% من الجسم';
+  document.getElementById('cb').textContent=rB;
+  document.getElementById('cs').textContent=rS;
+  document.getElementById('cn').textContent=rN;
+  const rP=Math.round(rA*100),wP=Math.round(wA*100),fP=Math.round(fA*100);
+  document.getElementById('sr').style.cssText='width:'+rP+'%;background:'+col;
+  document.getElementById('sw').style.cssText='width:'+wP+'%;background:'+col;
+  document.getElementById('snr').textContent=rP+'%';
+  document.getElementById('snw').textContent=wP+'%';
+  const msr=document.getElementById('mtf-srow');
+  if(mtfR.length>0){
+    msr.style.display='flex';
+    document.getElementById('sm').style.cssText='width:'+fP+'%;background:'+(mClass==='all'?col:mClass==='most'?'#f59e0b':'#f87171');
+    document.getElementById('snm').textContent=fP+'%';
+  } else msr.style.display='none';
   // Noise bars
-  const maxV=range||1;
-  document.getElementById('nb-body').style.width=pct(body/maxV);
-  document.getElementById('nb-noise').style.width=pct(relNoise/maxV);
-  document.getElementById('nv-body').textContent=f5(body);
-  document.getElementById('nv-noise').textContent=f5(relNoise);
-  document.getElementById('nv-range').textContent=f5(range);
-  document.getElementById('noise-dir-lbl').textContent=isBuy?'ضجيج ↓ (للشراء)':'ضجيج ↑ (للبيع)';
-  const nv=document.getElementById('noise-verdict');
-  nv.className='noise-verdict '+noiseClass;
-  nv.textContent='🔍 '+noiseLevel+' — '+noiseMsg;
-
+  const mv2=rng||1;
+  document.getElementById('nbb').style.width=pct(body/mv2);
+  document.getElementById('nbn2').style.width=pct(relN/mv2);
+  document.getElementById('nvb').textContent=f5(body);
+  document.getElementById('nvn').textContent=f5(relN);
+  document.getElementById('nvr').textContent=f5(rng);
+  document.getElementById('ndl').textContent=isBuy?'ضجيج ↓ (شراء)':'ضجيج ↑ (بيع)';
+  const nvd=document.getElementById('nvd');nvd.className='nvd '+nCl;
+  nvd.textContent='🔍 '+nLv+' — '+nMsg;
   // Groups
-  const gDiv=document.getElementById('groups');
-  gDiv.innerHTML=groups.map(g=>{
-    const gB=g.sigs.filter(s=>s.val>0).length;
-    const gS=g.sigs.filter(s=>s.val<0).length;
-    const gDir=gB>gS?1:gS>gB?-1:0;
-    let pvtHtml='';
-    if(g.pvt){
-      pvtHtml=`<div class="pvt-grid">${Object.keys(g.pvt).map(k=>{
-        const isR=k.startsWith('R')||['H1','H2','H3','H4'].includes(k);
-        const isS=k.startsWith('S')||['L1','L2','L3','L4'].includes(k);
-        return`<div class="pvt-cell"><div class="pvt-lbl">${k}</div><div class="pvt-val ${isR?'r':isS?'s':'p'}">${f5(g.pvt[k])}</div></div>`;
-      }).join('')}</div>`;
-    }
-    return`<div class="grp">
-      <div class="grp-head">
-        <div class="grp-name">${g.name}</div>
-        <div class="grp-right">
-          <div class="weight-tag">${g.wtag}</div>
-          <div class="grp-badge ${bcls(gDir)}">${blbl(gDir)}</div>
-        </div>
-      </div>
-      ${g.sigs.map(s=>`<div class="eq-row">
-        <div class="eq-icon" style="color:${s.val>0?'var(--buy)':s.val<0?'var(--sell)':'var(--text-muted)'}">${icon(s.val)}</div>
-        <div class="eq-body">
-          <div class="eq-name">${s.name}</div>
-          <div class="eq-formula">${s.formula}</div>
-          <div class="eq-val ${ecls(s.val)}">${s.desc}</div>
-        </div>
-      </div>`).join('')}
-      ${pvtHtml}
-    </div>`;
+  document.getElementById('grps').innerHTML=groups.map(g=>{
+    const gB=g.sigs.filter(s=>s.val>0).length,gS=g.sigs.filter(s=>s.val<0).length;
+    const gD=gB>gS?1:gS>gB?-1:0;
+    let pv='';
+    if(g.pvt){pv=`<div class="pvg">${Object.keys(g.pvt).map(k=>{
+      const ir=k.startsWith('R')||['H1','H2','H3','H4'].includes(k);
+      const is=k.startsWith('S')||['L1','L2','L3','L4'].includes(k);
+      return`<div class="pvc"><div class="pvl">${k}</div><div class="pvv ${ir?'r':is?'s':'p'}">${f5(g.pvt[k])}</div></div>`;
+    }).join('')}</div>`;}
+    return`<div class="grp"><div class="ghd"><div class="gnm">${g.name}</div><div class="grt"><div class="wtag">${g.wtag}</div><div class="gbdg ${bc(gD)}">${bl(gD)}</div></div></div>
+    ${g.sigs.map(s=>`<div class="eqr"><div class="eqi" style="color:${s.val>0?'var(--buy)':s.val<0?'var(--sell)':'var(--muted)'}">${ico(s.val)}</div>
+    <div class="eqb"><div class="eqn">${s.name}</div><div class="eqf">${s.formula}</div><div class="eqv ${ec(s.val)}">${s.desc}</div></div></div>`).join('')}${pv}</div>`;
   }).join('');
-
   document.getElementById('result').style.display='block';
   document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
 }
