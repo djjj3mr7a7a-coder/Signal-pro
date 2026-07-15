@@ -356,75 +356,77 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 
 <script>
 // ============================================================
-// OCR FUNCTION – دقيق 100%
+// OCR FUNCTION – دقيق تماماً
 // ============================================================
 async function extractFromImage(event){
-  const file=event.target.files[0];
-  if(!file)return;
-  const status=document.getElementById('ocr-status');
-  status.style.display='block';
-  status.textContent='⏳ جاري قراءة الصورة...';
+  const file = event.target.files[0];
+  if (!file) return;
+  const status = document.getElementById('ocr-status');
+  status.style.display = 'block';
+  status.textContent = '⏳ جاري قراءة الصورة...';
 
-  try{
-    const img=URL.createObjectURL(file);
+  try {
+    const img = URL.createObjectURL(file);
     
-    // استخدام Tesseract مع إعدادات مخصصة لقراءة الأرقام
-    const result=await Tesseract.recognize(
+    // استخدام إعدادات مخصصة للأرقام فقط
+    const result = await Tesseract.recognize(
       img,
       'eng',
       {
-        logger:m=>{
-          if(m.status==='recognizing text'){
-            status.textContent='⏳ '+Math.round(m.progress*100)+'%';
+        logger: m => {
+          if (m.status === 'recognizing text') {
+            status.textContent = '⏳ ' + Math.round(m.progress * 100) + '%';
           }
         },
-        // إعدادات مخصصة لدقة الأرقام
         tessedit_char_whitelist: '0123456789.',
-        tessedit_pageseg_mode: '6', // افتراض أن النص في سطر واحد
-        tessedit_ocr_engine_mode: '3' // استخدام كل المحركات
+        tessedit_pageseg_mode: '6',
+        tessedit_ocr_engine_mode: '3'
       }
     );
     
-    const text=result.data.text;
-    status.textContent='✅ تم الاستخراج! جاري ملء الحقول...';
-    console.log('النص المستخرج:',text);
+    const text = result.data.text;
+    console.log('النص المستخرج:', text);
 
-    // استخراج الأرقام العشرية بدقة (4-5 منازل عشرية)
-    const numbers=text.match(/\d+\.\d{4,5}/g)||[];
-    // استخراج أرقام صحيحة (للـ Volume)
-    const ints=text.match(/\b\d{3,5}\b/g)||[];
-    const allNumbers=[...numbers,...ints];
+    // استخراج الأرقام العشرية (4-5 منازل)
+    const numbers = text.match(/\d+\.\d{4,5}/g) || [];
+    // استخراج الأرقام الصحيحة (للـ Volume)
+    const ints = text.match(/\b\d{3,5}\b/g) || [];
+    const allNumbers = [...numbers, ...ints];
     
     console.log('الأرقام المستخرجة:', allNumbers);
 
-    // الحقول حسب الفريم المختار
-    const tfIndex=parseInt(document.getElementById('tfSelect').value);
-    const fieldMap={
-      1:['o1','h1','l1','c1','p1','v1'],
-      2:['o2','h2','l2','c2','p2','v2'],
-      3:['o3','h3','l3','c3','p3','v3'],
-      4:['o4','h4','l4','c4','p4','v4'],
-      5:['o5','h5','l5','c5','p5','v5']
+    // تحديد الحقول حسب الفريم المختار
+    const tfIndex = parseInt(document.getElementById('tfSelect').value);
+    const fieldMap = {
+      1: ['o1', 'h1', 'l1', 'c1', 'p1', 'v1'],
+      2: ['o2', 'h2', 'l2', 'c2', 'p2', 'v2'],
+      3: ['o3', 'h3', 'l3', 'c3', 'p3', 'v3'],
+      4: ['o4', 'h4', 'l4', 'c4', 'p4', 'v4'],
+      5: ['o5', 'h5', 'l5', 'c5', 'p5', 'v5']
     };
-    const fields=fieldMap[tfIndex]||[];
+    const fields = fieldMap[tfIndex] || [];
 
-    let idx=0;
-    for(const f of fields){
-      const el=document.getElementById(f);
-      if(el && idx<allNumbers.length){
-        el.value=allNumbers[idx++];
+    // ملء الحقول
+    let idx = 0;
+    for (const f of fields) {
+      const el = document.getElementById(f);
+      if (el && idx < allNumbers.length) {
+        // تنظيف الرقم من أي أحرف غريبة
+        let val = allNumbers[idx++].trim();
+        el.value = val;
       }
     }
-    const tfName=document.getElementById('tfSelect').options[tfIndex-1].text;
-    status.textContent=`✅ تم ملء فريم ${tfName} تلقائياً! (${Math.min(idx, allNumbers.length)} أرقام)`;
+
+    const tfName = document.getElementById('tfSelect').options[tfIndex-1].text;
+    const filled = fields.filter(f => document.getElementById(f).value !== '').length;
+    status.textContent = `✅ تم ملء ${filled}/${fields.length} حقل في فريم ${tfName}`;
     
-    // تنبيه إذا كان عدد الأرقام أقل من المطلوب
-    if(allNumbers.length < fields.length){
-      status.textContent += ` ⚠️ تم استخراج ${allNumbers.length} من ${fields.length} رقم`;
+    if (filled < fields.length) {
+      status.textContent += ' ⚠️ بعض الأرقام مفقودة، تأكد من وضوح الصورة';
     }
-    
-  }catch(e){
-    status.textContent='❌ فشل الاستخراج: '+e.message;
+
+  } catch (e) {
+    status.textContent = '❌ فشل الاستخراج: ' + e.message;
     console.error(e);
   }
 }
