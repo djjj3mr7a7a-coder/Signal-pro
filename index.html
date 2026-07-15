@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>محرك إشارات OTC – OCR دقيق</title>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<title>محرك إشارات OTC الأسطوري</title>
 <style>
 :root{--bg:#0e1117;--sf:#161b26;--sf2:#1e2535;--bd:#2a3247;--bds:#374160;--tx:#e8eaf0;--sc:#8b93a8;--mt:#5a6380;--buy:#4ade80;--buyb:#0d2818;--buybr:#166534;--sel:#f87171;--selb:#2b0f0f;--selbr:#7f1d1d;--ac:#3b82f6;--acd:#1e3a5f;--wn:#f59e0b;--r:10px;--fn:'Segoe UI',system-ui,sans-serif;--mo:'SF Mono','Fira Code',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -15,13 +14,6 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 .hbdg{margin-right:auto;font-size:10px;padding:3px 10px;border-radius:20px;background:var(--acd);color:var(--ac);border:.5px solid var(--ac);font-weight:500}
 .main{max-width:740px;margin:0 auto;padding:1.25rem 1rem 3rem}
 .slbl{font-size:10px;font-weight:600;color:var(--mt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
-.upload-area{background:var(--sf);border:2px dashed var(--ac);border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1rem;cursor:pointer;transition:all .3s}
-.upload-area:hover{border-color:var(--buy);background:var(--buyb)}
-.upload-area input{display:none}
-.upload-label{font-size:14px;color:var(--mt);cursor:pointer}
-.upload-label span{color:var(--ac);font-weight:600}
-.upload-label select{background:var(--sf2);color:var(--tx);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;margin-top:6px;cursor:pointer}
-#ocr-status{font-size:12px;color:var(--mt);margin-top:8px;display:none}
 .tf-block{background:var(--sf);border:.5px solid var(--bd);border-radius:12px;margin-bottom:8px;overflow:hidden}
 .tf-head{display:flex;align-items:center;gap:10px;padding:.65rem .9rem;background:var(--sf2);border-bottom:.5px solid var(--bd)}
 .tf-num{font-size:11px;font-weight:600;color:var(--mt);min-width:20px}
@@ -146,28 +138,11 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 </head>
 <body>
 <div class="hdr">
-  <div class="hico">📊</div>
-  <div><div class="htit">محرك إشارات OTC – OCR دقيق</div><div class="hsub">5 فريمات · 25 معادلة · رفع صورة</div></div>
-  <div class="hbdg">⚡ ULTIMATE</div>
+  <div class="hico">??</div>
+  <div><div class="htit">محرك إشارات OTC الأسطوري</div><div class="hsub">5 فريمات · 25 معادلة · AI · إدارة مخاطرة · أنماط شموع · تحليل زمني</div></div>
+  <div class="hbdg">? ULTIMATE</div>
 </div>
 <div class="main">
-
-<!-- ===== OCR UPLOAD ===== -->
-<div class="upload-area" onclick="document.getElementById('screenshot').click()">
-  <div class="upload-label">
-    📸 <span>ارفع سكرين شوت</span> للفريم<br>
-    <small style="color:var(--mt)">(اختار الفريم أولاً)</small><br>
-    <select id="tfSelect" style="background:var(--sf2);color:var(--tx);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;margin-top:6px;cursor:pointer;" onclick="event.stopPropagation();">
-      <option value="1">M5</option>
-      <option value="2">M15</option>
-      <option value="3">M30</option>
-      <option value="4">H1</option>
-      <option value="5">H4</option>
-    </select>
-  </div>
-  <input type="file" id="screenshot" accept="image/*" onchange="extractFromImage(event)"/>
-  <div id="ocr-status">⏳ جاري استخراج الأرقام...</div>
-</div>
 
 <div class="slbl">فريمات الدخول (5 فريمات)</div>
 
@@ -239,7 +214,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 <!-- Confirm TFs -->
 <div class="slbl">فريمات التأكيد</div>
 <div class="conf-block">
-  <div class="conf-head"><span style="font-size:14px">✅</span><div class="conf-lbl">تأكيد H1</div></div>
+  <div class="conf-head"><span style="font-size:14px">?</span><div class="conf-lbl">تأكيد H1</div></div>
   <div class="conf-fields">
     <div class="fd"><label>Open</label><input type="number" id="co1" step="0.00001"/></div>
     <div class="fd"><label>High</label><input type="number" id="ch1" step="0.00001"/></div>
@@ -249,7 +224,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
   </div>
 </div>
 <div class="conf-block">
-  <div class="conf-head"><span style="font-size:14px">✅</span><div class="conf-lbl">تأكيد H4</div></div>
+  <div class="conf-head"><span style="font-size:14px">?</span><div class="conf-lbl">تأكيد H4</div></div>
   <div class="conf-fields">
     <div class="fd"><label>Open</label><input type="number" id="co2" step="0.00001"/></div>
     <div class="fd"><label>High</label><input type="number" id="ch2" step="0.00001"/></div>
@@ -262,7 +237,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 <!-- Capital Management -->
 <div class="slbl">إدارة رأس المال</div>
 <div class="tf-block" style="border-color:var(--ac);">
-  <div class="tf-head" style="background:var(--acd);"><span style="font-size:14px">💰</span><div class="tf-label" style="color:var(--ac);">إدارة المخاطرة</div></div>
+  <div class="tf-head" style="background:var(--acd);"><span style="font-size:14px">??</span><div class="tf-label" style="color:var(--ac);">إدارة المخاطرة</div></div>
   <div class="tf-fields" style="grid-template-columns:repeat(3,1fr);">
     <div class="fd"><label>رأس المال ($)</label><input type="number" id="capital" value="200" step="1"/></div>
     <div class="fd"><label>نسبة المخاطرة (%)</label><input type="number" id="riskPct" value="2" step="0.5"/></div>
@@ -270,7 +245,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
   </div>
 </div>
 
-<button class="btn" onclick="calc()">🚀 احسب الإشارة الكاملة</button>
+<button class="btn" onclick="calc()">?? احسب الإشارة الكاملة</button>
 
 <!-- ===== RESULT ===== -->
 <div class="result" id="result">
@@ -285,14 +260,14 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
   </div>
 
   <!-- Patterns -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">🕯️ أنماط الشموع</div><div class="sep-line"></div></div>
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">??? أنماط الشموع</div><div class="sep-line"></div></div>
   <div class="nbox" id="patterns-box">
     <div class="nt">أنماط الشموع المكتشفة</div>
     <div class="pattern-grid" id="pattern-grid"></div>
   </div>
 
   <!-- Time Analysis -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">⏰ التحليل الزمني</div><div class="sep-line"></div></div>
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">? التحليل الزمني</div><div class="sep-line"></div></div>
   <div class="nbox" id="time-box">
     <div class="nt">توقيت الانعكاس المتوقع</div>
     <div class="time-analysis" id="time-analysis"></div>
@@ -314,7 +289,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
   </div>
 
   <!-- Risk Management -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">💰 إدارة المخاطرة</div><div class="sep-line"></div></div>
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">?? إدارة المخاطرة</div><div class="sep-line"></div></div>
   <div class="risk-box">
     <div class="nt">تفاصيل إدارة المخاطرة</div>
     <div class="risk-grid" id="risk-grid"></div>
@@ -322,23 +297,23 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 
   <!-- Alerts -->
   <div class="alert-box" id="alert-box">
-    <div class="alert-title">⚠️ تنبيهات</div>
+    <div class="alert-title">?? تنبيهات</div>
     <div class="alert-text" id="alert-text">لا توجد تنبيهات</div>
   </div>
 
   <!-- Metrics -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">📊 المقاييس</div><div class="sep-line"></div></div>
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">?? المقاييس</div><div class="sep-line"></div></div>
   <div class="mets">
-    <div class="met hi"><div class="met-l">🎯 دقة الإشارة</div><div class="met-v" id="macc"></div><div class="met-s" id="maccs"></div></div>
-    <div class="met"><div class="met-l">📊 اتفاق الدخول</div><div class="met-v" id="ment"></div><div class="met-s">من 5 فريمات</div></div>
-    <div class="met"><div class="met-l">✅ تأكيد MTF</div><div class="met-v" id="mconf"></div><div class="met-s">من 2 فريمات</div></div>
-    <div class="met"><div class="met-l">📈 RSI</div><div class="met-v" id="mrsi"></div><div class="met-s" id="mrsis"></div></div>
-    <div class="met"><div class="met-l">📊 MACD</div><div class="met-v" id="mmacd"></div><div class="met-s" id="mmacds"></div></div>
+    <div class="met hi"><div class="met-l">?? دقة الإشارة</div><div class="met-v" id="macc"></div><div class="met-s" id="maccs"></div></div>
+    <div class="met"><div class="met-l">?? اتفاق الدخول</div><div class="met-v" id="ment"></div><div class="met-s">من 5 فريمات</div></div>
+    <div class="met"><div class="met-l">? تأكيد MTF</div><div class="met-v" id="mconf"></div><div class="met-s">من 2 فريمات</div></div>
+    <div class="met"><div class="met-l">?? RSI</div><div class="met-v" id="mrsi"></div><div class="met-s" id="mrsis"></div></div>
+    <div class="met"><div class="met-l">?? MACD</div><div class="met-v" id="mmacd"></div><div class="met-s" id="mmacds"></div></div>
   </div>
 
   <!-- Noise -->
   <div class="nbox">
-    <div class="nt">🔊 تحليل الضجيج</div>
+    <div class="nt">?? تحليل الضجيج</div>
     <div class="nbr"><div class="nbl">جسم الشمعة</div><div class="nbt"><div class="nbf" id="nb-body" style="background:var(--ac)"></div></div><div class="nbn" id="nv-body"></div></div>
     <div class="nbr"><div class="nbl" id="ndirl">ضجيج الاتجاه</div><div class="nbt"><div class="nbf" id="nb-noise" style="background:var(--wn)"></div></div><div class="nbn" id="nv-noise"></div></div>
     <div class="nbr"><div class="nbl">النطاق الكامل</div><div class="nbt"><div class="nbf" style="background:var(--bds);width:100%"></div></div><div class="nbn" id="nv-range"></div></div>
@@ -352,91 +327,12 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 
 </div>
 </div>
-<div class="ftr">محرك إشارات OTC · 5 فريمات · 25 معادلة · OCR · أنماط شموع · تحليل زمني · إدارة مخاطرة</div>
+<div class="ftr">محرك إشارات OTC الأسطوري · 5 فريمات · 25 معادلة · أنماط شموع · تحليل زمني · إدارة مخاطرة</div>
 
 <script>
-// ============================================================
-// OCR FUNCTION – دقيق تماماً
-// ============================================================
-async function extractFromImage(event){
-  const file = event.target.files[0];
-  if (!file) return;
-  const status = document.getElementById('ocr-status');
-  status.style.display = 'block';
-  status.textContent = '⏳ جاري قراءة الصورة...';
-
-  try {
-    const img = URL.createObjectURL(file);
-    
-    // استخدام إعدادات مخصصة للأرقام فقط
-    const result = await Tesseract.recognize(
-      img,
-      'eng',
-      {
-        logger: m => {
-          if (m.status === 'recognizing text') {
-            status.textContent = '⏳ ' + Math.round(m.progress * 100) + '%';
-          }
-        },
-        tessedit_char_whitelist: '0123456789.',
-        tessedit_pageseg_mode: '6',
-        tessedit_ocr_engine_mode: '3'
-      }
-    );
-    
-    const text = result.data.text;
-    console.log('النص المستخرج:', text);
-
-    // استخراج الأرقام العشرية (4-5 منازل)
-    const numbers = text.match(/\d+\.\d{4,5}/g) || [];
-    // استخراج الأرقام الصحيحة (للـ Volume)
-    const ints = text.match(/\b\d{3,5}\b/g) || [];
-    const allNumbers = [...numbers, ...ints];
-    
-    console.log('الأرقام المستخرجة:', allNumbers);
-
-    // تحديد الحقول حسب الفريم المختار
-    const tfIndex = parseInt(document.getElementById('tfSelect').value);
-    const fieldMap = {
-      1: ['o1', 'h1', 'l1', 'c1', 'p1', 'v1'],
-      2: ['o2', 'h2', 'l2', 'c2', 'p2', 'v2'],
-      3: ['o3', 'h3', 'l3', 'c3', 'p3', 'v3'],
-      4: ['o4', 'h4', 'l4', 'c4', 'p4', 'v4'],
-      5: ['o5', 'h5', 'l5', 'c5', 'p5', 'v5']
-    };
-    const fields = fieldMap[tfIndex] || [];
-
-    // ملء الحقول
-    let idx = 0;
-    for (const f of fields) {
-      const el = document.getElementById(f);
-      if (el && idx < allNumbers.length) {
-        // تنظيف الرقم من أي أحرف غريبة
-        let val = allNumbers[idx++].trim();
-        el.value = val;
-      }
-    }
-
-    const tfName = document.getElementById('tfSelect').options[tfIndex-1].text;
-    const filled = fields.filter(f => document.getElementById(f).value !== '').length;
-    status.textContent = `✅ تم ملء ${filled}/${fields.length} حقل في فريم ${tfName}`;
-    
-    if (filled < fields.length) {
-      status.textContent += ' ⚠️ بعض الأرقام مفقودة، تأكد من وضوح الصورة';
-    }
-
-  } catch (e) {
-    status.textContent = '❌ فشل الاستخراج: ' + e.message;
-    console.error(e);
-  }
-}
-
-// ============================================================
-// MAIN CALCULATION
-// ============================================================
 function f5(n){return parseFloat(n).toFixed(5)}
 function pct(n){return(n*100).toFixed(1)+'%'}
-function ico(v){return v>0?'▲':v<0?'▼':'—'}
+function ico(v){return v>0?'?':v<0?'?':'—'}
 function ec(v){return v>0?'up':v<0?'down':'neu'}
 function bc(v){return v>0?'buy':v<0?'sell':'neu'}
 function bl(v){return v>0?'شراء':v<0?'بيع':'محايد'}
@@ -446,10 +342,15 @@ function detectPatterns(O,H,L,C){
   const body=Math.abs(C-O),range=H-L,bull=C>O;
   const up=H-Math.max(O,C),dn=Math.min(O,C)-L;
   const patterns=[],pInfo=[];
+  // Doji
   if(range>0 && body/range<0.1){patterns.push('Doji');pInfo.push({name:'Doji',type:'neutral'});}
+  // Hammer
   if(dn>body*2.5&&up<body*0.5){patterns.push(bull?'Hammer':'Hanging Man');pInfo.push({name:bull?'Hammer':'Hanging Man',type:bull?'bullish':'bearish'});}
+  // Shooting Star
   if(up>body*2.5&&dn<body*0.5){patterns.push(bull?'Shooting Star':'Inv Hammer');pInfo.push({name:bull?'Shooting Star':'Inv Hammer',type:bull?'bearish':'bullish'});}
+  // Marubozu
   if(body>range*0.75){patterns.push(bull?'Marubozu Bull':'Marubozu Bear');pInfo.push({name:bull?'Marubozu Bull':'Marubozu Bear',type:bull?'bullish':'bearish'});}
+  // Engulfing
   if(C>O){patterns.push('Bullish Engulfing');pInfo.push({name:'Bullish Engulfing',type:'bullish'});}
   if(C<O){patterns.push('Bearish Engulfing');pInfo.push({name:'Bearish Engulfing',type:'bearish'});}
   return{patterns,pInfo};
@@ -480,10 +381,10 @@ function fullAn(O,H,L,C,PC,V){
   const r3=C+(rng*k/4),s3=C-(rng*k/4),r4=C+(rng*k/2),s4=C-(rng*k/2),PPm=(H+L+C)/3;
   const d1=C>O?1:C<O?-1:0,bR=rng>0?body/rng:0,cP=rng>0?(C-L)/rng:0.5;
   let sv=0,sd='ذيول متوازنة';
-  if(loS>body*1.8&&upS<body*0.5){sv=1;sd='مطرقة ↕ ارتداد صعودي';}
-  else if(upS>body*1.8&&loS<body*0.5){sv=-1;sd='شهاب ↕ ارتداد هبوطي';}
-  else if(loS>upS*1.5){sv=1;sd='ذيل سفلي أطول → صعودي';}
-  else if(upS>loS*1.5){sv=-1;sd='ذيل علوي أطول → هبوطي';}
+  if(loS>body*1.8&&upS<body*0.5){sv=1;sd='مطرقة ? ارتداد صعودي';}
+  else if(upS>body*1.8&&loS<body*0.5){sv=-1;sd='شهاب ? ارتداد هبوطي';}
+  else if(loS>upS*1.5){sv=1;sd='ذيل سفلي أطول ? صعودي';}
+  else if(upS>loS*1.5){sv=-1;sd='ذيل علوي أطول ? هبوطي';}
   const cpD=cP>=0.75?1:cP<=0.25?-1:0;
   const stK=rng>0?(C-L)/rng*100:50,stD=stK<25?1:stK>75?-1:0;
   const mom=(C-O)/O*100,momD=Math.abs(mom)>0.03?d1:0;
@@ -492,51 +393,53 @@ function fullAn(O,H,L,C,PC,V){
   const cpP=C<=S1c&&C>=S2c?1:C>=R1c&&C<=R2c?-1:C<S2c?1:C>R2c?-1:cpT;
   const wT=C>PPw?1:C<PPw?-1:0,wP=C<=S1w?1:C>=R1w?-1:wT;
   let cL=0,cD='بين المستويات';
-  if(C>=r3){cL=-1;cD='فوق H3 → بيع على مقاومة';}
-  else if(C<=s3){cL=1;cD='تحت L3 → شراء على دعم';}
-  else if(C>=r2){cL=-1;cD='قرب H2 → ضغط هبوطي';}
-  else if(C<=s2){cL=1;cD='قرب L2 → دعم صعودي';}
+  if(C>=r3){cL=-1;cD='فوق H3 ? بيع على مقاومة';}
+  else if(C<=s3){cL=1;cD='تحت L3 ? شراء على دعم';}
+  else if(C>=r2){cL=-1;cD='قرب H2 ? ضغط هبوطي';}
+  else if(C<=s2){cL=1;cD='قرب L2 ? دعم صعودي';}
   else{cL=C>PPm?1:-1;cD='يتبع الاتجاه العام';}
   const cB=C>r4?1:C<s4?-1:0;
+  // Volume
   const vol=V||1;
   const groups=[
     {name:'تحليل الشمعة',wtag:'×1.0',sigs:[
       {name:'اتجاه الشمعة',formula:'C-O = '+(C>O?'+':'')+f5(C-O),val:d1,w:1,desc:d1>0?'صعودي':d1<0?'هبوطي':'دوجي'},
       {name:'قوة الجسم',formula:'|C-O|÷Range = '+pct(bR),val:bR>0.55?d1:0,w:1,desc:bR>0.7?'قوي جداً':bR>0.55?'متوسط':'ضعيف/دوجي'},
-      {name:'تحليل الذيول',formula:'↓'+f5(loS)+' ↑'+f5(upS),val:sv,w:1,desc:sd},
+      {name:'تحليل الذيول',formula:'?'+f5(loS)+' ?'+f5(upS),val:sv,w:1,desc:sd},
       {name:'موضع الإغلاق',formula:'(C-L)÷Range = '+pct(cP),val:cpD,w:1,desc:pct(cP)+' من النطاق'},
     ]},
     {name:'ATR والزخم',wtag:'×1.2',sigs:[
-      {name:'ATR — قوة الحركة',formula:'Body÷TR = '+pct(TR>0?body/TR:0),val:aD,w:1.2,desc:body/TR>0.6?'قوي ✅ تأكيد':body/TR>0.35?'متوسط':'ضعيف'},
-      {name:'Stochastic',formula:'(C-L)÷Range×100 = '+stK.toFixed(1),val:stD,w:1.2,desc:stK<25?'تشبع بيع → شراء':stK>75?'تشبع شراء → بيع':'محايد'},
+      {name:'ATR — قوة الحركة',formula:'Body÷TR = '+pct(TR>0?body/TR:0),val:aD,w:1.2,desc:body/TR>0.6?'قوي ? تأكيد':body/TR>0.35?'متوسط':'ضعيف'},
+      {name:'Stochastic',formula:'(C-L)÷Range×100 = '+stK.toFixed(1),val:stD,w:1.2,desc:stK<25?'تشبع بيع ? شراء':stK>75?'تشبع شراء ? بيع':'محايد'},
       {name:'Momentum %',formula:'(C-O)÷O×100 = '+(mom>0?'+':'')+mom.toFixed(4)+'%',val:momD,w:1.2,desc:'زخم '+(mom>=0?'صعودي':'هبوطي')},
-      {name:'Volume',formula:'V='+vol,val:vol>50?1:vol<30?-1:0,w:1,desc:vol>50?'حجم مرتفع → تأكيد':vol<30?'حجم منخفض → ضعف':'متوسط'},
+      {name:'Volume',formula:'V='+vol,val:vol>50?1:vol<30?-1:0,w:1,desc:vol>50?'حجم مرتفع ? تأكيد':vol<30?'حجم منخفض ? ضعف':'متوسط'},
     ]},
     {name:'Classic Pivot',wtag:'×1.8',pvt:{R2:R2c,R1:R1c,PP:PPc,S1:S1c,S2:S2c},sigs:[
-      {name:'اتجاه vs Classic PP',formula:'PP='+f5(PPc),val:cpT,w:1.8,desc:C>PPc?'فوق PP → صاعد':'تحت PP → هابط'},
-      {name:'قرب S1/R1',formula:'S1='+f5(S1c)+' R1='+f5(R1c),val:cpP,w:1.8,desc:C<=S1c?'قرب S1 → صعودي':C>=R1c?'قرب R1 → هبوطي':'بين المستويات'},
+      {name:'اتجاه vs Classic PP',formula:'PP='+f5(PPc),val:cpT,w:1.8,desc:C>PPc?'فوق PP ? صاعد':'تحت PP ? هابط'},
+      {name:'قرب S1/R1',formula:'S1='+f5(S1c)+' R1='+f5(R1c),val:cpP,w:1.8,desc:C<=S1c?'قرب S1 ? صعودي':C>=R1c?'قرب R1 ? هبوطي':'بين المستويات'},
     ]},
     {name:'Woodie Pivot',wtag:'×1.8',pvt:{R2:R2w,R1:R1w,PP:PPw,S1:S1w,S2:S2w},sigs:[
-      {name:'اتجاه vs Woodie PP',formula:'PP=(H+L+2C)÷4 = '+f5(PPw),val:wT,w:1.8,desc:C>PPw?'فوق PP → صاعد':'تحت PP → هابط'},
+      {name:'اتجاه vs Woodie PP',formula:'PP=(H+L+2C)÷4 = '+f5(PPw),val:wT,w:1.8,desc:C>PPw?'فوق PP ? صاعد':'تحت PP ? هابط'},
       {name:'قرب S1/R1 Woodie',formula:'S1='+f5(S1w)+' R1='+f5(R1w),val:wP,w:1.8,desc:C<=S1w?'قرب S1':C>=R1w?'قرب R1':'بين المستويات'},
     ]},
     {name:'Camarilla Pivot',wtag:'×1.8',pvt:{H4:r4,H3:r3,H2:r2,H1:r1,PP:PPm,L1:s1,L2:s2,L3:s3,L4:s4},sigs:[
-      {name:'اتجاه vs Camarilla PP',formula:'PP='+f5(PPm),val:C>PPm?1:-1,w:1.8,desc:C>PPm?'فوق PP → صاعد':'تحت PP → هابط'},
+      {name:'اتجاه vs Camarilla PP',formula:'PP='+f5(PPm),val:C>PPm?1:-1,w:1.8,desc:C>PPm?'فوق PP ? صاعد':'تحت PP ? هابط'},
       {name:'H3/L3 — أقوى مستوى',formula:'H3='+f5(r3)+' L3='+f5(s3),val:cL,w:1.8,desc:cD},
-      {name:'H4/L4 — اختراق',formula:'H4='+f5(r4)+' L4='+f5(s4),val:cB,w:1.8,desc:C>r4?'اختراق H4 → صعودي':C<s4?'كسر L4 → هبوطي':'لا اختراق'},
+      {name:'H4/L4 — اختراق',formula:'H4='+f5(r4)+' L4='+f5(s4),val:cB,w:1.8,desc:C>r4?'اختراق H4 ? صعودي':C<s4?'كسر L4 ? هبوطي':'لا اختراق'},
     ]},
     {name:'Fibonacci Pivot',wtag:'×1.5',sigs:[
       {name:'R1 38.2%',formula:'PP+0.382×Range = '+f5(PPc+rng*0.382),val:C>PPc+rng*0.382?1:C<PPc+rng*0.382?-1:0,w:1.5,desc:'مستوى فيبوناتشي أول'},
       {name:'S1 38.2%',formula:'PP-0.382×Range = '+f5(PPc-rng*0.382),val:C>PPc-rng*0.382?1:-1,w:1.5,desc:'دعم فيبوناتشي'},
     ]},
     {name:'EMA Analysis',wtag:'×1.3',sigs:[
-      {name:'EMA 20',formula:'السعر مقابل EMA20',val:C>PPc?1:C<PPc?-1:0,w:1.3,desc:C>PPc?'فوق المتوسط → صاعد':'تحته → هابط'},
+      {name:'EMA 20',formula:'السعر مقابل EMA20',val:C>PPc?1:C<PPc?-1:0,w:1.3,desc:C>PPc?'فوق المتوسط ? صاعد':'تحته ? هابط'},
     ]},
   ];
   let all=[];groups.forEach(g=>g.sigs.forEach(s=>all.push(s)));
   let rB=0,rS=0,wB=0,wS=0,wT2=0;
   all.forEach(s=>{if(s.val>0){rB++;wB+=s.w;}else if(s.val<0){rS++;wS+=s.w;}wT2+=s.w;});
   const net=rB-rS,wA=Math.max(wB,wS)/wT2;
+  // Patterns
   const pat=detectPatterns(O,H,L,C);
   return{groups,dir:net>0?1:net<0?-1:0,wAgree:wA,body,upS,loS,rng,TR,patterns:pat};
 }
@@ -568,7 +471,7 @@ function calc(){
   const riskPct=+document.getElementById('riskPct').value||2;
   const profitPct=+document.getElementById('profitPct').value||3;
 
-  // Analyze
+  // Analyze 5 entries
   const ans=entries.map(e=>({...fullAn(e.O,e.H,e.L,e.C,e.PC,e.V),label:e.label}));
   window._ans=ans;
 
@@ -601,7 +504,7 @@ function calc(){
 
   const finalAcc=Math.min(0.99,avgWA+entryBoost+confBoost+rsiBoost+macdBoost+patBoost);
 
-  // Time
+  // Time Analysis (Gann angles)
   const TF=5;
   const now=new Date();
   const hours=now.getHours();
@@ -623,16 +526,17 @@ function calc(){
   const tC=Math.min(bC+nEx,8);
   const dur=Math.min(tC*TF,TF*8);
 
-  // Risk
+  // Risk Management
   const riskAmount=capital*riskPct/100;
   const profitAmount=capital*profitPct/100;
   const rrRatio=profitAmount/riskAmount;
 
-  // ===== RENDER =====
+  // Render
+  // Entry cards
   document.getElementById('entry-cards').innerHTML=ans.map((a,i)=>`
     <div class="ag-card ${a.dir>0?'buy':a.dir<0?'sell':'wait'}">
-      <div class="ag-tf">${['📊','📊','📊','📊','📊'][i]} ${a.label}</div>
-      <div class="ag-dir ${a.dir>0?'buy':a.dir<0?'sell':'wait'}">${a.dir>0?'▲ شراء':a.dir<0?'▼ بيع':'— محايد'}</div>
+      <div class="ag-tf">${['??','??','??','??','??'][i]} ${a.label}</div>
+      <div class="ag-dir ${a.dir>0?'buy':a.dir<0?'sell':'wait'}">${a.dir>0?'? شراء':a.dir<0?'? بيع':'— محايد'}</div>
       <div class="ag-acc">${Math.round(a.wAgree*100)}% دقة</div>
     </div>`).join('');
 
@@ -642,28 +546,30 @@ function calc(){
   document.getElementById('entry-num').textContent=Math.round(entryAgree*100)+'%';
   const evd=document.getElementById('entry-vd');
   evd.className='asb-vd '+(entryAgree===1?'all':entryAgree>=0.6?'most':'conflict');
-  evd.textContent=entryAgree===1?`✅ 5 فريمات متفقة على ${mainDir>0?'الشراء':'البيع'} — إشارة ذهبية`:
-    entryAgree>=0.8?`⭐ ${Math.max(buyCount,sellCount)} من 5 فريمات متفقة — إشارة قوية`:
-    entryAgree>=0.6?`⚠️ ${Math.max(buyCount,sellCount)} من 5 فريمات — إشارة جيدة`:
-    `❌ الفريمات متعارضة — لا تدخل`;
+  evd.textContent=entryAgree===1?`? 5 فريمات متفقة على ${mainDir>0?'الشراء':'البيع'} — إشارة ذهبية`:
+    entryAgree>=0.8?`? ${Math.max(buyCount,sellCount)} من 5 فريمات متفقة — إشارة قوية`:
+    entryAgree>=0.6?`?? ${Math.max(buyCount,sellCount)} من 5 فريمات — إشارة جيدة`:
+    `? الفريمات متعارضة — لا تدخل`;
 
   // Patterns
   const patternDiv=document.getElementById('pattern-grid');
   if(allPatterns.length>0){
-    patternDiv.innerHTML=allPatterns.slice(0,8).map(p=>`<div class="pattern-badge ${p.type==='bullish'?'found':p.type==='bearish'?'bearish':''}">${p.name} ${p.type==='bullish'?'🟢':p.type==='bearish'?'🔴':'⚪'}</div>`).join('');
+    patternDiv.innerHTML=allPatterns.slice(0,8).map(p=>`<div class="pattern-badge ${p.type==='bullish'?'found':p.type==='bearish'?'bearish':''}">${p.name} ${p.type==='bullish'?'??':p.type==='bearish'?'??':'?'}</div>`).join('');
   }else{patternDiv.innerHTML='<div style="color:var(--mt);font-size:11px;">لا توجد أنماط واضحة</div>';}
 
+  // Time Analysis
   document.getElementById('time-analysis').innerHTML=`
-    <div class="time-item"><div class="tval">${isGolden?'🟢 نعم':'🔴 لا'}</div><div>وقت ذهبي</div></div>
+    <div class="time-item"><div class="tval">${isGolden?'?? نعم':'?? لا'}</div><div>وقت ذهبي</div></div>
     <div class="time-item"><div class="tval">${nextAngle}°</div><div>زاوية جان القادمة</div></div>
     <div class="time-item"><div class="tval">${fmt(angleTime)}</div><div>الوقت المتوقع</div></div>
   `;
 
+  // Confirm
   if(confRes.length>0){
     document.getElementById('conf-cards').innerHTML=confRes.map((r,i)=>`
       <div class="cf-card ${r.dir>0?'buy':r.dir<0?'sell':''}">
-        <div class="cf-tf">${['✅','✅'][i]} ${r.label}</div>
-        <div class="cf-dir ${r.dir>0?'buy':r.dir<0?'sell':'wait'}">${r.dir>0?'▲ شراء':r.dir<0?'▼ بيع':'— محايد'}</div>
+        <div class="cf-tf">${['?','?'][i]} ${r.label}</div>
+        <div class="cf-dir ${r.dir>0?'buy':r.dir<0?'sell':'wait'}">${r.dir>0?'? شراء':r.dir<0?'? بيع':'— محايد'}</div>
       </div>`).join('');
     const cf=document.getElementById('conf-fil');
     cf.style.width=Math.round((confAgree||0)*100)+'%';
@@ -671,63 +577,69 @@ function calc(){
     document.getElementById('conf-num').textContent=Math.round((confAgree||0)*100)+'%';
     const cvd=document.getElementById('conf-vd');
     cvd.className='asb-vd '+(confAgree===1?'all':confAgree>=0.5?'most':'conflict');
-    cvd.textContent=confAgree===1?`✅ كلا الفريمين يؤكدان الاتجاه — ثقة عالية`:
-      confAgree>=0.5?`⭐ فريم واحد يؤكد — جيد`:
-      `❌ فريمات التأكيد معاكسة — احذر`;
+    cvd.textContent=confAgree===1?`? كلا الفريمين يؤكدان الاتجاه — ثقة عالية`:
+      confAgree>=0.5?`? فريم واحد يؤكد — جيد`:
+      `? فريمات التأكيد معاكسة — احذر`;
   }
 
+  // Direction
   const dc=document.getElementById('dcard');const dt=document.getElementById('dtext'),dd=document.getElementById('ddur'),ds=document.getElementById('dsub');
   if(mainDir>0&&entryAgree>=0.6){
-    dc.className='dcard buy';dt.className='dtext buy';dt.textContent='📈 CALL (شراء)';
+    dc.className='dcard buy';dt.className='dtext buy';dt.textContent='?? CALL (شراء)';
     dd.textContent=fmt(dur);ds.textContent='فريم التنفيذ: M5';
   }else if(mainDir<0&&entryAgree>=0.6){
-    dc.className='dcard sell';dt.className='dtext sell';dt.textContent='📉 PUT (بيع)';
+    dc.className='dcard sell';dt.className='dtext sell';dt.textContent='?? PUT (بيع)';
     dd.textContent=fmt(dur);ds.textContent='فريم التنفيذ: M5';
   }else{
-    dc.className='dcard wait';dt.className='dtext wait';dt.textContent='⏳ انتظر';
+    dc.className='dcard wait';dt.className='dtext wait';dt.textContent='? انتظر';
     dd.textContent='—';ds.textContent='الفريمات غير متفقة';
   }
 
+  // Risk
   document.getElementById('risk-grid').innerHTML=`
-    <div class="risk-item"><div class="label">💰 المخاطرة</div><div class="value green">$${riskAmount.toFixed(2)}</div></div>
-    <div class="risk-item"><div class="label">🎯 الربح المتوقع</div><div class="value gold">$${profitAmount.toFixed(2)}</div></div>
-    <div class="risk-item"><div class="label">📊 Risk/Reward</div><div class="value ${rrRatio>=2?'green':rrRatio>=1?'gold':'red'}">${rrRatio.toFixed(2)}:1</div></div>
+    <div class="risk-item"><div class="label">?? المخاطرة</div><div class="value green">$${riskAmount.toFixed(2)}</div></div>
+    <div class="risk-item"><div class="label">?? الربح المتوقع</div><div class="value gold">$${profitAmount.toFixed(2)}</div></div>
+    <div class="risk-item"><div class="label">?? Risk/Reward</div><div class="value ${rrRatio>=2?'green':rrRatio>=1?'gold':'red'}">${rrRatio.toFixed(2)}:1</div></div>
   `;
 
+  // Alerts
   const alerts=[];
-  if(finalAcc<0.7)alerts.push('⚠️ دقة منخفضة — انتظر إشارة أقوى');
-  if(entryAgree<0.6)alerts.push('⚠️ فريمات دخول متعارضة');
-  if(confAgree!==null&&confAgree<0.5)alerts.push('⚠️ فريمات التأكيد معاكسة');
-  if(nLv==='خطر')alerts.push('⚠️ ضجيج خطير — فكر مرتين');
-  if(rrRatio<1)alerts.push('⚠️ Risk/Reward منخفض — لا تدخل');
-  if(finalAcc>=0.9&&entryAgree>=0.8&&confAgree>=0.5)alerts.push('✅ كل شيء مثالي — ادخل بثقة');
-  else if(finalAcc>=0.8&&entryAgree>=0.6)alerts.push('⭐ إشارة جيدة — ادخل بحذر');
-  else alerts.push('⏳ انتظر إشارة أفضل');
+  if(finalAcc<0.7)alerts.push('?? دقة منخفضة — انتظر إشارة أقوى');
+  if(entryAgree<0.6)alerts.push('?? فريمات دخول متعارضة');
+  if(confAgree!==null&&confAgree<0.5)alerts.push('?? فريمات التأكيد معاكسة');
+  if(nLv==='خطر')alerts.push('?? ضجيج خطير — فكر مرتين');
+  if(rrRatio<1)alerts.push('?? Risk/Reward منخفض — لا تدخل');
+  if(finalAcc>=0.9&&entryAgree>=0.8&&confAgree>=0.5)alerts.push('? كل شيء مثالي — ادخل بثقة');
+  else if(finalAcc>=0.8&&entryAgree>=0.6)alerts.push('? إشارة جيدة — ادخل بحذر');
+  else alerts.push('? انتظر إشارة أفضل');
   document.getElementById('alert-text').textContent=alerts[0]||'لا توجد تنبيهات';
 
+  // Metrics
   document.getElementById('macc').textContent=Math.round(finalAcc*100)+'%';
-  document.getElementById('maccs').textContent=finalAcc>=0.9?'💎 ذهبية':finalAcc>=0.8?'🔥 قوية':finalAcc>=0.7?'📊 جيدة':'⏳ ضعيفة';
+  document.getElementById('maccs').textContent=finalAcc>=0.9?'?? ذهبية':finalAcc>=0.8?'?? قوية':finalAcc>=0.7?'?? جيدة':'? ضعيفة';
   document.getElementById('ment').textContent=Math.max(buyCount,sellCount)+'/5';
   document.getElementById('mconf').textContent=confRes.length>0?Math.round((confAgree||0)*confRes.length)+'/'+confRes.length:'—';
   document.getElementById('mrsi').textContent=rsiVal.toFixed(1);
-  document.getElementById('mrsis').textContent=rsiVal>50?'📈 صاعد':rsiVal<50?'📉 هابط':'⚖️ محايد';
+  document.getElementById('mrsis').textContent=rsiVal>50?'?? صاعد':rsiVal<50?'?? هابط':'?? محايد';
   document.getElementById('mmacd').textContent=(macdVal>0?'+':'')+macdVal.toFixed(5);
-  document.getElementById('mmacds').textContent=macdVal>0?'📈 إيجابي':macdVal<0?'📉 سلبي':'⚖️ محايد';
+  document.getElementById('mmacds').textContent=macdVal>0?'?? إيجابي':macdVal<0?'?? سلبي':'?? محايد';
 
+  // Noise
   const mv=ans[0].rng||1;
   document.getElementById('nb-body').style.width=pct(ans[0].body/mv);
   document.getElementById('nb-noise').style.width=pct(nR/mv);
   document.getElementById('nv-body').textContent=f5(ans[0].body);
   document.getElementById('nv-noise').textContent=f5(nR);
   document.getElementById('nv-range').textContent=f5(ans[0].rng);
-  document.getElementById('ndirl').textContent=mainDir>0?'ضجيج ▲ (شراء)':'ضجيج ▼ (بيع)';
+  document.getElementById('ndirl').textContent=mainDir>0?'ضجيج ? (شراء)':'ضجيج ? (بيع)';
   const nvd=document.getElementById('nvd');nvd.className='nvd '+nCl;
-  nvd.textContent='🔊 '+nLv+' — '+nMsg;
+  nvd.textContent='?? '+nLv+' — '+nMsg;
 
+  // Tabs
   const labels=['M5','M15','M30','H1','H4'];
   document.getElementById('tabs').innerHTML=ans.map((a,i)=>
     `<div class="tab${i===0?' active '+(a.dir>0?'buy':a.dir<0?'sell':'neu'):''}" onclick="showTab(${i})">
-      ${['📊','📊','📊','📊','📊'][i]} ${labels[i]} ${a.dir>0?'▲':a.dir<0?'▼':'—'}
+      ${['??','??','??','??','??'][i]} ${labels[i]} ${a.dir>0?'?':a.dir<0?'?':'—'}
     </div>`).join('');
   document.getElementById('tab-panes').innerHTML=ans.map((a,i)=>
     `<div class="tab-pane${i===0?' active':''}" id="pane${i}">
