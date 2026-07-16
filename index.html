@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>محرك إشارات OTC الاسطوري</title>
+<title>محرك إشارات OTC الأسطوري - الإصدار الخارق</title>
 <style>
-:root{--bg:#0e1117;--sf:#161b26;--sf2:#1e2535;--bd:#2a3247;--bds:#374160;--tx:#e8eaf0;--sc:#8b93a8;--mt:#5a6380;--buy:#4ade80;--buyb:#0d2818;--buybr:#166534;--sel:#f87171;--selb:#2b0f0f;--selbr:#7f1d1d;--ac:#3b82f6;--acd:#1e3a5f;--wn:#f59e0b;--r:10px;--fn:"Segoe UI",system-ui,sans-serif;--mo:"SF Mono","Fira Code",monospace}
+:root{--bg:#0e1117;--sf:#161b26;--sf2:#1e2535;--bd:#2a3247;--bds:#374160;--tx:#e8eaf0;--sc:#8b93a8;--mt:#5a6380;--buy:#4ade80;--buyb:#0d2818;--buybr:#166534;--sel:#f87171;--selb:#2b0f0f;--selbr:#7f1d1d;--ac:#3b82f6;--acd:#1e3a5f;--wn:#f59e0b;--r:10px;--fn:'Segoe UI',system-ui,sans-serif;--mo:'SF Mono','Fira Code',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh}
 .hdr{background:var(--sf);border-bottom:.5px solid var(--bd);padding:1rem 1.5rem;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
@@ -119,7 +119,9 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 .risk-item{background:var(--sf2);border-radius:6px;padding:.5rem;text-align:center}
 .risk-item .label{font-size:9px;color:var(--mt)}
 .risk-item .value{font-size:14px;font-weight:600;font-family:var(--mo)}
-.risk-item .value.green{color:var(--buy)}.risk-item .value.red{color:var(--sel)}.risk-item .value.gold{color:var(--wn)}
+.risk-item .value.green{color:var(--buy)}
+.risk-item .value.red{color:var(--sel)}
+.risk-item .value.gold{color:var(--wn)}
 .ftr{text-align:center;padding:1.5rem 1rem;font-size:11px;color:var(--mt);border-top:.5px solid var(--bd);margin-top:2rem}
 .pattern-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:.5rem 0}
 .pattern-badge{background:var(--sf2);border-radius:6px;padding:3px 8px;font-size:10px;text-align:center;border:.5px solid var(--bd)}
@@ -131,570 +133,707 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 .time-analysis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:.5rem}
 .time-item{background:var(--sf2);border-radius:6px;padding:.4rem;text-align:center;font-size:10px}
 .time-item .tval{font-size:14px;font-weight:600;color:var(--ac)}
-/* ===== زرار السكرين شوت ===== */
-.ss-box{background:var(--sf);border:1px dashed var(--ac);border-radius:12px;padding:1rem;margin-bottom:1.25rem}
-.ss-box-title{font-size:12px;font-weight:600;color:var(--ac);margin-bottom:.75rem;display:flex;align-items:center;gap:8px}
-.ss-btn-wrap{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.ss-upload-btn{padding:10px 20px;background:var(--acd);border:1px solid var(--ac);border-radius:8px;color:var(--ac);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fn);transition:all .15s}
-.ss-upload-btn:hover{background:var(--ac);color:#fff}
-.ss-status{font-size:11px;color:var(--mt);padding:6px 10px;background:var(--sf2);border-radius:6px;flex:1;min-height:32px;display:flex;align-items:center}
-.ss-status.loading{color:var(--ac)}
-.ss-status.ok{color:var(--buy)}
-.ss-status.err{color:var(--sel)}
-.ss-preview{display:none;margin-top:.75rem}
-.ss-preview img{width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:.5px solid var(--bd)}
-.ss-result-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;margin-top:.75rem;display:none}
-.ss-rc{background:var(--sf2);border:.5px solid var(--bd);border-radius:8px;padding:.55rem}
-.ss-rc-tf{font-size:10px;color:var(--ac);font-weight:700;margin-bottom:4px}
-.ss-rc-row{display:flex;justify-content:space-between;font-size:11px;color:var(--sc);line-height:1.7;font-family:var(--mo)}
-.ss-rc-row span:last-child{color:var(--tx)}
-.ss-fill-btn{display:none;width:100%;padding:9px;background:var(--buy);border:none;border-radius:8px;color:#000;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fn);margin-top:.6rem;transition:opacity .15s}
-.ss-fill-btn:hover{opacity:.85}
-.ss-inp{display:none}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-.loading-pulse{animation:pulse 1s infinite}
-@media(max-width:520px){.tf-fields{grid-template-columns:repeat(3,1fr)}.mets{grid-template-columns:1fr 1fr}.agree-grid{grid-template-columns:1fr 1fr 1fr}.conf-fields{grid-template-columns:repeat(3,1fr)}.risk-grid{grid-template-columns:1fr}.time-analysis{grid-template-columns:1fr}}
+.final-score{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--r);padding:1rem;margin-bottom:1rem;text-align:center}
+.final-score .score-number{font-size:48px;font-weight:700;color:var(--ac)}
+.final-score .score-label{font-size:14px;color:var(--mt);margin-top:5px}
+.final-score .score-status{font-size:18px;font-weight:600;margin-top:8px}
+.final-score .score-status.elite{color:var(--buy)}
+.final-score .score-status.gold{color:var(--wn)}
+.final-score .score-status.silver{color:var(--sc)}
+.final-score .score-status.bronze{color:var(--sel)}
+.final-decision{background:var(--sf2);border:.5px solid var(--bd);border-radius:var(--r);padding:1rem;margin-bottom:1rem;text-align:center}
+.final-decision .decision-text{font-size:24px;font-weight:700}
+.final-decision .decision-text.strong{color:var(--buy)}
+.final-decision .decision-text.good{color:var(--wn)}
+.final-decision .decision-text.risky{color:var(--sel)}
+.final-decision .decision-text.avoid{color:var(--mt)}
+.final-decision .decision-reason{font-size:12px;color:var(--mt);margin-top:5px}
+.confidence-meter{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--r);padding:.85rem;margin-bottom:1rem}
+.confidence-meter .meter-bar{height:12px;background:var(--sf2);border-radius:6px;overflow:hidden;margin-top:5px}
+.confidence-meter .meter-fill{height:100%;border-radius:6px;transition:width .8s}
+.confidence-meter .meter-label{font-size:12px;color:var(--mt);margin-top:5px;text-align:center}
+.warnings-list{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--r);padding:.85rem;margin-bottom:1rem}
+.warning-item{padding:6px 10px;margin-bottom:4px;border-radius:6px;font-size:12px}
+.warning-item:last-child{margin-bottom:0}
+.warning-item.danger{background:var(--selb);color:var(--sel);border:.5px solid var(--selbr)}
+.warning-item.warning{background:var(--buyb);color:var(--wn);border:.5px solid var(--buybr)}
+.warning-item.info{background:var(--acd);color:var(--ac);border:.5px solid var(--ac)}
+.recommendation-box{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--r);padding:.85rem;margin-bottom:1rem}
+.recommendation-box .rec-title{font-size:14px;font-weight:600;color:var(--sc);margin-bottom:8px}
+.recommendation-box .rec-decision{font-size:20px;font-weight:700;margin-bottom:4px}
+.recommendation-box .rec-decision.strong{color:var(--buy)}
+.recommendation-box .rec-decision.good{color:var(--wn)}
+.recommendation-box .rec-decision.risky{color:var(--sel)}
+.recommendation-box .rec-decision.avoid{color:var(--mt)}
+.recommendation-box .rec-reason{font-size:12px;color:var(--mt);margin-bottom:8px}
+.recommendation-details{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.recommendation-details .detail-item{background:var(--sf2);border-radius:4px;padding:4px 8px;font-size:11px;text-align:center}
+.recommendation-details .detail-item .label{color:var(--mt)}
+.recommendation-details .detail-item .value{color:var(--tx);font-weight:600;font-family:var(--mo)}
+@media(max-width:520px){.tf-fields{grid-template-columns:repeat(3,1fr)}.mets{grid-template-columns:1fr 1fr}.agree-grid{grid-template-columns:1fr 1fr 1fr}.conf-fields{grid-template-columns:repeat(3,1fr)}.risk-grid{grid-template-columns:1fr}.time-analysis{grid-template-columns:1fr}.final-score .score-number{font-size:32px}.recommendation-details{grid-template-columns:1fr}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 <div class="hdr">
-  <div class="hico">&#128202;</div>
-  <div><div class="htit">محرك الاشارات OTC الاسطوري</div><div class="hsub">5 فريمات &middot; 25 معادلة &middot; AI &middot; ادارة مخاطرة &middot; انماط شموع</div></div>
-  <div class="hbdg">ULTIMATE</div>
+  <div class="hico">?</div>
+  <div><div class="htit">محرك إشارات OTC الأسطوري - ULTRA</div><div class="hsub">5 فريمات · 25 معادلة · AI · إدارة مخاطرة · أنماط شموع · تحليل زمني · نظام تقييم ذكي</div></div>
+  <div class="hbdg">?? ULTIMATE</div>
 </div>
 <div class="main">
 
-<!-- ===== زرار السكرين شوت ===== -->
-<div class="ss-box">
-  <div class="ss-box-title">&#128247; ملي البيانات من سكرين شوت</div>
-  <div class="ss-btn-wrap">
-    <button class="ss-upload-btn" onclick="document.getElementById('ss-inp').click()">ارفع السكرين شوت</button>
-    <div class="ss-status" id="ss-status">اضغط الزرار وارفع صورة الشارت</div>
-  </div>
-  <input type="file" id="ss-inp" class="ss-inp" accept="image/*" onchange="ssHandle(this.files[0])"/>
-  <div class="ss-preview" id="ss-preview"><img id="ss-img" src="" alt=""/></div>
-  <div class="ss-result-cards" id="ss-cards"></div>
-  <button class="ss-fill-btn" id="ss-fill-btn" onclick="ssFill()">اضغط هنا — ملي الفريمات تلقائي</button>
-</div>
+<div class="slbl">?? فريمات الدخول (5 فريمات)</div>
 
-<div class="slbl">فريمات الدخول (5 فريمات)</div>
-
+<!-- Entry TF 1 -->
 <div class="tf-block">
   <div class="tf-head"><div class="tf-num">1</div><div class="tf-label">M5</div><div class="tf-role">التنفيذ</div></div>
   <div class="tf-fields">
-    <div class="fd"><label>Open</label><input type="number" id="o1" step="0.00001"/></div>
-    <div class="fd"><label>High</label><input type="number" id="h1" step="0.00001"/></div>
-    <div class="fd"><label>Low</label><input type="number" id="l1" step="0.00001"/></div>
-    <div class="fd"><label>Close</label><input type="number" id="c1" step="0.00001"/></div>
-    <div class="fd"><label>Prev C</label><input type="number" id="p1" step="0.00001"/></div>
-    <div class="fd"><label>Volume</label><input type="number" id="v1" step="1" value="100"/></div>
+    <div class="fd"><label>Open</label><input type="number" id="o1" step="0.00001" value="1.1000"/></div>
+    <div class="fd"><label>High</label><input type="number" id="h1" step="0.00001" value="1.1015"/></div>
+    <div class="fd"><label>Low</label><input type="number" id="l1" step="0.00001" value="1.0990"/></div>
+    <div class="fd"><label>Close</label><input type="number" id="c1" step="0.00001" value="1.1010"/></div>
+    <div class="fd"><label>Prev C</label><input type="number" id="p1" step="0.00001" value="1.1005"/></div>
+    <div class="fd"><label>Volume</label><input type="number" id="v1" step="1" value="150"/></div>
   </div>
 </div>
+
+<!-- Entry TF 2 -->
 <div class="tf-block">
-  <div class="tf-head"><div class="tf-num">2</div><div class="tf-label">M15</div><div class="tf-role">تاكيد قريب</div></div>
+  <div class="tf-head"><div class="tf-num">2</div><div class="tf-label">M15</div><div class="tf-role">تأكيد قريب</div></div>
   <div class="tf-fields">
-    <div class="fd"><label>Open</label><input type="number" id="o2" step="0.00001"/></div>
-    <div class="fd"><label>High</label><input type="number" id="h2" step="0.00001"/></div>
-    <div class="fd"><label>Low</label><input type="number" id="l2" step="0.00001"/></div>
-    <div class="fd"><label>Close</label><input type="number" id="c2" step="0.00001"/></div>
-    <div class="fd"><label>Prev C</label><input type="number" id="p2" step="0.00001"/></div>
-    <div class="fd"><label>Volume</label><input type="number" id="v2" step="1" value="100"/></div>
+    <div class="fd"><label>Open</label><input type="number" id="o2" step="0.00001" value="1.0995"/></div>
+    <div class="fd"><label>High</label><input type="number" id="h2" step="0.00001" value="1.1020"/></div>
+    <div class="fd"><label>Low</label><input type="number" id="l2" step="0.00001" value="1.0985"/></div>
+    <div class="fd"><label>Close</label><input type="number" id="c2" step="0.00001" value="1.1015"/></div>
+    <div class="fd"><label>Prev C</label><input type="number" id="p2" step="0.00001" value="1.0990"/></div>
+    <div class="fd"><label>Volume</label><input type="number" id="v2" step="1" value="180"/></div>
   </div>
 </div>
+
+<!-- Entry TF 3 -->
 <div class="tf-block">
   <div class="tf-head"><div class="tf-num">3</div><div class="tf-label">M30</div><div class="tf-role">الاتجاه</div></div>
   <div class="tf-fields">
-    <div class="fd"><label>Open</label><input type="number" id="o3" step="0.00001"/></div>
-    <div class="fd"><label>High</label><input type="number" id="h3" step="0.00001"/></div>
-    <div class="fd"><label>Low</label><input type="number" id="l3" step="0.00001"/></div>
-    <div class="fd"><label>Close</label><input type="number" id="c3" step="0.00001"/></div>
-    <div class="fd"><label>Prev C</label><input type="number" id="p3" step="0.00001"/></div>
-    <div class="fd"><label>Volume</label><input type="number" id="v3" step="1" value="100"/></div>
+    <div class="fd"><label>Open</label><input type="number" id="o3" step="0.00001" value="1.0980"/></div>
+    <div class="fd"><label>High</label><input type="number" id="h3" step="0.00001" value="1.1025"/></div>
+    <div class="fd"><label>Low</label><input type="number" id="l3" step="0.00001" value="1.0975"/></div>
+    <div class="fd"><label>Close</label><input type="number" id="c3" step="0.00001" value="1.1018"/></div>
+    <div class="fd"><label>Prev C</label><input type="number" id="p3" step="0.00001" value="1.0970"/></div>
+    <div class="fd"><label>Volume</label><input type="number" id="v3" step="1" value="200"/></div>
   </div>
 </div>
+
+<!-- Entry TF 4 -->
 <div class="tf-block">
   <div class="tf-head"><div class="tf-num">4</div><div class="tf-label">H1</div><div class="tf-role">ترند</div></div>
   <div class="tf-fields">
-    <div class="fd"><label>Open</label><input type="number" id="o4" step="0.00001"/></div>
-    <div class="fd"><label>High</label><input type="number" id="h4" step="0.00001"/></div>
-    <div class="fd"><label>Low</label><input type="number" id="l4" step="0.00001"/></div>
-    <div class="fd"><label>Close</label><input type="number" id="c4" step="0.00001"/></div>
-    <div class="fd"><label>Prev C</label><input type="number" id="p4" step="0.00001"/></div>
-    <div class="fd"><label>Volume</label><input type="number" id="v4" step="1" value="100"/></div>
+    <div class="fd"><label>Open</label><input type="number" id="o4" step="0.00001" value="1.0950"/></div>
+    <div class="fd"><label>High</label><input type="number" id="h4" step="0.00001" value="1.1030"/></div>
+    <div class="fd"><label>Low</label><input type="number" id="l4" step="0.00001" value="1.0940"/></div>
+    <div class="fd"><label>Close</label><input type="number" id="c4" step="0.00001" value="1.1025"/></div>
+    <div class="fd"><label>Prev C</label><input type="number" id="p4" step="0.00001" value="1.0945"/></div>
+    <div class="fd"><label>Volume</label><input type="number" id="v4" step="1" value="250"/></div>
   </div>
 </div>
+
+<!-- Entry TF 5 -->
 <div class="tf-block">
   <div class="tf-head"><div class="tf-num">5</div><div class="tf-label">H4</div><div class="tf-role">ترند رئيسي</div></div>
   <div class="tf-fields">
-    <div class="fd"><label>Open</label><input type="number" id="o5" step="0.00001"/></div>
-    <div class="fd"><label>High</label><input type="number" id="h5" step="0.00001"/></div>
-    <div class="fd"><label>Low</label><input type="number" id="l5" step="0.00001"/></div>
-    <div class="fd"><label>Close</label><input type="number" id="c5" step="0.00001"/></div>
-    <div class="fd"><label>Prev C</label><input type="number" id="p5" step="0.00001"/></div>
-    <div class="fd"><label>Volume</label><input type="number" id="v5" step="1" value="100"/></div>
+    <div class="fd"><label>Open</label><input type="number" id="o5" step="0.00001" value="1.0900"/></div>
+    <div class="fd"><label>High</label><input type="number" id="h5" step="0.00001" value="1.1040"/></div>
+    <div class="fd"><label>Low</label><input type="number" id="l5" step="0.00001" value="1.0890"/></div>
+    <div class="fd"><label>Close</label><input type="number" id="c5" step="0.00001" value="1.1030"/></div>
+    <div class="fd"><label>Prev C</label><input type="number" id="p5" step="0.00001" value="1.0895"/></div>
+    <div class="fd"><label>Volume</label><input type="number" id="v5" step="1" value="300"/></div>
   </div>
 </div>
 
-<div class="slbl">فريمات التاكيد</div>
+<!-- Confirm TFs -->
+<div class="slbl">?? فريمات التأكيد</div>
 <div class="conf-block">
-  <div class="conf-head"><div class="conf-lbl">تاكيد H1</div><div class="conf-role">اتجاه عام</div></div>
+  <div class="conf-head"><span style="font-size:14px">?</span><div class="conf-lbl">تأكيد H1</div></div>
   <div class="conf-fields">
-    <div class="fd"><label>Open</label><input type="number" id="co1" step="0.00001"/></div>
-    <div class="fd"><label>High</label><input type="number" id="ch1" step="0.00001"/></div>
-    <div class="fd"><label>Low</label><input type="number" id="cl1" step="0.00001"/></div>
-    <div class="fd"><label>Close</label><input type="number" id="cc1" step="0.00001"/></div>
-    <div class="fd"><label>Volume</label><input type="number" id="cv1" step="1" value="100"/></div>
+    <div class="fd"><label>Open</label><input type="number" id="co1" step="0.00001" value="1.0970"/></div>
+    <div class="fd"><label>High</label><input type="number" id="ch1" step="0.00001" value="1.1030"/></div>
+    <div class="fd"><label>Low</label><input type="number" id="cl1" step="0.00001" value="1.0960"/></div>
+    <div class="fd"><label>Close</label><input type="number" id="cc1" step="0.00001" value="1.1020"/></div>
+    <div class="fd"><label>Volume</label><input type="number" id="cv1" step="1" value="220"/></div>
   </div>
 </div>
 <div class="conf-block">
-  <div class="conf-head"><div class="conf-lbl">تاكيد H4</div><div class="conf-role">اتجاه اكبر</div></div>
+  <div class="conf-head"><span style="font-size:14px">?</span><div class="conf-lbl">تأكيد H4</div></div>
   <div class="conf-fields">
-    <div class="fd"><label>Open</label><input type="number" id="co2" step="0.00001"/></div>
-    <div class="fd"><label>High</label><input type="number" id="ch2" step="0.00001"/></div>
-    <div class="fd"><label>Low</label><input type="number" id="cl2" step="0.00001"/></div>
-    <div class="fd"><label>Close</label><input type="number" id="cc2" step="0.00001"/></div>
-    <div class="fd"><label>Volume</label><input type="number" id="cv2" step="1" value="100"/></div>
+    <div class="fd"><label>Open</label><input type="number" id="co2" step="0.00001" value="1.0920"/></div>
+    <div class="fd"><label>High</label><input type="number" id="ch2" step="0.00001" value="1.1040"/></div>
+    <div class="fd"><label>Low</label><input type="number" id="cl2" step="0.00001" value="1.0910"/></div>
+    <div class="fd"><label>Close</label><input type="number" id="cc2" step="0.00001" value="1.1035"/></div>
+    <div class="fd"><label>Volume</label><input type="number" id="cv2" step="1" value="280"/></div>
   </div>
 </div>
 
-<div class="slbl">ادارة راس المال</div>
-<div class="tf-block" style="border-color:var(--ac)">
-  <div class="tf-head" style="background:var(--acd)"><div class="tf-label" style="color:var(--ac)">ادارة المخاطرة</div></div>
-  <div class="tf-fields" style="grid-template-columns:repeat(3,1fr)">
-    <div class="fd"><label>راس المال ($)</label><input type="number" id="capital" value="200" step="1"/></div>
+<!-- Capital Management -->
+<div class="slbl">?? إدارة رأس المال</div>
+<div class="tf-block" style="border-color:var(--ac);">
+  <div class="tf-head" style="background:var(--acd);"><span style="font-size:14px">??</span><div class="tf-label" style="color:var(--ac);">إدارة المخاطرة الذكية</div></div>
+  <div class="tf-fields" style="grid-template-columns:repeat(3,1fr);">
+    <div class="fd"><label>رأس المال ($)</label><input type="number" id="capital" value="1000" step="1"/></div>
     <div class="fd"><label>نسبة المخاطرة (%)</label><input type="number" id="riskPct" value="2" step="0.5"/></div>
     <div class="fd"><label>نسبة الربح المتوقعة (%)</label><input type="number" id="profitPct" value="3" step="0.5"/></div>
   </div>
 </div>
 
-<button class="btn" onclick="calc()">احسب الاشارة الكاملة</button>
+<button class="btn" onclick="calc()">?? احسب الإشارة الكاملة - ULTRA</button>
 
+<!-- ===== RESULT ===== -->
 <div class="result" id="result">
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">اتفاق فريمات الدخول (5)</div><div class="sep-line"></div></div>
+
+  <!-- Final Score -->
+  <div class="final-score">
+    <div class="score-number" id="finalScoreNum">0</div>
+    <div class="score-label">?? النتيجة النهائية</div>
+    <div class="score-status" id="finalScoreStatus">—</div>
+  </div>
+
+  <!-- Final Decision -->
+  <div class="final-decision" id="finalDecision">
+    <div class="decision-text" id="decisionText">? انتظر...</div>
+    <div class="decision-reason" id="decisionReason">جاري التحليل...</div>
+  </div>
+
+  <!-- Confidence Meter -->
+  <div class="confidence-meter">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:12px;font-weight:600;color:var(--sc);">?? مستوى الثقة</span>
+      <span style="font-size:14px;font-weight:700;color:var(--ac);" id="confidencePercent">0%</span>
+    </div>
+    <div class="meter-bar">
+      <div class="meter-fill" id="confidenceFill" style="width:0%;background:var(--ac);"></div>
+    </div>
+    <div class="meter-label" id="confidenceLabel">منخفضة</div>
+  </div>
+
+  <!-- Warnings -->
+  <div class="warnings-list" id="warningsList">
+    <div class="nt">?? التحذيرات</div>
+    <div id="warningsContainer">
+      <div class="warning-item info">لا توجد تحذيرات</div>
+    </div>
+  </div>
+
+  <!-- Recommendation -->
+  <div class="recommendation-box" id="recommendationBox">
+    <div class="rec-title">?? التوصية النهائية</div>
+    <div class="rec-decision" id="recDecision">—</div>
+    <div class="rec-reason" id="recReason">—</div>
+    <div class="recommendation-details" id="recDetails">
+      <div class="detail-item"><div class="label">?? حجم العقد</div><div class="value" id="recLot">—</div></div>
+      <div class="detail-item"><div class="label">?? وقف الخسارة</div><div class="value" id="recSL">—</div></div>
+      <div class="detail-item"><div class="label">?? جني الربح</div><div class="value" id="recTP">—</div></div>
+      <div class="detail-item"><div class="label">?? المدة المتوقعة</div><div class="value" id="recDuration">—</div></div>
+    </div>
+  </div>
+
+  <!-- Entry Cards -->
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">?? اتفاق فريمات الدخول (5)</div><div class="sep-line"></div></div>
   <div class="agree-grid" id="entry-cards"></div>
-  <div class="asb">
+  <div class="asb" id="entry-asb">
     <div class="asb-title">مستوى اتفاق فريمات الدخول</div>
     <div class="asb-row"><div class="asb-lbl">الاتفاق</div><div class="asb-trk"><div class="asb-fil" id="entry-fil"></div></div><div class="asb-num" id="entry-num"></div></div>
     <div class="asb-vd" id="entry-vd"></div>
   </div>
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">انماط الشموع</div><div class="sep-line"></div></div>
-  <div class="nbox"><div class="nt">الانماط المكتشفة</div><div class="pattern-grid" id="pattern-grid"></div></div>
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">التحليل الزمني</div><div class="sep-line"></div></div>
-  <div class="nbox"><div class="nt">توقيت الانعكاس</div><div class="time-analysis" id="time-analysis"></div></div>
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">تاكيد الاتجاه العام</div><div class="sep-line"></div></div>
+
+  <!-- Patterns -->
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">??? أنماط الشموع</div><div class="sep-line"></div></div>
+  <div class="nbox" id="patterns-box">
+    <div class="nt">أنماط الشموع المكتشفة</div>
+    <div class="pattern-grid" id="pattern-grid"></div>
+  </div>
+
+  <!-- Time Analysis -->
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">? التحليل الزمني</div><div class="sep-line"></div></div>
+  <div class="nbox" id="time-box">
+    <div class="nt">توقيت الانعكاس المتوقع</div>
+    <div class="time-analysis" id="time-analysis"></div>
+  </div>
+
+  <!-- Confirm -->
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">?? تأكيد الاتجاه العام</div><div class="sep-line"></div></div>
   <div class="conf-grid" id="conf-cards"></div>
-  <div class="asb"><div class="asb-title">اتفاق فريمات التاكيد</div>
-    <div class="asb-row"><div class="asb-lbl">التاكيد</div><div class="asb-trk"><div class="asb-fil" id="conf-fil"></div></div><div class="asb-num" id="conf-num"></div></div>
+  <div class="asb"><div class="asb-title">اتفاق فريمات التأكيد</div>
+    <div class="asb-row"><div class="asb-lbl">التأكيد</div><div class="asb-trk"><div class="asb-fil" id="conf-fil"></div></div><div class="asb-num" id="conf-num"></div></div>
     <div class="asb-vd" id="conf-vd"></div>
   </div>
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">الاشارة النهائية</div><div class="sep-line"></div></div>
+
+  <!-- Final Signal -->
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">?? الإشارة النهائية</div><div class="sep-line"></div></div>
   <div class="dcard" id="dcard">
     <div><div class="dtext" id="dtext"></div><div class="dsub" id="dsub"></div></div>
     <div><div class="ddur" id="ddur"></div><div class="ddurl">مدة الصفقة المثلى</div></div>
   </div>
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">ادارة المخاطرة</div><div class="sep-line"></div></div>
-  <div class="risk-box"><div class="nt">تفاصيل المخاطرة</div><div class="risk-grid" id="risk-grid"></div></div>
-  <div class="alert-box"><div class="alert-title">تنبيهات</div><div class="alert-text" id="alert-text">لا توجد تنبيهات</div></div>
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">المقاييس</div><div class="sep-line"></div></div>
-  <div class="mets">
-    <div class="met hi"><div class="met-l">دقة الاشارة</div><div class="met-v" id="macc"></div><div class="met-s" id="maccs"></div></div>
-    <div class="met"><div class="met-l">اتفاق الدخول</div><div class="met-v" id="ment"></div><div class="met-s">من 5 فريمات</div></div>
-    <div class="met"><div class="met-l">تاكيد MTF</div><div class="met-v" id="mconf"></div><div class="met-s">من 2 فريمات</div></div>
-    <div class="met"><div class="met-l">RSI</div><div class="met-v" id="mrsi"></div><div class="met-s" id="mrsis"></div></div>
-    <div class="met"><div class="met-l">MACD</div><div class="met-v" id="mmacd"></div><div class="met-s" id="mmacds"></div></div>
+
+  <!-- Risk Management -->
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">??? إدارة المخاطرة</div><div class="sep-line"></div></div>
+  <div class="risk-box">
+    <div class="nt">تفاصيل إدارة المخاطرة الذكية</div>
+    <div class="risk-grid" id="risk-grid"></div>
   </div>
+
+  <!-- Alerts -->
+  <div class="alert-box" id="alert-box">
+    <div class="alert-title">?? تنبيهات</div>
+    <div class="alert-text" id="alert-text">لا توجد تنبيهات</div>
+  </div>
+
+  <!-- Metrics -->
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">?? المقاييس</div><div class="sep-line"></div></div>
+  <div class="mets">
+    <div class="met hi"><div class="met-l">?? دقة الإشارة</div><div class="met-v" id="macc"></div><div class="met-s" id="maccs"></div></div>
+    <div class="met"><div class="met-l">?? اتفاق الدخول</div><div class="met-v" id="ment"></div><div class="met-s">من 5 فريمات</div></div>
+    <div class="met"><div class="met-l">?? تأكيد MTF</div><div class="met-v" id="mconf"></div><div class="met-s">من 2 فريمات</div></div>
+    <div class="met"><div class="met-l">?? RSI</div><div class="met-v" id="mrsi"></div><div class="met-s" id="mrsis"></div></div>
+    <div class="met"><div class="met-l">?? MACD</div><div class="met-v" id="mmacd"></div><div class="met-s" id="mmacds"></div></div>
+  </div>
+
+  <!-- Noise -->
   <div class="nbox">
-    <div class="nt">تحليل الضجيج</div>
+    <div class="nt">?? تحليل الضجيج</div>
     <div class="nbr"><div class="nbl">جسم الشمعة</div><div class="nbt"><div class="nbf" id="nb-body" style="background:var(--ac)"></div></div><div class="nbn" id="nv-body"></div></div>
     <div class="nbr"><div class="nbl" id="ndirl">ضجيج الاتجاه</div><div class="nbt"><div class="nbf" id="nb-noise" style="background:var(--wn)"></div></div><div class="nbn" id="nv-noise"></div></div>
     <div class="nbr"><div class="nbl">النطاق الكامل</div><div class="nbt"><div class="nbf" style="background:var(--bds);width:100%"></div></div><div class="nbn" id="nv-range"></div></div>
     <div class="nvd" id="nvd"></div>
   </div>
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">تفاصيل المعادلات</div><div class="sep-line"></div></div>
+
+  <!-- Detail Tabs -->
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">?? تفاصيل المعادلات</div><div class="sep-line"></div></div>
   <div class="tabs" id="tabs"></div>
   <div id="tab-panes"></div>
+
 </div>
 </div>
-<div class="ftr">محرك اشارات OTC الاسطوري &middot; 5 فريمات &middot; 25 معادلة &middot; انماط شموع &middot; ادارة مخاطرة</div>
+<div class="ftr">?? محرك إشارات OTC الأسطوري - ULTRA · 5 فريمات · 25 معادلة · أنماط شموع · تحليل زمني · إدارة مخاطرة ذكية · نظام تقييم متكامل</div>
 
 <script>
-// ===== Screenshot OCR Feature (Tesseract.js - no API needed) =====
-var _ssOCR = {};
-
-function ssHandle(file) {
-  if (!file) return;
-  var st = document.getElementById('ss-status');
-  st.className = 'ss-status loading';
-  st.innerHTML = 'بيقرأ الصورة... <span class="loading-pulse">OCR جاري</span>';
-  document.getElementById('ss-img').src = URL.createObjectURL(file);
-  document.getElementById('ss-preview').style.display = 'block';
-  document.getElementById('ss-cards').style.display = 'none';
-  document.getElementById('ss-fill-btn').style.display = 'none';
-
-  if (typeof Tesseract === 'undefined') {
-    st.className = 'ss-status err';
-    st.textContent = 'خطا: مكتبة OCR مش محملة - تاكد من الانترنت';
-    return;
-  }
-
-  Tesseract.recognize(file, 'eng', {
-    tessedit_char_whitelist: '0123456789.OpenHighLowClose:OHLC '
-  }).then(function(result) {
-    var text = result.data.text;
-    var found = parseOHLC(text);
-    if (!found.open && !found.close) {
-      // Try again with full OCR
-      return Tesseract.recognize(file, 'eng').then(function(r2) {
-        return parseOHLC(r2.data.text);
-      });
-    }
-    return found;
-  }).then(function(found) {
-    showOCRResult(found, st);
-  }).catch(function(err) {
-    st.className = 'ss-status err';
-    st.textContent = 'فشل القراءة: ' + err.message;
-  });
-}
-
-function parseOHLC(text) {
-  var found = {};
-  // Match patterns like "Open: 0.18570" or "Open 0.18570" or "O: 0.18570"
-  var patterns = {
-    open:  [/open[:\s]+([0-9]+\.?[0-9]*)/i, /O[:\s]+([0-9]+\.?[0-9]*)/i],
-    high:  [/high[:\s]+([0-9]+\.?[0-9]*)/i, /H[:\s]+([0-9]+\.?[0-9]*)/i],
-    low:   [/low[:\s]+([0-9]+\.?[0-9]*)/i,  /L[:\s]+([0-9]+\.?[0-9]*)/i],
-    close: [/close[:\s]+([0-9]+\.?[0-9]*)/i,/C[:\s]+([0-9]+\.?[0-9]*)/i],
-  };
-  Object.keys(patterns).forEach(function(key) {
-    patterns[key].forEach(function(re) {
-      if (!found[key]) {
-        var m = text.match(re);
-        if (m) found[key] = parseFloat(m[1]);
-      }
-    });
-  });
-  // Fallback: extract all decimal numbers
-  if (!found.open || !found.close) {
-    var nums = text.match(/[0-9]+\.[0-9]{3,6}/g);
-    if (nums && nums.length >= 4) {
-      found.open  = found.open  || parseFloat(nums[0]);
-      found.high  = found.high  || parseFloat(nums[1]);
-      found.low   = found.low   || parseFloat(nums[2]);
-      found.close = found.close || parseFloat(nums[3]);
-    }
-  }
-  return found;
-}
-
-function showOCRResult(found, st) {
-  _ssOCR = found;
-  var cards = document.getElementById('ss-cards');
-  cards.style.display = 'grid';
-
-  var hasData = found.open || found.high || found.low || found.close;
-  if (!hasData) {
-    st.className = 'ss-status err';
-    st.textContent = 'ما عرفتش اقرأ الارقام - جرب صورة اوضح او ادخل يدوي';
-    cards.innerHTML = '<div style="color:var(--mt);font-size:11px;padding:.5rem">لم تُكتشف ارقام OHLC في الصورة</div>';
-    return;
-  }
-
-  cards.innerHTML =
-    '<div class="ss-rc">' +
-    '<div class="ss-rc-tf">البيانات المستخرجة</div>' +
-    '<div class="ss-rc-row"><span>Open</span><span>' + (found.open || '—') + '</span></div>' +
-    '<div class="ss-rc-row"><span>High</span><span style="color:var(--buy)">' + (found.high || '—') + '</span></div>' +
-    '<div class="ss-rc-row"><span>Low</span><span style="color:var(--sel)">' + (found.low || '—') + '</span></div>' +
-    '<div class="ss-rc-row"><span>Close</span><span>' + (found.close || '—') + '</span></div>' +
-    '</div>' +
-    '<div class="ss-rc" style="background:var(--sf);border-color:var(--ac)">' +
-    '<div class="ss-rc-tf" style="color:var(--wn)">اي فريم تملي؟</div>' +
-    '<select id="ss-tf-sel" style="width:100%;background:var(--sf2);border:.5px solid var(--bd);border-radius:6px;color:var(--tx);padding:4px;font-size:12px;margin-top:4px">' +
-    '<option value="1">① M5 - التنفيذ</option>' +
-    '<option value="2">② M15 - تاكيد</option>' +
-    '<option value="3">③ M30 - اتجاه</option>' +
-    '<option value="4">④ H1 - ترند</option>' +
-    '<option value="5">⑤ H4 - رئيسي</option>' +
-    '<option value="c1">تاكيد H1</option>' +
-    '<option value="c2">تاكيد H4</option>' +
-    '</select>' +
-    '</div>';
-
-  document.getElementById('ss-fill-btn').style.display = 'block';
-  st.className = 'ss-status ok';
-  st.textContent = 'تم القراءة — اختار الفريم واضغط ملي';
-}
-
-function ssFill() {
-  var sel = document.getElementById('ss-tf-sel');
-  if (!sel) return;
-  var v = sel.value;
-  var prefix = v.startsWith('c') ? (v === 'c1' ? {o:'co1',h:'ch1',l:'cl1',c:'cc1'} : {o:'co2',h:'ch2',l:'cl2',c:'cc2'})
-                                 : {o:'o'+v, h:'h'+v, l:'l'+v, c:'c'+v};
-
-  if (_ssOCR.open)  { document.getElementById(prefix.o).value = _ssOCR.open;  flash(prefix.o); }
-  if (_ssOCR.high)  { document.getElementById(prefix.h).value = _ssOCR.high;  flash(prefix.h); }
-  if (_ssOCR.low)   { document.getElementById(prefix.l).value = _ssOCR.low;   flash(prefix.l); }
-  if (_ssOCR.close) { document.getElementById(prefix.c).value = _ssOCR.close; flash(prefix.c); }
-
-  var st = document.getElementById('ss-status');
-  st.className = 'ss-status ok';
-  st.textContent = 'تم الملي — راجع الارقام وبعدين احسب';
-}
-
-function flash(id) {
-  var el = document.getElementById(id);
-  if (el) { el.style.color = '#4ade80'; setTimeout(function(){ el.style.color = ''; }, 2000); }
-}
-// ===== End Screenshot OCR =====
-
 function f5(n){return parseFloat(n).toFixed(5)}
 function pct(n){return(n*100).toFixed(1)+'%'}
-function ico(v){return v>0?'▲':v<0?'▼':'—'}
+function ico(v){return v>0?'??':v<0?'??':'?'}
 function ec(v){return v>0?'up':v<0?'down':'neu'}
 function bc(v){return v>0?'buy':v<0?'sell':'neu'}
 function bl(v){return v>0?'شراء':v<0?'بيع':'محايد'}
 function fmt(m){if(m<60)return m+' دقيقة';if(m===60)return 'ساعة';if(m===120)return 'ساعتين';if(m===180)return '3 ساعات';if(m===240)return '4 ساعات';if(m%60===0)return(m/60)+' ساعات';return m+' دقيقة';}
 
 function detectPatterns(O,H,L,C){
-  var body=Math.abs(C-O),range=H-L,bull=C>O;
-  var up=H-Math.max(O,C),dn=Math.min(O,C)-L;
-  var pInfo=[];
-  if(range>0&&body/range<0.1){pInfo.push({name:'Doji',type:'neutral'});}
-  if(dn>body*2.5&&up<body*0.5){pInfo.push({name:bull?'Hammer':'Hanging Man',type:bull?'bullish':'bearish'});}
-  if(up>body*2.5&&dn<body*0.5){pInfo.push({name:bull?'Shooting Star':'Inv Hammer',type:bull?'bearish':'bullish'});}
-  if(body>range*0.75){pInfo.push({name:bull?'Marubozu Bull':'Marubozu Bear',type:bull?'bullish':'bearish'});}
-  if(C>O){pInfo.push({name:'Bullish Engulfing',type:'bullish'});}
-  if(C<O){pInfo.push({name:'Bearish Engulfing',type:'bearish'});}
-  return{pInfo:pInfo};
+  const body=Math.abs(C-O),range=H-L,bull=C>O;
+  const up=H-Math.max(O,C),dn=Math.min(O,C)-L;
+  const patterns=[],pInfo=[];
+  if(range>0 && body/range<0.1){patterns.push('Doji');pInfo.push({name:'Doji',type:'neutral'});}
+  if(dn>body*2.5&&up<body*0.5){patterns.push(bull?'Hammer':'Hanging Man');pInfo.push({name:bull?'Hammer':'Hanging Man',type:bull?'bullish':'bearish'});}
+  if(up>body*2.5&&dn<body*0.5){patterns.push(bull?'Shooting Star':'Inv Hammer');pInfo.push({name:bull?'Shooting Star':'Inv Hammer',type:bull?'bearish':'bullish'});}
+  if(body>range*0.75){patterns.push(bull?'Marubozu Bull':'Marubozu Bear');pInfo.push({name:bull?'Marubozu Bull':'Marubozu Bear',type:bull?'bullish':'bearish'});}
+  if(C>O && range>0 && body/range>0.3){patterns.push('Bullish Engulfing');pInfo.push({name:'Bullish Engulfing',type:'bullish'});}
+  if(C<O && range>0 && body/range>0.3){patterns.push('Bearish Engulfing');pInfo.push({name:'Bearish Engulfing',type:'bearish'});}
+  return{patterns,pInfo};
 }
 
-function rsiCalc(close,p){p=p||14;if(close.length<p+1)return 50;var g=0,l=0;for(var i=close.length-p;i<close.length;i++){var x=close[i]-close[i-1];x>0?g+=x:l+=Math.abs(x);}return 100-100/(1+(g/p)/((l/p)||0.0001));}
+function rsi(close,p=14){
+  if(close.length<p+1)return 50;
+  let g=0,l=0;
+  for(let i=close.length-p;i<close.length;i++){const x=close[i]-close[i-1];x>0?g+=x:l+=Math.abs(x);}
+  return 100-100/(1+(g/p)/((l/p)||0.0001));
+}
 
-function macdCalc(close){if(close.length<26)return 0;var ema=function(d,p){var k=2/(p+1),e=d[0];for(var i=1;i<d.length;i++)e=d[i]*k+e*(1-k);return e;};return ema(close.slice(-26),12)-ema(close.slice(-26),26);}
+function macd(close){
+  if(close.length<26)return 0;
+  const ema12=(d,p)=>{const k=2/(p+1);let e=d[0];for(let i=1;i<d.length;i++)e=d[i]*k+e*(1-k);return e;};
+  return ema12(close.slice(-26),12)-ema12(close.slice(-26),26);
+}
 
-function qdir(O,H,L,C){if([O,H,L,C].some(isNaN)||H<=L)return null;var rng=H-L,body=Math.abs(C-O),d=C>O?1:C<O?-1:0;var cp=rng>0?(C-L)/rng:0.5,br=rng>0?body/rng:0;var PP=(H+L+C)/3,PPw=(H+L+2*C)/4;var sigs=[d,cp>=0.65?1:cp<=0.35?-1:0,br>0.5?d:0,C>PP?1:-1,C>PPw?1:-1];var buy=sigs.filter(function(s){return s>0;}).length,sell=sigs.filter(function(s){return s<0;}).length;var net=buy-sell,agree=Math.max(buy,sell)/sigs.length;return{dir:net>0?1:net<0?-1:0,agree:agree};}
+function qdir(O,H,L,C){if([O,H,L,C].some(isNaN)||H<=L)return null;const rng=H-L,body=Math.abs(C-O),d=C>O?1:C<O?-1:0;const cp=rng>0?(C-L)/rng:0.5,br=rng>0?body/rng:0;const PP=(H+L+C)/3,PPw=(H+L+2*C)/4;const sigs=[d,cp>=0.65?1:cp<=0.35?-1:0,br>0.5?d:0,C>PP?1:-1,C>PPw?1:-1];const buy=sigs.filter(s=>s>0).length,sell=sigs.filter(s=>s<0).length;const net=buy-sell,agree=Math.max(buy,sell)/sigs.length;return{dir:net>0?1:net<0?-1:0,agree};}
 
 function fullAn(O,H,L,C,PC,V){
-  var hpc=!isNaN(PC),rng=H-L,body=Math.abs(C-O);
-  var upS=H-Math.max(O,C),loS=Math.min(O,C)-L;
-  var TR=hpc?Math.max(rng,Math.abs(H-PC),Math.abs(L-PC)):rng;
-  var PPc=(H+L+C)/3,R1c=2*PPc-L,S1c=2*PPc-H,R2c=PPc+rng,S2c=PPc-rng;
-  var PPw=(H+L+2*C)/4,R1w=2*PPw-L,S1w=2*PPw-H,R2w=PPw+rng,S2w=PPw-rng;
-  var k=1.1,r1=C+(rng*k/12),s1=C-(rng*k/12),r2=C+(rng*k/6),s2=C-(rng*k/6);
-  var r3=C+(rng*k/4),s3=C-(rng*k/4),r4=C+(rng*k/2),s4=C-(rng*k/2),PPm=(H+L+C)/3;
-  var d1=C>O?1:C<O?-1:0,bR=rng>0?body/rng:0,cP=rng>0?(C-L)/rng:0.5;
-  var sv=0,sd='ذيول متوازنة';
-  if(loS>body*1.8&&upS<body*0.5){sv=1;sd='مطرقة - ارتداد صعودي';}
-  else if(upS>body*1.8&&loS<body*0.5){sv=-1;sd='شهاب - ارتداد هبوطي';}
-  else if(loS>upS*1.5){sv=1;sd='ذيل سفلي اطول - صعودي';}
-  else if(upS>loS*1.5){sv=-1;sd='ذيل علوي اطول - هبوطي';}
-  var cpD=cP>=0.75?1:cP<=0.25?-1:0;
-  var stK=rng>0?(C-L)/rng*100:50,stD=stK<25?1:stK>75?-1:0;
-  var mom=(C-O)/O*100,momD=Math.abs(mom)>0.03?d1:0;
-  var aD=TR>0&&body/TR>0.45?d1:0;
-  var cpT=C>PPc?1:C<PPc?-1:0;
-  var cpP=C<=S1c&&C>=S2c?1:C>=R1c&&C<=R2c?-1:C<S2c?1:C>R2c?-1:cpT;
-  var wT=C>PPw?1:C<PPw?-1:0,wP=C<=S1w?1:C>=R1w?-1:wT;
-  var cL=0,cD='بين المستويات';
-  if(C>=r3){cL=-1;cD='فوق H3 - بيع على مقاومة';}
-  else if(C<=s3){cL=1;cD='تحت L3 - شراء على دعم';}
-  else if(C>=r2){cL=-1;cD='قرب H2 - ضغط هبوطي';}
-  else if(C<=s2){cL=1;cD='قرب L2 - دعم صعودي';}
+  const hpc=!isNaN(PC),rng=H-L,body=Math.abs(C-O);
+  const upS=H-Math.max(O,C),loS=Math.min(O,C)-L;
+  const TR=hpc?Math.max(rng,Math.abs(H-PC),Math.abs(L-PC)):rng;
+  const PPc=(H+L+C)/3,R1c=2*PPc-L,S1c=2*PPc-H,R2c=PPc+rng,S2c=PPc-rng;
+  const PPw=(H+L+2*C)/4,R1w=2*PPw-L,S1w=2*PPw-H,R2w=PPw+rng,S2w=PPw-rng;
+  const k=1.1;const r1=C+(rng*k/12),s1=C-(rng*k/12),r2=C+(rng*k/6),s2=C-(rng*k/6);
+  const r3=C+(rng*k/4),s3=C-(rng*k/4),r4=C+(rng*k/2),s4=C-(rng*k/2),PPm=(H+L+C)/3;
+  const d1=C>O?1:C<O?-1:0,bR=rng>0?body/rng:0,cP=rng>0?(C-L)/rng:0.5;
+  let sv=0,sd='ذيول متوازنة';
+  if(loS>body*1.8&&upS<body*0.5){sv=1;sd='مطرقة ?? ارتداد صعودي';}
+  else if(upS>body*1.8&&loS<body*0.5){sv=-1;sd='شهاب ?? ارتداد هبوطي';}
+  else if(loS>upS*1.5){sv=1;sd='ذيل سفلي أطول ?? صعودي';}
+  else if(upS>loS*1.5){sv=-1;sd='ذيل علوي أطول ?? هبوطي';}
+  const cpD=cP>=0.75?1:cP<=0.25?-1:0;
+  const stK=rng>0?(C-L)/rng*100:50,stD=stK<25?1:stK>75?-1:0;
+  const mom=(C-O)/O*100,momD=Math.abs(mom)>0.03?d1:0;
+  const aD=TR>0&&body/TR>0.45?d1:0;
+  const cpT=C>PPc?1:C<PPc?-1:0;
+  const cpP=C<=S1c&&C>=S2c?1:C>=R1c&&C<=R2c?-1:C<S2c?1:C>R2c?-1:cpT;
+  const wT=C>PPw?1:C<PPw?-1:0,wP=C<=S1w?1:C>=R1w?-1:wT;
+  let cL=0,cD='بين المستويات';
+  if(C>=r3){cL=-1;cD='فوق H3 ?? بيع على مقاومة';}
+  else if(C<=s3){cL=1;cD='تحت L3 ?? شراء على دعم';}
+  else if(C>=r2){cL=-1;cD='قرب H2 ?? ضغط هبوطي';}
+  else if(C<=s2){cL=1;cD='قرب L2 ?? دعم صعودي';}
   else{cL=C>PPm?1:-1;cD='يتبع الاتجاه العام';}
-  var cB=C>r4?1:C<s4?-1:0;
-  var vol=V||1;
-  var groups=[
-    {name:'تحليل الشمعة',wtag:'x1.0',pvt:null,sigs:[
-      {name:'اتجاه الشمعة',formula:'C-O = '+(C>O?'+':'')+f5(C-O),val:d1,w:1,desc:d1>0?'صعودي':d1<0?'هبوطي':'دوجي'},
-      {name:'قوة الجسم',formula:'Body/Range = '+pct(bR),val:bR>0.55?d1:0,w:1,desc:bR>0.7?'قوي جداً':bR>0.55?'متوسط':'ضعيف'},
-      {name:'تحليل الذيول',formula:'dn='+f5(loS)+' up='+f5(upS),val:sv,w:1,desc:sd},
-      {name:'موضع الاغلاق',formula:'(C-L)/Range = '+pct(cP),val:cpD,w:1,desc:pct(cP)+' من النطاق'},
+  const cB=C>r4?1:C<s4?-1:0;
+  const vol=V||1;
+  const groups=[
+    {name:'?? تحليل الشمعة',wtag:'×1.0',sigs:[
+      {name:'اتجاه الشمعة',formula:'C-O = '+(C>O?'+':'')+f5(C-O),val:d1,w:1,desc:d1>0?'صعودي ??':d1<0?'هبوطي ??':'دوجي ?'},
+      {name:'قوة الجسم',formula:'|C-O|÷Range = '+pct(bR),val:bR>0.55?d1:0,w:1,desc:bR>0.7?'قوي جداً ??':bR>0.55?'متوسط ??':'ضعيف/دوجي ?'},
+      {name:'تحليل الذيول',formula:'??'+f5(loS)+' ??'+f5(upS),val:sv,w:1,desc:sd},
+      {name:'موضع الإغلاق',formula:'(C-L)÷Range = '+pct(cP),val:cpD,w:1,desc:pct(cP)+' من النطاق ??'},
     ]},
-    {name:'ATR والزخم',wtag:'x1.2',pvt:null,sigs:[
-      {name:'ATR - قوة الحركة',formula:'Body/TR = '+pct(TR>0?body/TR:0),val:aD,w:1.2,desc:body/TR>0.6?'قوي - تاكيد':body/TR>0.35?'متوسط':'ضعيف'},
-      {name:'Stochastic',formula:'(C-L)/Range*100 = '+stK.toFixed(1),val:stD,w:1.2,desc:stK<25?'تشبع بيع - شراء':stK>75?'تشبع شراء - بيع':'محايد'},
-      {name:'Momentum %',formula:'(C-O)/O*100 = '+(mom>0?'+':'')+mom.toFixed(4)+'%',val:momD,w:1.2,desc:'زخم '+(mom>=0?'صعودي':'هبوطي')},
-      {name:'Volume',formula:'V='+vol,val:vol>50?1:vol<30?-1:0,w:1,desc:vol>50?'حجم مرتفع - تاكيد':vol<30?'حجم منخفض - ضعف':'متوسط'},
+    {name:'?? ATR والزخم',wtag:'×1.2',sigs:[
+      {name:'ATR — قوة الحركة',formula:'Body÷TR = '+pct(TR>0?body/TR:0),val:aD,w:1.2,desc:body/TR>0.6?'قوي ?? تأكيد':body/TR>0.35?'متوسط ??':'ضعيف ?'},
+      {name:'Stochastic',formula:'(C-L)÷Range×100 = '+stK.toFixed(1),val:stD,w:1.2,desc:stK<25?'تشبع بيع ?? شراء':stK>75?'تشبع شراء ?? بيع':'محايد ?'},
+      {name:'Momentum %',formula:'(C-O)÷O×100 = '+(mom>0?'+':'')+mom.toFixed(4)+'%',val:momD,w:1.2,desc:'زخم '+(mom>=0?'صعودي ??':'هبوطي ??')},
+      {name:'Volume',formula:'V='+vol,val:vol>50?1:vol<30?-1:0,w:1,desc:vol>50?'حجم مرتفع ?? تأكيد':vol<30?'حجم منخفض ? ضعف':'متوسط ??'},
     ]},
-    {name:'Classic Pivot',wtag:'x1.8',pvt:{R2:R2c,R1:R1c,PP:PPc,S1:S1c,S2:S2c},sigs:[
-      {name:'اتجاه vs Classic PP',formula:'PP='+f5(PPc),val:cpT,w:1.8,desc:C>PPc?'فوق PP - صاعد':'تحت PP - هابط'},
-      {name:'قرب S1/R1',formula:'S1='+f5(S1c)+' R1='+f5(R1c),val:cpP,w:1.8,desc:C<=S1c?'قرب S1 - صعودي':C>=R1c?'قرب R1 - هبوطي':'بين المستويات'},
+    {name:'?? Classic Pivot',wtag:'×1.8',pvt:{R2:R2c,R1:R1c,PP:PPc,S1:S1c,S2:S2c},sigs:[
+      {name:'اتجاه vs Classic PP',formula:'PP='+f5(PPc),val:cpT,w:1.8,desc:C>PPc?'فوق PP ?? صاعد':'تحت PP ?? هابط'},
+      {name:'قرب S1/R1',formula:'S1='+f5(S1c)+' R1='+f5(R1c),val:cpP,w:1.8,desc:C<=S1c?'قرب S1 ?? صعودي':C>=R1c?'قرب R1 ?? هبوطي':'بين المستويات ?'},
     ]},
-    {name:'Woodie Pivot',wtag:'x1.8',pvt:{R2:R2w,R1:R1w,PP:PPw,S1:S1w,S2:S2w},sigs:[
-      {name:'اتجاه vs Woodie PP',formula:'PP=(H+L+2C)/4 = '+f5(PPw),val:wT,w:1.8,desc:C>PPw?'فوق PP - صاعد':'تحت PP - هابط'},
-      {name:'قرب S1/R1 Woodie',formula:'S1='+f5(S1w)+' R1='+f5(R1w),val:wP,w:1.8,desc:C<=S1w?'قرب S1':C>=R1w?'قرب R1':'بين المستويات'},
+    {name:'?? Woodie Pivot',wtag:'×1.8',pvt:{R2:R2w,R1:R1w,PP:PPw,S1:S1w,S2:S2w},sigs:[
+      {name:'اتجاه vs Woodie PP',formula:'PP=(H+L+2C)÷4 = '+f5(PPw),val:wT,w:1.8,desc:C>PPw?'فوق PP ?? صاعد':'تحت PP ?? هابط'},
+      {name:'قرب S1/R1 Woodie',formula:'S1='+f5(S1w)+' R1='+f5(R1w),val:wP,w:1.8,desc:C<=S1w?'قرب S1 ??':C>=R1w?'قرب R1 ??':'بين المستويات ?'},
     ]},
-    {name:'Camarilla Pivot',wtag:'x1.8',pvt:{H4:r4,H3:r3,H2:r2,H1:r1,PP:PPm,L1:s1,L2:s2,L3:s3,L4:s4},sigs:[
-      {name:'اتجاه vs Camarilla PP',formula:'PP='+f5(PPm),val:C>PPm?1:-1,w:1.8,desc:C>PPm?'فوق PP - صاعد':'تحت PP - هابط'},
-      {name:'H3/L3 - اقوى مستوى',formula:'H3='+f5(r3)+' L3='+f5(s3),val:cL,w:1.8,desc:cD},
-      {name:'H4/L4 - اختراق',formula:'H4='+f5(r4)+' L4='+f5(s4),val:cB,w:1.8,desc:C>r4?'اختراق H4 - صعودي':C<s4?'كسر L4 - هبوطي':'لا اختراق'},
+    {name:'?? Camarilla Pivot',wtag:'×1.8',pvt:{H4:r4,H3:r3,H2:r2,H1:r1,PP:PPm,L1:s1,L2:s2,L3:s3,L4:s4},sigs:[
+      {name:'اتجاه vs Camarilla PP',formula:'PP='+f5(PPm),val:C>PPm?1:-1,w:1.8,desc:C>PPm?'فوق PP ?? صاعد':'تحت PP ?? هابط'},
+      {name:'H3/L3 — أقوى مستوى',formula:'H3='+f5(r3)+' L3='+f5(s3),val:cL,w:1.8,desc:cD},
+      {name:'H4/L4 — اختراق',formula:'H4='+f5(r4)+' L4='+f5(s4),val:cB,w:1.8,desc:C>r4?'اختراق H4 ?? صعودي':C<s4?'كسر L4 ?? هبوطي':'لا اختراق ?'},
     ]},
-    {name:'Fibonacci Pivot',wtag:'x1.5',pvt:null,sigs:[
-      {name:'R1 Fib 38.2%',formula:'PP+0.382*Range = '+f5(PPc+rng*0.382),val:C>PPc+rng*0.382?1:-1,w:1.5,desc:'مستوى فيبوناتشي اول'},
-      {name:'S1 Fib 38.2%',formula:'PP-0.382*Range = '+f5(PPc-rng*0.382),val:C>PPc-rng*0.382?1:-1,w:1.5,desc:'دعم فيبوناتشي'},
+    {name:'?? Fibonacci Pivot',wtag:'×1.5',sigs:[
+      {name:'R1 38.2%',formula:'PP+0.382×Range = '+f5(PPc+rng*0.382),val:C>PPc+rng*0.382?1:C<PPc+rng*0.382?-1:0,w:1.5,desc:'مستوى فيبوناتشي أول ??'},
+      {name:'S1 38.2%',formula:'PP-0.382×Range = '+f5(PPc-rng*0.382),val:C>PPc-rng*0.382?1:-1,w:1.5,desc:'دعم فيبوناتشي ??'},
     ]},
-    {name:'EMA',wtag:'x1.3',pvt:null,sigs:[
-      {name:'EMA 20',formula:'السعر مقابل EMA20',val:C>PPc?1:C<PPc?-1:0,w:1.3,desc:C>PPc?'فوق المتوسط - صاعد':'تحته - هابط'},
+    {name:'?? EMA Analysis',wtag:'×1.3',sigs:[
+      {name:'EMA 20',formula:'السعر مقابل EMA20',val:C>PPc?1:C<PPc?-1:0,w:1.3,desc:C>PPc?'فوق المتوسط ?? صاعد':'تحته ?? هابط'},
     ]},
   ];
-  var all=[];groups.forEach(function(g){g.sigs.forEach(function(s){all.push(s);});});
-  var rB=0,rS=0,wB=0,wS=0,wT2=0;
-  all.forEach(function(s){if(s.val>0){rB++;wB+=s.w;}else if(s.val<0){rS++;wS+=s.w;}wT2+=s.w;});
-  var net=rB-rS,wA=Math.max(wB,wS)/wT2;
-  var pat=detectPatterns(O,H,L,C);
-  return{groups:groups,dir:net>0?1:net<0?-1:0,wAgree:wA,body:body,upS:upS,loS:loS,rng:rng,TR:TR,patterns:pat};
+  let all=[];groups.forEach(g=>g.sigs.forEach(s=>all.push(s)));
+  let rB=0,rS=0,wB=0,wS=0,wT2=0;
+  all.forEach(s=>{if(s.val>0){rB++;wB+=s.w;}else if(s.val<0){rS++;wS+=s.w;}wT2+=s.w;});
+  const net=rB-rS,wA=Math.max(wB,wS)/wT2;
+  const pat=detectPatterns(O,H,L,C);
+  return{groups,dir:net>0?1:net<0?-1:0,wAgree:wA,body,upS,loS,rng,TR,patterns:pat};
 }
 
-function renderGroups(groups){return groups.map(function(g){
-  var gB=g.sigs.filter(function(s){return s.val>0;}).length,gS=g.sigs.filter(function(s){return s.val<0;}).length;
-  var gD=gB>gS?1:gS>gB?-1:0;var pv='';
-  if(g.pvt){pv='<div class="pvg">'+Object.keys(g.pvt).map(function(k){var ir=k.startsWith('R')||['H1','H2','H3','H4'].includes(k);var is=k.startsWith('S')||['L1','L2','L3','L4'].includes(k);return'<div class="pvc"><div class="pvl">'+k+'</div><div class="pvv '+(ir?'r':is?'s':'p')+'">'+f5(g.pvt[k])+'</div></div>';}).join('')+'</div>';}
-  return'<div class="grp"><div class="ghd"><div class="gnm">'+g.name+'</div><div class="grt"><div class="wtag">وزن '+g.wtag+'</div><div class="gbdg '+bc(gD)+'">'+bl(gD)+'</div></div></div>'+
-  g.sigs.map(function(s){return'<div class="eqr"><div class="eqi" style="color:'+(s.val>0?'var(--buy)':s.val<0?'var(--sel)':'var(--mt)')+'">'+ico(s.val)+'</div><div class="eqb"><div class="eqn">'+s.name+'</div><div class="eqf">'+s.formula+'</div><div class="eqv '+ec(s.val)+'">'+s.desc+'</div></div></div>';}).join('')+pv+'</div>';
+function renderGroups(groups){return groups.map(g=>{
+  const gB=g.sigs.filter(s=>s.val>0).length,gS=g.sigs.filter(s=>s.val<0).length;
+  const gD=gB>gS?1:gS>gB?-1:0;let pv='';
+  if(g.pvt){pv=`<div class="pvg">${Object.keys(g.pvt).map(k=>{const ir=k.startsWith('R')||['H1','H2','H3','H4'].includes(k);const is=k.startsWith('S')||['L1','L2','L3','L4'].includes(k);return`<div class="pvc"><div class="pvl">${k}</div><div class="pvv ${ir?'r':is?'s':'p'}">${f5(g.pvt[k])}</div></div>`;}).join('')}</div>`;}
+  return`<div class="grp"><div class="ghd"><div class="gnm">${g.name}</div><div class="grt"><div class="wtag">وزن ${g.wtag}</div><div class="gbdg ${bc(gD)}">${bl(gD)}</div></div></div>
+  ${g.sigs.map(s=>`<div class="eqr"><div class="eqi" style="color:${s.val>0?'var(--buy)':s.val<0?'var(--sel)':'var(--mt)'}">${ico(s.val)}</div>
+  <div class="eqb"><div class="eqn">${s.name}</div><div class="eqf">${s.formula}</div><div class="eqv ${ec(s.val)}">${s.desc}</div></div></div>`).join('')}${pv}</div>`;
 }).join('');}
 
-function showTab(i){document.querySelectorAll('.tab').forEach(function(t,j){t.classList.toggle('active',i===j);if(i===j){var an=window._ans[j];t.className='tab active '+(an.dir>0?'buy':an.dir<0?'sell':'neu');}});document.querySelectorAll('.tab-pane').forEach(function(p,j){p.classList.toggle('active',i===j);});}
+function showTab(i){document.querySelectorAll('.tab').forEach((t,j)=>{t.classList.toggle('active',i===j);if(i===j){const an=window._ans[j];t.className='tab active '+(an.dir>0?'buy':an.dir<0?'sell':'neu');}});document.querySelectorAll('.tab-pane').forEach((p,j)=>p.classList.toggle('active',i===j));}
 
 function calc(){
-  var entries=[];
-  for(var i=1;i<=5;i++){
-    entries.push({O:+document.getElementById('o'+i).value,H:+document.getElementById('h'+i).value,L:+document.getElementById('l'+i).value,C:+document.getElementById('c'+i).value,PC:+document.getElementById('p'+i).value,V:+document.getElementById('v'+i).value,label:['M5','M15','M30','H1','H4'][i-1]});
+  // Read 5 entry TFs
+  const entries=[];
+  for(let i=1;i<=5;i++){
+    const o=document.getElementById('o'+i);const h=document.getElementById('h'+i);const l=document.getElementById('l'+i);const c=document.getElementById('c'+i);const p=document.getElementById('p'+i);const v=document.getElementById('v'+i);
+    entries.push({O:+o.value,H:+h.value,L:+l.value,C:+c.value,PC:+p.value,V:+v.value,label:['M5','M15','M30','H1','H4'][i-1]});
   }
-  for(var i=0;i<entries.length;i++){var e=entries[i];if([e.O,e.H,e.L,e.C].some(isNaN)||e.H<e.L||e.H<e.O||e.H<e.C||e.L>e.O||e.L>e.C){alert('فريم '+(i+1)+': تاكد من البيانات');return;}}
-  var confs=[
-    {O:+document.getElementById('co1').value,H:+document.getElementById('ch1').value,L:+document.getElementById('cl1').value,C:+document.getElementById('cc1').value,label:'H1'},
-    {O:+document.getElementById('co2').value,H:+document.getElementById('ch2').value,L:+document.getElementById('cl2').value,C:+document.getElementById('cc2').value,label:'H4'}
-  ];
-  var capital=+document.getElementById('capital').value||200;
-  var riskPct=+document.getElementById('riskPct').value||2;
-  var profitPct=+document.getElementById('profitPct').value||3;
+  for(let i=0;i<entries.length;i++){const e=entries[i];if([e.O,e.H,e.L,e.C].some(isNaN)||e.H<e.L||e.H<e.O||e.H<e.C||e.L>e.O||e.L>e.C){alert('? فريم '+(i+1)+': تأكد من البيانات');return;}}
+  // Confirm
+  const confs=[{O:+document.getElementById('co1').value,H:+document.getElementById('ch1').value,L:+document.getElementById('cl1').value,C:+document.getElementById('cc1').value,V:+document.getElementById('cv1').value,label:'H1'},
+    {O:+document.getElementById('co2').value,H:+document.getElementById('ch2').value,L:+document.getElementById('cl2').value,C:+document.getElementById('cc2').value,V:+document.getElementById('cv2').value,label:'H4'}];
+  // Capital
+  const capital=+document.getElementById('capital').value||1000;
+  const riskPct=+document.getElementById('riskPct').value||2;
+  const profitPct=+document.getElementById('profitPct').value||3;
 
-  var ans=entries.map(function(e){return Object.assign(fullAn(e.O,e.H,e.L,e.C,e.PC,e.V),{label:e.label});});
+  // Analyze 5 entries
+  const ans=entries.map(e=>({...fullAn(e.O,e.H,e.L,e.C,e.PC,e.V),label:e.label}));
   window._ans=ans;
 
-  var buyCount=ans.filter(function(a){return a.dir>0;}).length;
-  var sellCount=ans.filter(function(a){return a.dir<0;}).length;
-  var mainDir=buyCount>sellCount?1:sellCount>buyCount?-1:0;
-  var entryAgree=Math.max(buyCount,sellCount)/5;
-  var avgWA=ans.reduce(function(s,a){return s+a.wAgree;},0)/5;
-  var entryBoost=entryAgree===1?0.10:entryAgree>=0.8?0.05:0;
+  const buyCount=ans.filter(a=>a.dir>0).length;
+  const sellCount=ans.filter(a=>a.dir<0).length;
+  const mainDir=buyCount>sellCount?1:sellCount>buyCount?-1:0;
+  const entryAgree=Math.max(buyCount,sellCount)/5;
+  const avgWA=ans.reduce((s,a)=>s+a.wAgree,0)/5;
+  const entryBoost=entryAgree===1?0.10:entryAgree>=0.8?0.05:entryAgree>=0.6?0:0;
 
-  var confRes=confs.map(function(e){var r=qdir(e.O,e.H,e.L,e.C);return r?Object.assign(r,{label:e.label}):null;}).filter(Boolean);
-  var confAgree=confRes.length>0?confRes.filter(function(r){return r.dir===mainDir;}).length/confRes.length:null;
-  var confBoost=confAgree===null?0:confAgree===1?0.10:confAgree>=0.5?0.05:-0.05;
+  // Confirm
+  const confRes=confs.map(e=>{const r=qdir(e.O,e.H,e.L,e.C);return r?{...r,label:e.label}:null;}).filter(Boolean);
+  const confAgree=confRes.length>0?confRes.filter(r=>r.dir===mainDir).length/confRes.length:null;
+  const confBoost=confAgree===null?0:confAgree===1?0.10:confAgree>=0.5?0.05:-0.05;
 
-  var closePrices=entries.map(function(e){return e.C;});
-  var rsiVal=rsiCalc(closePrices);
-  var macdVal=macdCalc(closePrices);
-  var rsiDir=rsiVal>50?1:rsiVal<50?-1:0;
-  var macdDir=macdVal>0?1:macdVal<0?-1:0;
-  var rsiBoost=rsiDir===mainDir?0.05:0;
-  var macdBoost=macdDir===mainDir?0.05:0;
+  // RSI & MACD
+  const closePrices=entries.map(e=>e.C);
+  const rsiVal=rsi(closePrices);
+  const macdVal=macd(closePrices);
+  const rsiDir=rsiVal>50?1:rsiVal<50?-1:0;
+  const macdDir=macdVal>0?1:macdVal<0?-1:0;
+  const rsiBoost=rsiDir===mainDir?0.05:0;
+  const macdBoost=macdDir===mainDir?0.05:0;
 
-  var allPatterns=ans.map(function(a){return a.patterns.pInfo;}).reduce(function(a,b){return a.concat(b);});
-  var bullPats=allPatterns.filter(function(p){return p.type==='bullish';}).length;
-  var bearPats=allPatterns.filter(function(p){return p.type==='bearish';}).length;
-  var patBoost=bullPats>bearPats&&mainDir===1?0.03:bearPats>bullPats&&mainDir===-1?0.03:0;
+  // Patterns
+  const allPatterns=ans.map(a=>a.patterns.pInfo).flat();
+  const bullPats=allPatterns.filter(p=>p.type==='bullish').length;
+  const bearPats=allPatterns.filter(p=>p.type==='bearish').length;
+  const patBoost=bullPats>bearPats&&mainDir===1?0.03:bearPats>bullPats&&mainDir===-1?0.03:0;
 
-  var finalAcc=Math.min(0.99,avgWA+entryBoost+confBoost+rsiBoost+macdBoost+patBoost);
+  // Final Score Calculation
+  let finalScore = 0;
+  // Entry agreement (30%)
+  finalScore += entryAgree * 30;
+  // Indicator quality (25%)
+  const rsiQuality = (rsiDir === mainDir) ? 12.5 : 0;
+  const macdQuality = (macdDir === mainDir) ? 12.5 : 0;
+  finalScore += rsiQuality + macdQuality;
+  // Pattern quality (20%)
+  const patternScore = allPatterns.length > 0 ? (bullPats - bearPats) / Math.max(bullPats + bearPats, 1) : 0;
+  finalScore += patternScore * 20;
+  // Volume quality (15%)
+  const avgVol = entries.reduce((s,e) => s + e.V, 0) / entries.length;
+  const volQuality = avgVol > 200 ? 15 : avgVol > 100 ? 10 : avgVol > 50 ? 5 : 0;
+  finalScore += volQuality;
+  // Confirmation (10%)
+  const confQuality = confAgree === 1 ? 10 : confAgree >= 0.5 ? 5 : 0;
+  finalScore += confQuality;
+  
+  finalScore = Math.min(100, Math.max(0, finalScore));
+  
+  // Determine status
+  let status = '';
+  let statusClass = '';
+  if (finalScore >= 90) { status = '?? ELITE - إشارة ذهبية نادرة'; statusClass = 'elite'; }
+  else if (finalScore >= 75) { status = '?? GOLD - إشارة قوية جداً'; statusClass = 'gold'; }
+  else if (finalScore >= 60) { status = '?? SILVER - إشارة جيدة'; statusClass = 'silver'; }
+  else if (finalScore >= 40) { status = '?? BRONZE - إشارة ضعيفة'; statusClass = 'bronze'; }
+  else { status = '? REJECT - تجنب الدخول'; statusClass = 'bronze'; }
 
-  var now=new Date();var hours=now.getHours();
-  var goldenHours=[10,11,14,15,20,21];var isGolden=goldenHours.includes(hours);
-  var nextAngle=90;var angleTime=5*nextAngle;
+  // Final Decision
+  let decision = '';
+  let decisionClass = '';
+  let decisionReason = '';
+  if (finalScore >= 90 && mainDir !== 0) {
+    decision = '?? دخول قوي جداً (STRONG BUY/SELL)';
+    decisionClass = 'strong';
+    decisionReason = 'جميع المؤشرات متوافقة بشكل مثالي - ثقة عالية جداً';
+  } else if (finalScore >= 75 && mainDir !== 0) {
+    decision = '? دخول جيد (BUY/SELL)';
+    decisionClass = 'good';
+    decisionReason = 'معظم المؤشرات متوافقة - ثقة عالية';
+  } else if (finalScore >= 60 && mainDir !== 0) {
+    decision = '?? دخول محفوف بالمخاطر (RISKY)';
+    decisionClass = 'risky';
+    decisionReason = 'بعض المؤشرات غير متوافقة - ثقة متوسطة';
+  } else {
+    decision = '? انتظر (WAIT)';
+    decisionClass = 'avoid';
+    decisionReason = 'ظروف السوق غير واضحة - ثقة منخفضة';
+  }
 
-  var nR=mainDir===1?ans[0].loS:ans[0].upS;var body=ans[0].body;
-  var nR2=body>0?nR/body:0;
-  var nLv,nCl,nMsg,nEx;
-  if(nR2<0.3){nLv='منخفض';nCl='low';nMsg='شمعة نظيفة - السعر سيبتعد بسرعة';nEx=0;}
-  else if(nR2<0.7){nLv='متوسط';nCl='mid';nMsg='ضجيج معقول - محتاج شمعة اضافية';nEx=1;}
-  else if(nR2<1.3){nLv='مرتفع';nCl='high';nMsg='ضجيج عالي - زود المدة';nEx=2;}
-  else{nLv='خطر';nCl='danger';nMsg='ضجيج خطير - فكر مرتين';nEx=3;}
-  var bC=finalAcc>=0.9?3:finalAcc>=0.8?2:1;
-  var tC=Math.min(bC+nEx,8);var dur=Math.min(tC*5,40);
+  // Confidence Level
+  let confidenceLevel = '';
+  let confidenceColor = '';
+  if (finalScore >= 80) { confidenceLevel = 'عالية جداً ??'; confidenceColor = '#4ade80'; }
+  else if (finalScore >= 60) { confidenceLevel = 'عالية ??'; confidenceColor = '#f59e0b'; }
+  else if (finalScore >= 40) { confidenceLevel = 'متوسطة ??'; confidenceColor = '#fb923c'; }
+  else { confidenceLevel = 'منخفضة ??'; confidenceColor = '#f87171'; }
 
-  var riskAmount=capital*riskPct/100;
-  var profitAmount=capital*profitPct/100;
-  var rrRatio=profitAmount/riskAmount;
+  // Warnings
+  const warnings = [];
+  if (rsiVal > 80) warnings.push({type: 'danger', text: '?? RSI فوق 80 - تشبع شراء شديد (احتمال انعكاس)'});
+  if (rsiVal < 20) warnings.push({type: 'danger', text: '?? RSI تحت 20 - تشبع بيع شديد (احتمال انعكاس)'});
+  if (entryAgree < 0.6) warnings.push({type: 'warning', text: '?? فريمات دخول متعارضة - إشارة ضعيفة'});
+  if (confAgree !== null && confAgree < 0.5) warnings.push({type: 'danger', text: '?? فريمات التأكيد معاكسة - خطر'});
+  if (avgVol < 50) warnings.push({type: 'warning', text: '?? حجم تداول منخفض - إشارة ضعيفة'});
+  if (finalScore < 40) warnings.push({type: 'danger', text: '?? درجة منخفضة جداً - تجنب الدخول'});
+  if (bullPats > 0 && bearPats > 0) warnings.push({type: 'info', text: '?? أنماط متضاربة - انتظر تأكيد إضافي'});
+  
+  if (warnings.length === 0) warnings.push({type: 'info', text: '? لا توجد تحذيرات - كل الظروف مثالية'});
 
-  document.getElementById('entry-cards').innerHTML=ans.map(function(a,i){
-    return'<div class="ag-card '+(a.dir>0?'buy':a.dir<0?'sell':'wait')+'"><div class="ag-tf">'+['①','②','③','④','⑤'][i]+' '+a.label+'</div><div class="ag-dir '+(a.dir>0?'buy':a.dir<0?'sell':'wait')+'">'+(a.dir>0?'▲ شراء':a.dir<0?'▼ بيع':'— محايد')+'</div><div class="ag-acc">'+Math.round(a.wAgree*100)+'% دقة</div></div>';
-  }).join('');
+  // Smart Risk Management
+  const volatility = entries.reduce((s,e) => s + (e.H - e.L), 0) / entries.length;
+  let adjustedRisk = riskPct;
+  if (finalScore >= 90) adjustedRisk = Math.min(riskPct * 1.5, 5);
+  else if (finalScore >= 75) adjustedRisk = riskPct;
+  else if (finalScore >= 60) adjustedRisk = riskPct * 0.7;
+  else adjustedRisk = 0;
+  
+  if (volatility > 0.02) adjustedRisk *= 0.7;
+  
+  const riskAmount = capital * adjustedRisk / 100;
+  const profitAmount = capital * profitPct / 100;
+  const rrRatio = profitAmount / riskAmount;
+  const stopLoss = volatility * 1.5;
+  const takeProfit = stopLoss * 2.5;
+  const lotSize = riskAmount / stopLoss;
 
-  var ef=document.getElementById('entry-fil');
+  // Duration
+  const nR=mainDir===1?ans[0].loS:ans[0].upS;const body=ans[0].body;
+  const nR2=body>0?nR/body:0;
+  let nLv,nCl,nMsg,nEx;
+  if(nR2<0.3){nLv='منخفض';nCl='low';nMsg='شمعة نظيفة — السعر سيبتعد بسرعة ?';nEx=0;}
+  else if(nR2<0.7){nLv='متوسط';nCl='mid';nMsg='ضجيج معقول — محتاج شمعة إضافية ??';nEx=1;}
+  else if(nR2<1.3){nLv='مرتفع';nCl='high';nMsg='ضجيج عالي — زود المدة ??';nEx=2;}
+  else{nLv='خطر';nCl='danger';nMsg='ضجيج خطير — فكر مرتين ??';nEx=3;}
+  const bC=finalScore>=90?3:finalScore>=75?2:1;
+  const tC=Math.min(bC+nEx,8);
+  const dur=Math.min(tC*5,40);
+
+  // Render Entry Cards
+  document.getElementById('entry-cards').innerHTML=ans.map((a,i)=>`
+    <div class="ag-card ${a.dir>0?'buy':a.dir<0?'sell':'wait'}">
+      <div class="ag-tf">${['?','??','??','??','??'][i]} ${a.label}</div>
+      <div class="ag-dir ${a.dir>0?'buy':a.dir<0?'sell':'wait'}">${a.dir>0?'?? شراء':a.dir<0?'?? بيع':'? محايد'}</div>
+      <div class="ag-acc">${Math.round(a.wAgree*100)}% دقة</div>
+    </div>`).join('');
+
+  const ef=document.getElementById('entry-fil');
   ef.style.width=Math.round(entryAgree*100)+'%';
-  ef.style.background=entryAgree===1?'#4ade80':entryAgree>=0.6?'#f59e0b':'#f87171';
+  ef.style.background=entryAgree===1?'#4ade80':entryAgree>=0.8?'#f59e0b':entryAgree>=0.6?'#f59e0b':'#f87171';
   document.getElementById('entry-num').textContent=Math.round(entryAgree*100)+'%';
-  var evd=document.getElementById('entry-vd');
+  const evd=document.getElementById('entry-vd');
   evd.className='asb-vd '+(entryAgree===1?'all':entryAgree>=0.6?'most':'conflict');
-  evd.textContent=entryAgree===1?'✅ 5 فريمات متفقة على '+(mainDir>0?'الشراء':'البيع')+' - اشارة ذهبية':
-    entryAgree>=0.8?'✦ '+Math.max(buyCount,sellCount)+' من 5 متفقة - قوية':
-    entryAgree>=0.6?'~ '+Math.max(buyCount,sellCount)+' من 5 - معقولة':
-    '✗ الفريمات متعارضة - لا تدخل';
+  evd.textContent=entryAgree===1?`?? 5 فريمات متفقة على ${mainDir>0?'الشراء':'البيع'} — إشارة ذهبية نادرة`:
+    entryAgree>=0.8?`?? ${Math.max(buyCount,sellCount)} من 5 فريمات متفقة — إشارة قوية جداً`:
+    entryAgree>=0.6?`? ${Math.max(buyCount,sellCount)} من 5 فريمات — إشارة جيدة`:
+    `? الفريمات متعارضة — لا تدخل`;
 
-  var patDiv=document.getElementById('pattern-grid');
-  if(allPatterns.length>0){patDiv.innerHTML=allPatterns.slice(0,8).map(function(p){return'<div class="pattern-badge '+(p.type==='bullish'?'found':p.type==='bearish'?'bearish':'')+'">'+p.name+' '+(p.type==='bullish'?'▲':p.type==='bearish'?'▼':'—')+'</div>';}).join('');}
-  else{patDiv.innerHTML='<div style="color:var(--mt);font-size:11px;">لا توجد انماط واضحة</div>';}
+  // Patterns
+  const patternDiv=document.getElementById('pattern-grid');
+  if(allPatterns.length>0){
+    patternDiv.innerHTML=allPatterns.slice(0,8).map(p=>`<div class="pattern-badge ${p.type==='bullish'?'found':p.type==='bearish'?'bearish':''}">${p.name} ${p.type==='bullish'?'??':p.type==='bearish'?'??':'?'}</div>`).join('');
+  }else{patternDiv.innerHTML='<div style="color:var(--mt);font-size:11px;">? لا توجد أنماط واضحة</div>';}
 
-  document.getElementById('time-analysis').innerHTML='<div class="time-item"><div class="tval">'+(isGolden?'نعم':'لا')+'</div><div>وقت ذهبي</div></div><div class="time-item"><div class="tval">'+nextAngle+'</div><div>زاوية جان</div></div><div class="time-item"><div class="tval">'+fmt(angleTime)+'</div><div>الوقت المتوقع</div></div>';
+  // Time Analysis
+  const now=new Date();
+  const hours=now.getHours();
+  const goldenHours=[10,11,14,15,20,21];
+  const isGolden=goldenHours.includes(hours);
+  const gannAngles=[45,90,135,180,225,270,315,360];
+  const nextAngle=gannAngles.find(a=>a>45)||90;
+  const angleTime=5*nextAngle;
 
+  document.getElementById('time-analysis').innerHTML=`
+    <div class="time-item"><div class="tval">${isGolden?'?? نعم':'?? لا'}</div><div>? وقت ذهبي</div></div>
+    <div class="time-item"><div class="tval">${nextAngle}°</div><div>?? زاوية جان القادمة</div></div>
+    <div class="time-item"><div class="tval">${fmt(angleTime)}</div><div>?? الوقت المتوقع</div></div>
+  `;
+
+  // Confirm
   if(confRes.length>0){
-    document.getElementById('conf-cards').innerHTML=confRes.map(function(r,i){return'<div class="cf-card '+(r.dir>0?'buy':r.dir<0?'sell':'')+'"><div class="cf-tf">'+['🔗①','🔗②'][i]+' '+r.label+'</div><div class="cf-dir '+(r.dir>0?'buy':r.dir<0?'sell':'wait')+'">'+(r.dir>0?'▲ شراء':r.dir<0?'▼ بيع':'— محايد')+'</div></div>';}).join('');
-    var cf=document.getElementById('conf-fil');
+    document.getElementById('conf-cards').innerHTML=confRes.map((r,i)=>`
+      <div class="cf-card ${r.dir>0?'buy':r.dir<0?'sell':''}">
+        <div class="cf-tf">${['?','?'][i]} ${r.label}</div>
+        <div class="cf-dir ${r.dir>0?'buy':r.dir<0?'sell':'wait'}">${r.dir>0?'?? شراء':r.dir<0?'?? بيع':'? محايد'}</div>
+      </div>`).join('');
+    const cf=document.getElementById('conf-fil');
     cf.style.width=Math.round((confAgree||0)*100)+'%';
     cf.style.background=confAgree===1?'#4ade80':confAgree>=0.5?'#f59e0b':'#f87171';
     document.getElementById('conf-num').textContent=Math.round((confAgree||0)*100)+'%';
-    var cvd=document.getElementById('conf-vd');
+    const cvd=document.getElementById('conf-vd');
     cvd.className='asb-vd '+(confAgree===1?'all':confAgree>=0.5?'most':'conflict');
-    cvd.textContent=confAgree===1?'✅ كلا الفريمين يؤكدان الاتجاه':confAgree>=0.5?'✓ فريم واحد يؤكد':'✗ فريمات التاكيد معاكسة - احذر';
+    cvd.textContent=confAgree===1?`?? كلا الفريمين يؤكدان الاتجاه — ثقة عالية جداً`:
+      confAgree>=0.5?`? فريم واحد يؤكد — جيد`:
+      `? فريمات التأكيد معاكسة — احذر`;
   }
 
-  var dc=document.getElementById('dcard'),dt=document.getElementById('dtext'),dd=document.getElementById('ddur'),ds=document.getElementById('dsub');
-  if(mainDir>0&&entryAgree>=0.6){dc.className='dcard buy';dt.className='dtext buy';dt.textContent='▲ CALL (شراء)';dd.textContent=fmt(dur);ds.textContent='فريم التنفيذ: M5';}
-  else if(mainDir<0&&entryAgree>=0.6){dc.className='dcard sell';dt.className='dtext sell';dt.textContent='▼ PUT (بيع)';dd.textContent=fmt(dur);ds.textContent='فريم التنفيذ: M5';}
-  else{dc.className='dcard wait';dt.className='dtext wait';dt.textContent='— انتظر';dd.textContent='—';ds.textContent='الفريمات غير متفقة';}
+  // Direction
+  const dc=document.getElementById('dcard');const dt=document.getElementById('dtext'),dd=document.getElementById('ddur'),ds=document.getElementById('dsub');
+  if(mainDir>0&&entryAgree>=0.6){
+    dc.className='dcard buy';dt.className='dtext buy';dt.textContent='?? CALL (شراء)';
+    dd.textContent=fmt(dur);ds.textContent='? فريم التنفيذ: M5';
+  }else if(mainDir<0&&entryAgree>=0.6){
+    dc.className='dcard sell';dt.className='dtext sell';dt.textContent='?? PUT (بيع)';
+    dd.textContent=fmt(dur);ds.textContent='? فريم التنفيذ: M5';
+  }else{
+    dc.className='dcard wait';dt.className='dtext wait';dt.textContent='? انتظر';
+    dd.textContent='—';ds.textContent='? الفريمات غير متفقة';
+  }
 
-  document.getElementById('risk-grid').innerHTML='<div class="risk-item"><div class="label">المخاطرة</div><div class="value green">$'+riskAmount.toFixed(2)+'</div></div><div class="risk-item"><div class="label">الربح المتوقع</div><div class="value gold">$'+profitAmount.toFixed(2)+'</div></div><div class="risk-item"><div class="label">Risk/Reward</div><div class="value '+(rrRatio>=2?'green':rrRatio>=1?'gold':'red')+'">'+rrRatio.toFixed(2)+':1</div></div>';
+  // Risk
+  document.getElementById('risk-grid').innerHTML=`
+    <div class="risk-item"><div class="label">??? المخاطرة المعدلة</div><div class="value green">${adjustedRisk.toFixed(1)}%</div></div>
+    <div class="risk-item"><div class="label">?? مبلغ المخاطرة</div><div class="value green">$${riskAmount.toFixed(2)}</div></div>
+    <div class="risk-item"><div class="label">?? الربح المتوقع</div><div class="value gold">$${profitAmount.toFixed(2)}</div></div>
+    <div class="risk-item"><div class="label">?? Risk/Reward</div><div class="value ${rrRatio>=2?'green':rrRatio>=1?'gold':'red'}">${rrRatio.toFixed(2)}:1</div></div>
+    <div class="risk-item"><div class="label">?? حجم العقد</div><div class="value gold">${lotSize.toFixed(4)}</div></div>
+    <div class="risk-item"><div class="label">?? التقلب (ATR)</div><div class="value gold">${volatility.toFixed(5)}</div></div>
+  `;
 
-  var alerts=[];
-  if(finalAcc<0.7)alerts.push('⚠ دقة منخفضة - انتظر اشارة اقوى');
-  if(entryAgree<0.6)alerts.push('⚠ فريمات دخول متعارضة');
-  if(confAgree!==null&&confAgree<0.5)alerts.push('⚠ فريمات التاكيد معاكسة');
-  if(nLv==='خطر')alerts.push('⚠ ضجيج خطير - فكر مرتين');
-  if(rrRatio<1)alerts.push('⚠ Risk/Reward منخفض - لا تدخل');
-  if(finalAcc>=0.9&&entryAgree>=0.8&&(confAgree===null||confAgree>=0.5))alerts.push('✅ كل شيء مثالي - ادخل بثقة');
-  else if(finalAcc>=0.8&&entryAgree>=0.6)alerts.push('✓ اشارة جيدة - ادخل بحذر');
-  else alerts.push('— انتظر اشارة افضل');
-  document.getElementById('alert-text').textContent=alerts[0]||'لا توجد تنبيهات';
+  // Alerts
+  const alerts=[];
+  if(finalScore<60)alerts.push('?? دقة منخفضة — انتظر إشارة أقوى');
+  if(entryAgree<0.6)alerts.push('? فريمات دخول متعارضة');
+  if(confAgree!==null&&confAgree<0.5)alerts.push('? فريمات التأكيد معاكسة');
+  if(nLv=='خطر')alerts.push('?? ضجيج خطير — فكر مرتين');
+  if(rrRatio<1)alerts.push('?? Risk/Reward منخفض — لا تدخل');
+  if(finalScore>=90&&entryAgree>=0.8&&confAgree>=0.5)alerts.push('?? كل شيء مثالي — ادخل بثقة عالية');
+  else if(finalScore>=75&&entryAgree>=0.6)alerts.push('? إشارة جيدة — ادخل بحذر');
+  else alerts.push('? انتظر إشارة أفضل');
+  document.getElementById('alert-text').textContent=alerts[0]||'? لا توجد تنبيهات';
 
-  document.getElementById('macc').textContent=Math.round(finalAcc*100)+'%';
-  document.getElementById('maccs').textContent=finalAcc>=0.9?'ذهبية':finalAcc>=0.8?'قوية':finalAcc>=0.7?'جيدة':'ضعيفة';
+  // Metrics
+  document.getElementById('macc').textContent=Math.round(finalScore)+'%';
+  document.getElementById('maccs').textContent=finalScore>=90?'?? ذهبية نادرة':finalScore>=75?'?? قوية جداً':finalScore>=60?'?? جيدة':'?? ضعيفة';
   document.getElementById('ment').textContent=Math.max(buyCount,sellCount)+'/5';
   document.getElementById('mconf').textContent=confRes.length>0?Math.round((confAgree||0)*confRes.length)+'/'+confRes.length:'—';
   document.getElementById('mrsi').textContent=rsiVal.toFixed(1);
-  document.getElementById('mrsis').textContent=rsiVal>50?'صاعد':rsiVal<50?'هابط':'محايد';
+  document.getElementById('mrsis').textContent=rsiVal>50?'?? صاعد':rsiVal<50?'?? هابط':'? محايد';
   document.getElementById('mmacd').textContent=(macdVal>0?'+':'')+macdVal.toFixed(5);
-  document.getElementById('mmacds').textContent=macdVal>0?'ايجابي':macdVal<0?'سلبي':'محايد';
+  document.getElementById('mmacds').textContent=macdVal>0?'?? إيجابي':macdVal<0?'?? سلبي':'? محايد';
 
-  var mv=ans[0].rng||1;
+  // Noise
+  const mv=ans[0].rng||1;
   document.getElementById('nb-body').style.width=pct(ans[0].body/mv);
   document.getElementById('nb-noise').style.width=pct(nR/mv);
   document.getElementById('nv-body').textContent=f5(ans[0].body);
   document.getElementById('nv-noise').textContent=f5(nR);
   document.getElementById('nv-range').textContent=f5(ans[0].rng);
-  document.getElementById('ndirl').textContent=mainDir>0?'ضجيج (شراء)':'ضجيج (بيع)';
-  var nvd=document.getElementById('nvd');nvd.className='nvd '+nCl;
-  nvd.textContent=nLv+' - '+nMsg;
+  document.getElementById('ndirl').textContent=mainDir>0?'ضجيج ?? (شراء)':'ضجيج ?? (بيع)';
+  const nvd=document.getElementById('nvd');nvd.className='nvd '+nCl;
+  nvd.textContent='?? '+nLv+' — '+nMsg;
 
-  var labels=['M5','M15','M30','H1','H4'];
-  document.getElementById('tabs').innerHTML=ans.map(function(a,i){
-    return'<div class="tab'+(i===0?' active '+(a.dir>0?'buy':a.dir<0?'sell':'neu'):'')+'" onclick="showTab('+i+')">'+['①','②','③','④','⑤'][i]+' '+labels[i]+' '+(a.dir>0?'▲':a.dir<0?'▼':'—')+'</div>';
-  }).join('');
-  document.getElementById('tab-panes').innerHTML=ans.map(function(a,i){
-    return'<div class="tab-pane'+(i===0?' active':'')+'" id="pane'+i+'"><div class="grps">'+renderGroups(a.groups)+'</div></div>';
-  }).join('');
+  // Tabs
+  const labels=['M5','M15','M30','H1','H4'];
+  document.getElementById('tabs').innerHTML=ans.map((a,i)=>
+    `<div class="tab${i===0?' active '+(a.dir>0?'buy':a.dir<0?'sell':'neu'):''}" onclick="showTab(${i})">
+      ${['?','??','??','??','??'][i]} ${labels[i]} ${a.dir>0?'??':a.dir<0?'??':'?'}
+    </div>`).join('');
+  document.getElementById('tab-panes').innerHTML=ans.map((a,i)=>
+    `<div class="tab-pane${i===0?' active':''}" id="pane${i}">
+      <div class="grps">${renderGroups(a.groups)}</div>
+    </div>`).join('');
+
+  // Final Score Display
+  document.getElementById('finalScoreNum').textContent = Math.round(finalScore);
+  document.getElementById('finalScoreStatus').textContent = status;
+  document.getElementById('finalScoreStatus').className = 'score-status ' + statusClass;
+
+  // Final Decision Display
+  document.getElementById('decisionText').textContent = decision;
+  document.getElementById('decisionText').className = 'decision-text ' + decisionClass;
+  document.getElementById('decisionReason').textContent = '?? ' + decisionReason;
+
+  // Confidence Meter
+  document.getElementById('confidenceFill').style.width = Math.round(finalScore) + '%';
+  document.getElementById('confidenceFill').style.background = confidenceColor;
+  document.getElementById('confidencePercent').textContent = Math.round(finalScore) + '%';
+  document.getElementById('confidenceLabel').textContent = '?? ' + confidenceLevel;
+
+  // Warnings
+  const warningsContainer = document.getElementById('warningsContainer');
+  warningsContainer.innerHTML = warnings.map(w => 
+    `<div class="warning-item ${w.type}">${w.text}</div>`
+  ).join('');
+
+  // Recommendation
+  document.getElementById('recDecision').textContent = decision;
+  document.getElementById('recDecision').className = 'rec-decision ' + decisionClass;
+  document.getElementById('recReason').textContent = decisionReason;
+  document.getElementById('recLot').textContent = lotSize.toFixed(4);
+  document.getElementById('recSL').textContent = (mainDir > 0 ? (entries[0].C - stopLoss) : (entries[0].C + stopLoss)).toFixed(5);
+  document.getElementById('recTP').textContent = (mainDir > 0 ? (entries[0].C + takeProfit) : (entries[0].C - takeProfit)).toFixed(5);
+  document.getElementById('recDuration').textContent = fmt(dur);
 
   document.getElementById('result').style.display='block';
   document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
