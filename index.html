@@ -171,9 +171,9 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 </head>
 <body>
 <div class="hdr">
-  <div class="hico">??</div>
+  <div class="hico"></div>
   <div><div class="htit">���� ������ OTC ��������</div><div class="hsub">5 ������ � 25 ������ � AI � ����� ������ � ����� ���� � ����� ����</div></div>
-  <div class="hbdg">? ULTIMATE</div>
+  <div class="hbdg">★ ULTIMATE</div>
 </div>
 <div class="main">
 
@@ -247,7 +247,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 <!-- Confirm TFs -->
 <div class="slbl">������ �������</div>
 <div class="conf-block">
-  <div class="conf-head"><span style="font-size:14px">?</span><div class="conf-lbl">����� H1</div></div>
+  <div class="conf-head"><span style="font-size:14px">🔗</span><div class="conf-lbl">����� H1</div></div>
   <div class="conf-fields">
     <div class="fd"><label>Open</label><input type="number" id="co1" step="0.00001"/></div>
     <div class="fd"><label>High</label><input type="number" id="ch1" step="0.00001"/></div>
@@ -257,7 +257,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
   </div>
 </div>
 <div class="conf-block">
-  <div class="conf-head"><span style="font-size:14px">?</span><div class="conf-lbl">����� H4</div></div>
+  <div class="conf-head"><span style="font-size:14px">🔗</span><div class="conf-lbl">����� H4</div></div>
   <div class="conf-fields">
     <div class="fd"><label>Open</label><input type="number" id="co2" step="0.00001"/></div>
     <div class="fd"><label>High</label><input type="number" id="ch2" step="0.00001"/></div>
@@ -270,7 +270,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 <!-- Capital Management -->
 <div class="slbl">����� ��� �����</div>
 <div class="tf-block" style="border-color:var(--ac);">
-  <div class="tf-head" style="background:var(--acd);"><span style="font-size:14px">??</span><div class="tf-label" style="color:var(--ac);">����� ��������</div></div>
+  <div class="tf-head" style="background:var(--acd);"><span style="font-size:14px"></span><div class="tf-label" style="color:var(--ac);">����� ��������</div></div>
   <div class="tf-fields" style="grid-template-columns:repeat(3,1fr);">
     <div class="fd"><label>��� ����� ($)</label><input type="number" id="capital" value="200" step="1"/></div>
     <div class="fd"><label>���� �������� (%)</label><input type="number" id="riskPct" value="2" step="0.5"/></div>
@@ -278,7 +278,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
   </div>
 </div>
 
-<button class="btn" onclick="calc()">?? ���� ������� �������</button>
+<button class="btn" onclick="calc()"> ���� ������� �������</button>
 
 <!-- ===== RESULT ===== -->
 <div class="result" id="result">
@@ -293,14 +293,14 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
   </div>
 
   <!-- Patterns -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">??? ����� ������</div><div class="sep-line"></div></div>
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">🔗 ����� ������</div><div class="sep-line"></div></div>
   <div class="nbox" id="patterns-box">
     <div class="nt">����� ������ ��������</div>
     <div class="pattern-grid" id="pattern-grid"></div>
   </div>
 
   <!-- Time Analysis -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">? ������� ������</div><div class="sep-line"></div></div>
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">🔗 ������� ������</div><div class="sep-line"></div></div>
   <div class="nbox" id="time-box">
     <div class="nt">����� �������� �������</div>
     <div class="time-analysis" id="time-analysis"></div>
@@ -322,7 +322,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
   </div>
 
   <!-- Risk Management -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">?? ����� ��������</div><div class="sep-line"></div></div>
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt"> ����� ��������</div><div class="sep-line"></div></div>
   <div class="risk-box">
     <div class="nt">������ ����� ��������</div>
     <div class="risk-grid" id="risk-grid"></div>
@@ -330,23 +330,23 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 
   <!-- Alerts -->
   <div class="alert-box" id="alert-box">
-    <div class="alert-title">?? �������</div>
+    <div class="alert-title"> �������</div>
     <div class="alert-text" id="alert-text">�� ���� �������</div>
   </div>
 
   <!-- Metrics -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">?? ��������</div><div class="sep-line"></div></div>
+  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt"> ��������</div><div class="sep-line"></div></div>
   <div class="mets">
-    <div class="met hi"><div class="met-l">?? ��� �������</div><div class="met-v" id="macc"></div><div class="met-s" id="maccs"></div></div>
-    <div class="met"><div class="met-l">?? ����� ������</div><div class="met-v" id="ment"></div><div class="met-s">�� 5 ������</div></div>
-    <div class="met"><div class="met-l">? ����� MTF</div><div class="met-v" id="mconf"></div><div class="met-s">�� 2 ������</div></div>
-    <div class="met"><div class="met-l">?? RSI</div><div class="met-v" id="mrsi"></div><div class="met-s" id="mrsis"></div></div>
-    <div class="met"><div class="met-l">?? MACD</div><div class="met-v" id="mmacd"></div><div class="met-s" id="mmacds"></div></div>
+    <div class="met hi"><div class="met-l"> ��� �������</div><div class="met-v" id="macc"></div><div class="met-s" id="maccs"></div></div>
+    <div class="met"><div class="met-l"> ����� ������</div><div class="met-v" id="ment"></div><div class="met-s">�� 5 ������</div></div>
+    <div class="met"><div class="met-l">🔗 ����� MTF</div><div class="met-v" id="mconf"></div><div class="met-s">�� 2 ������</div></div>
+    <div class="met"><div class="met-l"> RSI</div><div class="met-v" id="mrsi"></div><div class="met-s" id="mrsis"></div></div>
+    <div class="met"><div class="met-l"> MACD</div><div class="met-v" id="mmacd"></div><div class="met-s" id="mmacds"></div></div>
   </div>
 
   <!-- Noise -->
   <div class="nbox">
-    <div class="nt">?? ����� ������</div>
+    <div class="nt"> ����� ������</div>
     <div class="nbr"><div class="nbl">��� ������</div><div class="nbt"><div class="nbf" id="nb-body" style="background:var(--ac)"></div></div><div class="nbn" id="nv-body"></div></div>
     <div class="nbr"><div class="nbl" id="ndirl">���� �������</div><div class="nbt"><div class="nbf" id="nb-noise" style="background:var(--wn)"></div></div><div class="nbn" id="nv-noise"></div></div>
     <div class="nbr"><div class="nbl">������ ������</div><div class="nbt"><div class="nbf" style="background:var(--bds);width:100%"></div></div><div class="nbn" id="nv-range"></div></div>
@@ -365,10 +365,10 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 <script>
 function f5(n){return parseFloat(n).toFixed(5)}
 function pct(n){return(n*100).toFixed(1)+'%'}
-function ico(v){return v>0?'?':v<0?'?':'�'}
-function ec(v){return v>0?'up':v<0?'down':'neu'}
-function bc(v){return v>0?'buy':v<0?'sell':'neu'}
-function bl(v){return v>0?'����':v<0?'���':'�����'}
+function ico(v){return v>0🔗'🔗':v<0🔗'🔗':'�'}
+function ec(v){return v>0🔗'up':v<0🔗'down':'neu'}
+function bc(v){return v>0🔗'buy':v<0🔗'sell':'neu'}
+function bl(v){return v>0🔗'����':v<0🔗'���':'�����'}
 function fmt(m){if(m<60)return m+' �����';if(m===60)return '����';if(m===120)return '������';if(m===180)return '3 �����';if(m===240)return '4 �����';if(m%60===0)return(m/60)+' �����';return m+' �����';}
 
 function detectPatterns(O,H,L,C){
@@ -378,11 +378,11 @@ function detectPatterns(O,H,L,C){
   // Doji
   if(range>0 && body/range<0.1){patterns.push('Doji');pInfo.push({name:'Doji',type:'neutral'});}
   // Hammer
-  if(dn>body*2.5&&up<body*0.5){patterns.push(bull?'Hammer':'Hanging Man');pInfo.push({name:bull?'Hammer':'Hanging Man',type:bull?'bullish':'bearish'});}
+  if(dn>body*2.5&&up<body*0.5){patterns.push(bull🔗'Hammer':'Hanging Man');pInfo.push({name:bull🔗'Hammer':'Hanging Man',type:bull🔗'bullish':'bearish'});}
   // Shooting Star
-  if(up>body*2.5&&dn<body*0.5){patterns.push(bull?'Shooting Star':'Inv Hammer');pInfo.push({name:bull?'Shooting Star':'Inv Hammer',type:bull?'bearish':'bullish'});}
+  if(up>body*2.5&&dn<body*0.5){patterns.push(bull🔗'Shooting Star':'Inv Hammer');pInfo.push({name:bull🔗'Shooting Star':'Inv Hammer',type:bull🔗'bearish':'bullish'});}
   // Marubozu
-  if(body>range*0.75){patterns.push(bull?'Marubozu Bull':'Marubozu Bear');pInfo.push({name:bull?'Marubozu Bull':'Marubozu Bear',type:bull?'bullish':'bearish'});}
+  if(body>range*0.75){patterns.push(bull🔗'Marubozu Bull':'Marubozu Bear');pInfo.push({name:bull🔗'Marubozu Bull':'Marubozu Bear',type:bull🔗'bullish':'bearish'});}
   // Engulfing
   if(C>O){patterns.push('Bullish Engulfing');pInfo.push({name:'Bullish Engulfing',type:'bullish'});}
   if(C<O){patterns.push('Bearish Engulfing');pInfo.push({name:'Bearish Engulfing',type:'bearish'});}
@@ -392,7 +392,7 @@ function detectPatterns(O,H,L,C){
 function rsi(close,p=14){
   if(close.length<p+1)return 50;
   let g=0,l=0;
-  for(let i=close.length-p;i<close.length;i++){const x=close[i]-close[i-1];x>0?g+=x:l+=Math.abs(x);}
+  for(let i=close.length-p;i<close.length;i++){const x=close[i]-close[i-1];x>0🔗g+=x:l+=Math.abs(x);}
   return 100-100/(1+(g/p)/((l/p)||0.0001));
 }
 
@@ -402,70 +402,70 @@ function macd(close){
   return ema12(close.slice(-26),12)-ema12(close.slice(-26),26);
 }
 
-function qdir(O,H,L,C){if([O,H,L,C].some(isNaN)||H<=L)return null;const rng=H-L,body=Math.abs(C-O),d=C>O?1:C<O?-1:0;const cp=rng>0?(C-L)/rng:0.5,br=rng>0?body/rng:0;const PP=(H+L+C)/3,PPw=(H+L+2*C)/4;const sigs=[d,cp>=0.65?1:cp<=0.35?-1:0,br>0.5?d:0,C>PP?1:-1,C>PPw?1:-1];const buy=sigs.filter(s=>s>0).length,sell=sigs.filter(s=>s<0).length;const net=buy-sell,agree=Math.max(buy,sell)/sigs.length;return{dir:net>0?1:net<0?-1:0,agree};}
+function qdir(O,H,L,C){if([O,H,L,C].some(isNaN)||H<=L)return null;const rng=H-L,body=Math.abs(C-O),d=C>O🔗1:C<O🔗-1:0;const cp=rng>0🔗(C-L)/rng:0.5,br=rng>0🔗body/rng:0;const PP=(H+L+C)/3,PPw=(H+L+2*C)/4;const sigs=[d,cp>=0.65🔗1:cp<=0.35🔗-1:0,br>0.5🔗d:0,C>PP🔗1:-1,C>PPw🔗1:-1];const buy=sigs.filter(s=>s>0).length,sell=sigs.filter(s=>s<0).length;const net=buy-sell,agree=Math.max(buy,sell)/sigs.length;return{dir:net>0🔗1:net<0🔗-1:0,agree};}
 
 function fullAn(O,H,L,C,PC,V){
   const hpc=!isNaN(PC),rng=H-L,body=Math.abs(C-O);
   const upS=H-Math.max(O,C),loS=Math.min(O,C)-L;
-  const TR=hpc?Math.max(rng,Math.abs(H-PC),Math.abs(L-PC)):rng;
+  const TR=hpc🔗Math.max(rng,Math.abs(H-PC),Math.abs(L-PC)):rng;
   const PPc=(H+L+C)/3,R1c=2*PPc-L,S1c=2*PPc-H,R2c=PPc+rng,S2c=PPc-rng;
   const PPw=(H+L+2*C)/4,R1w=2*PPw-L,S1w=2*PPw-H,R2w=PPw+rng,S2w=PPw-rng;
   const k=1.1;const r1=C+(rng*k/12),s1=C-(rng*k/12),r2=C+(rng*k/6),s2=C-(rng*k/6);
   const r3=C+(rng*k/4),s3=C-(rng*k/4),r4=C+(rng*k/2),s4=C-(rng*k/2),PPm=(H+L+C)/3;
-  const d1=C>O?1:C<O?-1:0,bR=rng>0?body/rng:0,cP=rng>0?(C-L)/rng:0.5;
+  const d1=C>O🔗1:C<O🔗-1:0,bR=rng>0🔗body/rng:0,cP=rng>0🔗(C-L)/rng:0.5;
   let sv=0,sd='���� �������';
-  if(loS>body*1.8&&upS<body*0.5){sv=1;sd='����� ? ������ �����';}
-  else if(upS>body*1.8&&loS<body*0.5){sv=-1;sd='���� ? ������ �����';}
-  else if(loS>upS*1.5){sv=1;sd='��� ���� ���� ? �����';}
-  else if(upS>loS*1.5){sv=-1;sd='��� ���� ���� ? �����';}
-  const cpD=cP>=0.75?1:cP<=0.25?-1:0;
-  const stK=rng>0?(C-L)/rng*100:50,stD=stK<25?1:stK>75?-1:0;
-  const mom=(C-O)/O*100,momD=Math.abs(mom)>0.03?d1:0;
-  const aD=TR>0&&body/TR>0.45?d1:0;
-  const cpT=C>PPc?1:C<PPc?-1:0;
-  const cpP=C<=S1c&&C>=S2c?1:C>=R1c&&C<=R2c?-1:C<S2c?1:C>R2c?-1:cpT;
-  const wT=C>PPw?1:C<PPw?-1:0,wP=C<=S1w?1:C>=R1w?-1:wT;
+  if(loS>body*1.8&&upS<body*0.5){sv=1;sd='����� 🔗 ������ �����';}
+  else if(upS>body*1.8&&loS<body*0.5){sv=-1;sd='���� 🔗 ������ �����';}
+  else if(loS>upS*1.5){sv=1;sd='��� ���� ���� 🔗 �����';}
+  else if(upS>loS*1.5){sv=-1;sd='��� ���� ���� 🔗 �����';}
+  const cpD=cP>=0.75🔗1:cP<=0.25🔗-1:0;
+  const stK=rng>0🔗(C-L)/rng*100:50,stD=stK<25🔗1:stK>75🔗-1:0;
+  const mom=(C-O)/O*100,momD=Math.abs(mom)>0.03🔗d1:0;
+  const aD=TR>0&&body/TR>0.45🔗d1:0;
+  const cpT=C>PPc🔗1:C<PPc🔗-1:0;
+  const cpP=C<=S1c&&C>=S2c🔗1:C>=R1c&&C<=R2c🔗-1:C<S2c🔗1:C>R2c🔗-1:cpT;
+  const wT=C>PPw🔗1:C<PPw🔗-1:0,wP=C<=S1w🔗1:C>=R1w🔗-1:wT;
   let cL=0,cD='��� ���������';
-  if(C>=r3){cL=-1;cD='��� H3 ? ��� ��� ������';}
-  else if(C<=s3){cL=1;cD='��� L3 ? ���� ��� ���';}
-  else if(C>=r2){cL=-1;cD='��� H2 ? ��� �����';}
-  else if(C<=s2){cL=1;cD='��� L2 ? ��� �����';}
-  else{cL=C>PPm?1:-1;cD='���� ������� �����';}
-  const cB=C>r4?1:C<s4?-1:0;
+  if(C>=r3){cL=-1;cD='��� H3 🔗 ��� ��� ������';}
+  else if(C<=s3){cL=1;cD='��� L3 🔗 ���� ��� ���';}
+  else if(C>=r2){cL=-1;cD='��� H2 🔗 ��� �����';}
+  else if(C<=s2){cL=1;cD='��� L2 🔗 ��� �����';}
+  else{cL=C>PPm🔗1:-1;cD='���� ������� �����';}
+  const cB=C>r4🔗1:C<s4🔗-1:0;
   // Volume
   const vol=V||1;
   const groups=[
     {name:'����� ������',wtag:'�1.0',sigs:[
-      {name:'����� ������',formula:'C-O = '+(C>O?'+':'')+f5(C-O),val:d1,w:1,desc:d1>0?'�����':d1<0?'�����':'����'},
-      {name:'��� �����',formula:'|C-O|�Range = '+pct(bR),val:bR>0.55?d1:0,w:1,desc:bR>0.7?'��� ����':bR>0.55?'�����':'����/����'},
-      {name:'����� ������',formula:'?'+f5(loS)+' ?'+f5(upS),val:sv,w:1,desc:sd},
+      {name:'����� ������',formula:'C-O = '+(C>O🔗'+':'')+f5(C-O),val:d1,w:1,desc:d1>0🔗'�����':d1<0🔗'�����':'����'},
+      {name:'��� �����',formula:'|C-O|�Range = '+pct(bR),val:bR>0.55🔗d1:0,w:1,desc:bR>0.7🔗'��� ����':bR>0.55🔗'�����':'����/����'},
+      {name:'����� ������',formula:'🔗'+f5(loS)+' 🔗'+f5(upS),val:sv,w:1,desc:sd},
       {name:'���� �������',formula:'(C-L)�Range = '+pct(cP),val:cpD,w:1,desc:pct(cP)+' �� ������'},
     ]},
     {name:'ATR ������',wtag:'�1.2',sigs:[
-      {name:'ATR � ��� ������',formula:'Body�TR = '+pct(TR>0?body/TR:0),val:aD,w:1.2,desc:body/TR>0.6?'��� ? �����':body/TR>0.35?'�����':'����'},
-      {name:'Stochastic',formula:'(C-L)�Range�100 = '+stK.toFixed(1),val:stD,w:1.2,desc:stK<25?'���� ��� ? ����':stK>75?'���� ���� ? ���':'�����'},
-      {name:'Momentum %',formula:'(C-O)�O�100 = '+(mom>0?'+':'')+mom.toFixed(4)+'%',val:momD,w:1.2,desc:'��� '+(mom>=0?'�����':'�����')},
-      {name:'Volume',formula:'V='+vol,val:vol>50?1:vol<30?-1:0,w:1,desc:vol>50?'��� ����� ? �����':vol<30?'��� ����� ? ���':'�����'},
+      {name:'ATR � ��� ������',formula:'Body�TR = '+pct(TR>0🔗body/TR:0),val:aD,w:1.2,desc:body/TR>0.6🔗'��� 🔗 �����':body/TR>0.35🔗'�����':'����'},
+      {name:'Stochastic',formula:'(C-L)�Range�100 = '+stK.toFixed(1),val:stD,w:1.2,desc:stK<25🔗'���� ��� 🔗 ����':stK>75🔗'���� ���� 🔗 ���':'�����'},
+      {name:'Momentum %',formula:'(C-O)�O�100 = '+(mom>0🔗'+':'')+mom.toFixed(4)+'%',val:momD,w:1.2,desc:'��� '+(mom>=0🔗'�����':'�����')},
+      {name:'Volume',formula:'V='+vol,val:vol>50🔗1:vol<30🔗-1:0,w:1,desc:vol>50🔗'��� ����� 🔗 �����':vol<30🔗'��� ����� 🔗 ���':'�����'},
     ]},
     {name:'Classic Pivot',wtag:'�1.8',pvt:{R2:R2c,R1:R1c,PP:PPc,S1:S1c,S2:S2c},sigs:[
-      {name:'����� vs Classic PP',formula:'PP='+f5(PPc),val:cpT,w:1.8,desc:C>PPc?'��� PP ? ����':'��� PP ? ����'},
-      {name:'��� S1/R1',formula:'S1='+f5(S1c)+' R1='+f5(R1c),val:cpP,w:1.8,desc:C<=S1c?'��� S1 ? �����':C>=R1c?'��� R1 ? �����':'��� ���������'},
+      {name:'����� vs Classic PP',formula:'PP='+f5(PPc),val:cpT,w:1.8,desc:C>PPc🔗'��� PP 🔗 ����':'��� PP 🔗 ����'},
+      {name:'��� S1/R1',formula:'S1='+f5(S1c)+' R1='+f5(R1c),val:cpP,w:1.8,desc:C<=S1c🔗'��� S1 🔗 �����':C>=R1c🔗'��� R1 🔗 �����':'��� ���������'},
     ]},
     {name:'Woodie Pivot',wtag:'�1.8',pvt:{R2:R2w,R1:R1w,PP:PPw,S1:S1w,S2:S2w},sigs:[
-      {name:'����� vs Woodie PP',formula:'PP=(H+L+2C)�4 = '+f5(PPw),val:wT,w:1.8,desc:C>PPw?'��� PP ? ����':'��� PP ? ����'},
-      {name:'��� S1/R1 Woodie',formula:'S1='+f5(S1w)+' R1='+f5(R1w),val:wP,w:1.8,desc:C<=S1w?'��� S1':C>=R1w?'��� R1':'��� ���������'},
+      {name:'����� vs Woodie PP',formula:'PP=(H+L+2C)�4 = '+f5(PPw),val:wT,w:1.8,desc:C>PPw🔗'��� PP 🔗 ����':'��� PP 🔗 ����'},
+      {name:'��� S1/R1 Woodie',formula:'S1='+f5(S1w)+' R1='+f5(R1w),val:wP,w:1.8,desc:C<=S1w🔗'��� S1':C>=R1w🔗'��� R1':'��� ���������'},
     ]},
     {name:'Camarilla Pivot',wtag:'�1.8',pvt:{H4:r4,H3:r3,H2:r2,H1:r1,PP:PPm,L1:s1,L2:s2,L3:s3,L4:s4},sigs:[
-      {name:'����� vs Camarilla PP',formula:'PP='+f5(PPm),val:C>PPm?1:-1,w:1.8,desc:C>PPm?'��� PP ? ����':'��� PP ? ����'},
+      {name:'����� vs Camarilla PP',formula:'PP='+f5(PPm),val:C>PPm🔗1:-1,w:1.8,desc:C>PPm🔗'��� PP 🔗 ����':'��� PP 🔗 ����'},
       {name:'H3/L3 � ���� �����',formula:'H3='+f5(r3)+' L3='+f5(s3),val:cL,w:1.8,desc:cD},
-      {name:'H4/L4 � ������',formula:'H4='+f5(r4)+' L4='+f5(s4),val:cB,w:1.8,desc:C>r4?'������ H4 ? �����':C<s4?'��� L4 ? �����':'�� ������'},
+      {name:'H4/L4 � ������',formula:'H4='+f5(r4)+' L4='+f5(s4),val:cB,w:1.8,desc:C>r4🔗'������ H4 🔗 �����':C<s4🔗'��� L4 🔗 �����':'�� ������'},
     ]},
     {name:'Fibonacci Pivot',wtag:'�1.5',sigs:[
-      {name:'R1 38.2%',formula:'PP+0.382�Range = '+f5(PPc+rng*0.382),val:C>PPc+rng*0.382?1:C<PPc+rng*0.382?-1:0,w:1.5,desc:'����� ��������� ���'},
-      {name:'S1 38.2%',formula:'PP-0.382�Range = '+f5(PPc-rng*0.382),val:C>PPc-rng*0.382?1:-1,w:1.5,desc:'��� ���������'},
+      {name:'R1 38.2%',formula:'PP+0.382�Range = '+f5(PPc+rng*0.382),val:C>PPc+rng*0.382🔗1:C<PPc+rng*0.382🔗-1:0,w:1.5,desc:'����� ��������� ���'},
+      {name:'S1 38.2%',formula:'PP-0.382�Range = '+f5(PPc-rng*0.382),val:C>PPc-rng*0.382🔗1:-1,w:1.5,desc:'��� ���������'},
     ]},
     {name:'EMA Analysis',wtag:'�1.3',sigs:[
-      {name:'EMA 20',formula:'����� ����� EMA20',val:C>PPc?1:C<PPc?-1:0,w:1.3,desc:C>PPc?'��� ������� ? ����':'���� ? ����'},
+      {name:'EMA 20',formula:'����� ����� EMA20',val:C>PPc🔗1:C<PPc🔗-1:0,w:1.3,desc:C>PPc🔗'��� ������� 🔗 ����':'���� 🔗 ����'},
     ]},
   ];
   let all=[];groups.forEach(g=>g.sigs.forEach(s=>all.push(s)));
@@ -474,19 +474,19 @@ function fullAn(O,H,L,C,PC,V){
   const net=rB-rS,wA=Math.max(wB,wS)/wT2;
   // Patterns
   const pat=detectPatterns(O,H,L,C);
-  return{groups,dir:net>0?1:net<0?-1:0,wAgree:wA,body,upS,loS,rng,TR,patterns:pat};
+  return{groups,dir:net>0🔗1:net<0🔗-1:0,wAgree:wA,body,upS,loS,rng,TR,patterns:pat};
 }
 
 function renderGroups(groups){return groups.map(g=>{
   const gB=g.sigs.filter(s=>s.val>0).length,gS=g.sigs.filter(s=>s.val<0).length;
-  const gD=gB>gS?1:gS>gB?-1:0;let pv='';
-  if(g.pvt){pv=`<div class="pvg">${Object.keys(g.pvt).map(k=>{const ir=k.startsWith('R')||['H1','H2','H3','H4'].includes(k);const is=k.startsWith('S')||['L1','L2','L3','L4'].includes(k);return`<div class="pvc"><div class="pvl">${k}</div><div class="pvv ${ir?'r':is?'s':'p'}">${f5(g.pvt[k])}</div></div>`;}).join('')}</div>`;}
+  const gD=gB>gS🔗1:gS>gB🔗-1:0;let pv='';
+  if(g.pvt){pv=`<div class="pvg">${Object.keys(g.pvt).map(k=>{const ir=k.startsWith('R')||['H1','H2','H3','H4'].includes(k);const is=k.startsWith('S')||['L1','L2','L3','L4'].includes(k);return`<div class="pvc"><div class="pvl">${k}</div><div class="pvv ${ir🔗'r':is🔗's':'p'}">${f5(g.pvt[k])}</div></div>`;}).join('')}</div>`;}
   return`<div class="grp"><div class="ghd"><div class="gnm">${g.name}</div><div class="grt"><div class="wtag">��� ${g.wtag}</div><div class="gbdg ${bc(gD)}">${bl(gD)}</div></div></div>
-  ${g.sigs.map(s=>`<div class="eqr"><div class="eqi" style="color:${s.val>0?'var(--buy)':s.val<0?'var(--sel)':'var(--mt)'}">${ico(s.val)}</div>
+  ${g.sigs.map(s=>`<div class="eqr"><div class="eqi" style="color:${s.val>0🔗'var(--buy)':s.val<0🔗'var(--sel)':'var(--mt)'}">${ico(s.val)}</div>
   <div class="eqb"><div class="eqn">${s.name}</div><div class="eqf">${s.formula}</div><div class="eqv ${ec(s.val)}">${s.desc}</div></div></div>`).join('')}${pv}</div>`;
 }).join('');}
 
-function showTab(i){document.querySelectorAll('.tab').forEach((t,j)=>{t.classList.toggle('active',i===j);if(i===j){const an=window._ans[j];t.className='tab active '+(an.dir>0?'buy':an.dir<0?'sell':'neu');}});document.querySelectorAll('.tab-pane').forEach((p,j)=>p.classList.toggle('active',i===j));}
+function showTab(i){document.querySelectorAll('.tab').forEach((t,j)=>{t.classList.toggle('active',i===j);if(i===j){const an=window._ans[j];t.className='tab active '+(an.dir>0🔗'buy':an.dir<0🔗'sell':'neu');}});document.querySelectorAll('.tab-pane').forEach((p,j)=>p.classList.toggle('active',i===j));}
 
 function calc(){
   // Read 5 entry TFs
@@ -510,30 +510,30 @@ function calc(){
 
   const buyCount=ans.filter(a=>a.dir>0).length;
   const sellCount=ans.filter(a=>a.dir<0).length;
-  const mainDir=buyCount>sellCount?1:sellCount>buyCount?-1:0;
+  const mainDir=buyCount>sellCount🔗1:sellCount>buyCount🔗-1:0;
   const entryAgree=Math.max(buyCount,sellCount)/5;
   const avgWA=ans.reduce((s,a)=>s+a.wAgree,0)/5;
-  const entryBoost=entryAgree===1?0.10:entryAgree>=0.8?0.05:entryAgree>=0.6?0:0;
+  const entryBoost=entryAgree===1🔗0.10:entryAgree>=0.8🔗0.05:entryAgree>=0.6🔗0:0;
 
   // Confirm
-  const confRes=confs.map(e=>{const r=qdir(e.O,e.H,e.L,e.C);return r?{...r,label:e.label}:null;}).filter(Boolean);
-  const confAgree=confRes.length>0?confRes.filter(r=>r.dir===mainDir).length/confRes.length:null;
-  const confBoost=confAgree===null?0:confAgree===1?0.10:confAgree>=0.5?0.05:-0.05;
+  const confRes=confs.map(e=>{const r=qdir(e.O,e.H,e.L,e.C);return r🔗{...r,label:e.label}:null;}).filter(Boolean);
+  const confAgree=confRes.length>0🔗confRes.filter(r=>r.dir===mainDir).length/confRes.length:null;
+  const confBoost=confAgree===null🔗0:confAgree===1🔗0.10:confAgree>=0.5🔗0.05:-0.05;
 
   // RSI & MACD
   const closePrices=entries.map(e=>e.C);
   const rsiVal=rsi(closePrices);
   const macdVal=macd(closePrices);
-  const rsiDir=rsiVal>50?1:rsiVal<50?-1:0;
-  const macdDir=macdVal>0?1:macdVal<0?-1:0;
-  const rsiBoost=rsiDir===mainDir?0.05:0;
-  const macdBoost=macdDir===mainDir?0.05:0;
+  const rsiDir=rsiVal>50🔗1:rsiVal<50🔗-1:0;
+  const macdDir=macdVal>0🔗1:macdVal<0🔗-1:0;
+  const rsiBoost=rsiDir===mainDir🔗0.05:0;
+  const macdBoost=macdDir===mainDir🔗0.05:0;
 
   // Patterns
   const allPatterns=ans.map(a=>a.patterns.pInfo).flat();
   const bullPats=allPatterns.filter(p=>p.type==='bullish').length;
   const bearPats=allPatterns.filter(p=>p.type==='bearish').length;
-  const patBoost=bullPats>bearPats&&mainDir===1?0.03:bearPats>bullPats&&mainDir===-1?0.03:0;
+  const patBoost=bullPats>bearPats&&mainDir===1🔗0.03:bearPats>bullPats&&mainDir===-1🔗0.03:0;
 
   const finalAcc=Math.min(0.99,avgWA+entryBoost+confBoost+rsiBoost+macdBoost+patBoost);
 
@@ -548,14 +548,14 @@ function calc(){
   const angleTime=TF*nextAngle;
 
   // Duration
-  const nR=mainDir===1?ans[0].loS:ans[0].upS;const body=ans[0].body;
-  const nR2=body>0?nR/body:0;
+  const nR=mainDir===1🔗ans[0].loS:ans[0].upS;const body=ans[0].body;
+  const nR2=body>0🔗nR/body:0;
   let nLv,nCl,nMsg,nEx;
   if(nR2<0.3){nLv='�����';nCl='low';nMsg='���� ����� � ����� ������ �����';nEx=0;}
   else if(nR2<0.7){nLv='�����';nCl='mid';nMsg='���� ����� � ����� ���� ������';nEx=1;}
   else if(nR2<1.3){nLv='�����';nCl='high';nMsg='���� ���� � ��� �����';nEx=2;}
   else{nLv='���';nCl='danger';nMsg='���� ���� � ��� �����';nEx=3;}
-  const bC=finalAcc>=0.9?3:finalAcc>=0.8?2:1;
+  const bC=finalAcc>=0.9🔗3:finalAcc>=0.8🔗2:1;
   const tC=Math.min(bC+nEx,8);
   const dur=Math.min(tC*TF,TF*8);
 
@@ -567,32 +567,32 @@ function calc(){
   // Render
   // Entry cards
   document.getElementById('entry-cards').innerHTML=ans.map((a,i)=>`
-    <div class="ag-card ${a.dir>0?'buy':a.dir<0?'sell':'wait'}">
-      <div class="ag-tf">${['??','??','??','??','??'][i]} ${a.label}</div>
-      <div class="ag-dir ${a.dir>0?'buy':a.dir<0?'sell':'wait'}">${a.dir>0?'? ����':a.dir<0?'? ���':'� �����'}</div>
+    <div class="ag-card ${a.dir>0🔗'buy':a.dir<0🔗'sell':'wait'}">
+      <div class="ag-tf">${['','','','',''][i]} ${a.label}</div>
+      <div class="ag-dir ${a.dir>0🔗'buy':a.dir<0🔗'sell':'wait'}">${a.dir>0🔗'🔗 ����':a.dir<0🔗'🔗 ���':'� �����'}</div>
       <div class="ag-acc">${Math.round(a.wAgree*100)}% ���</div>
     </div>`).join('');
 
   const ef=document.getElementById('entry-fil');
   ef.style.width=Math.round(entryAgree*100)+'%';
-  ef.style.background=entryAgree===1?'#4ade80':entryAgree>=0.8?'#f59e0b':entryAgree>=0.6?'#f59e0b':'#f87171';
+  ef.style.background=entryAgree===1🔗'#4ade80':entryAgree>=0.8🔗'#f59e0b':entryAgree>=0.6🔗'#f59e0b':'#f87171';
   document.getElementById('entry-num').textContent=Math.round(entryAgree*100)+'%';
   const evd=document.getElementById('entry-vd');
-  evd.className='asb-vd '+(entryAgree===1?'all':entryAgree>=0.6?'most':'conflict');
-  evd.textContent=entryAgree===1?`? 5 ������ ����� ��� ${mainDir>0?'������':'�����'} � ����� �����`:
-    entryAgree>=0.8?`? ${Math.max(buyCount,sellCount)} �� 5 ������ ����� � ����� ����`:
-    entryAgree>=0.6?`?? ${Math.max(buyCount,sellCount)} �� 5 ������ � ����� ����`:
-    `? �������� ������� � �� ����`;
+  evd.className='asb-vd '+(entryAgree===1🔗'all':entryAgree>=0.6🔗'most':'conflict');
+  evd.textContent=entryAgree===1🔗`🔗 5 ������ ����� ��� ${mainDir>0🔗'������':'�����'} � ����� �����`:
+    entryAgree>=0.8🔗`🔗 ${Math.max(buyCount,sellCount)} �� 5 ������ ����� � ����� ����`:
+    entryAgree>=0.6🔗` ${Math.max(buyCount,sellCount)} �� 5 ������ � ����� ����`:
+    `🔗 �������� ������� � �� ����`;
 
   // Patterns
   const patternDiv=document.getElementById('pattern-grid');
   if(allPatterns.length>0){
-    patternDiv.innerHTML=allPatterns.slice(0,8).map(p=>`<div class="pattern-badge ${p.type==='bullish'?'found':p.type==='bearish'?'bearish':''}">${p.name} ${p.type==='bullish'?'??':p.type==='bearish'?'??':'?'}</div>`).join('');
+    patternDiv.innerHTML=allPatterns.slice(0,8).map(p=>`<div class="pattern-badge ${p.type==='bullish'🔗'found':p.type==='bearish'🔗'bearish':''}">${p.name} ${p.type==='bullish'🔗'':p.type==='bearish'🔗'':'🔗'}</div>`).join('');
   }else{patternDiv.innerHTML='<div style="color:var(--mt);font-size:11px;">�� ���� ����� �����</div>';}
 
   // Time Analysis
   document.getElementById('time-analysis').innerHTML=`
-    <div class="time-item"><div class="tval">${isGolden?'?? ���':'?? ��'}</div><div>��� ����</div></div>
+    <div class="time-item"><div class="tval">${isGolden🔗' ���':' ��'}</div><div>��� ����</div></div>
     <div class="time-item"><div class="tval">${nextAngle}�</div><div>����� ��� �������</div></div>
     <div class="time-item"><div class="tval">${fmt(angleTime)}</div><div>����� �������</div></div>
   `;
@@ -600,62 +600,62 @@ function calc(){
   // Confirm
   if(confRes.length>0){
     document.getElementById('conf-cards').innerHTML=confRes.map((r,i)=>`
-      <div class="cf-card ${r.dir>0?'buy':r.dir<0?'sell':''}">
-        <div class="cf-tf">${['?','?'][i]} ${r.label}</div>
-        <div class="cf-dir ${r.dir>0?'buy':r.dir<0?'sell':'wait'}">${r.dir>0?'? ����':r.dir<0?'? ���':'� �����'}</div>
+      <div class="cf-card ${r.dir>0🔗'buy':r.dir<0🔗'sell':''}">
+        <div class="cf-tf">${['🔗','🔗'][i]} ${r.label}</div>
+        <div class="cf-dir ${r.dir>0🔗'buy':r.dir<0🔗'sell':'wait'}">${r.dir>0🔗'🔗 ����':r.dir<0🔗'🔗 ���':'� �����'}</div>
       </div>`).join('');
     const cf=document.getElementById('conf-fil');
     cf.style.width=Math.round((confAgree||0)*100)+'%';
-    cf.style.background=confAgree===1?'#4ade80':confAgree>=0.5?'#f59e0b':'#f87171';
+    cf.style.background=confAgree===1🔗'#4ade80':confAgree>=0.5🔗'#f59e0b':'#f87171';
     document.getElementById('conf-num').textContent=Math.round((confAgree||0)*100)+'%';
     const cvd=document.getElementById('conf-vd');
-    cvd.className='asb-vd '+(confAgree===1?'all':confAgree>=0.5?'most':'conflict');
-    cvd.textContent=confAgree===1?`? ��� �������� ������ ������� � ��� �����`:
-      confAgree>=0.5?`? ���� ���� ���� � ���`:
-      `? ������ ������� ������ � ����`;
+    cvd.className='asb-vd '+(confAgree===1🔗'all':confAgree>=0.5🔗'most':'conflict');
+    cvd.textContent=confAgree===1🔗`🔗 ��� �������� ������ ������� � ��� �����`:
+      confAgree>=0.5🔗`🔗 ���� ���� ���� � ���`:
+      `🔗 ������ ������� ������ � ����`;
   }
 
   // Direction
   const dc=document.getElementById('dcard');const dt=document.getElementById('dtext'),dd=document.getElementById('ddur'),ds=document.getElementById('dsub');
   if(mainDir>0&&entryAgree>=0.6){
-    dc.className='dcard buy';dt.className='dtext buy';dt.textContent='?? CALL (����)';
+    dc.className='dcard buy';dt.className='dtext buy';dt.textContent=' CALL (����)';
     dd.textContent=fmt(dur);ds.textContent='���� �������: M5';
   }else if(mainDir<0&&entryAgree>=0.6){
-    dc.className='dcard sell';dt.className='dtext sell';dt.textContent='?? PUT (���)';
+    dc.className='dcard sell';dt.className='dtext sell';dt.textContent=' PUT (���)';
     dd.textContent=fmt(dur);ds.textContent='���� �������: M5';
   }else{
-    dc.className='dcard wait';dt.className='dtext wait';dt.textContent='? �����';
+    dc.className='dcard wait';dt.className='dtext wait';dt.textContent='🔗 �����';
     dd.textContent='�';ds.textContent='�������� ��� �����';
   }
 
   // Risk
   document.getElementById('risk-grid').innerHTML=`
-    <div class="risk-item"><div class="label">?? ��������</div><div class="value green">$${riskAmount.toFixed(2)}</div></div>
-    <div class="risk-item"><div class="label">?? ����� �������</div><div class="value gold">$${profitAmount.toFixed(2)}</div></div>
-    <div class="risk-item"><div class="label">?? Risk/Reward</div><div class="value ${rrRatio>=2?'green':rrRatio>=1?'gold':'red'}">${rrRatio.toFixed(2)}:1</div></div>
+    <div class="risk-item"><div class="label"> ��������</div><div class="value green">$${riskAmount.toFixed(2)}</div></div>
+    <div class="risk-item"><div class="label"> ����� �������</div><div class="value gold">$${profitAmount.toFixed(2)}</div></div>
+    <div class="risk-item"><div class="label"> Risk/Reward</div><div class="value ${rrRatio>=2🔗'green':rrRatio>=1🔗'gold':'red'}">${rrRatio.toFixed(2)}:1</div></div>
   `;
 
   // Alerts
   const alerts=[];
-  if(finalAcc<0.7)alerts.push('?? ��� ������ � ����� ����� ����');
-  if(entryAgree<0.6)alerts.push('?? ������ ���� �������');
-  if(confAgree!==null&&confAgree<0.5)alerts.push('?? ������ ������� ������');
-  if(nLv==='���')alerts.push('?? ���� ���� � ��� �����');
-  if(rrRatio<1)alerts.push('?? Risk/Reward ����� � �� ����');
-  if(finalAcc>=0.9&&entryAgree>=0.8&&confAgree>=0.5)alerts.push('? �� ��� ����� � ���� ����');
-  else if(finalAcc>=0.8&&entryAgree>=0.6)alerts.push('? ����� ���� � ���� ����');
-  else alerts.push('? ����� ����� ����');
+  if(finalAcc<0.7)alerts.push(' ��� ������ � ����� ����� ����');
+  if(entryAgree<0.6)alerts.push(' ������ ���� �������');
+  if(confAgree!==null&&confAgree<0.5)alerts.push(' ������ ������� ������');
+  if(nLv==='���')alerts.push(' ���� ���� � ��� �����');
+  if(rrRatio<1)alerts.push(' Risk/Reward ����� � �� ����');
+  if(finalAcc>=0.9&&entryAgree>=0.8&&confAgree>=0.5)alerts.push('🔗 �� ��� ����� � ���� ����');
+  else if(finalAcc>=0.8&&entryAgree>=0.6)alerts.push('🔗 ����� ���� � ���� ����');
+  else alerts.push('🔗 ����� ����� ����');
   document.getElementById('alert-text').textContent=alerts[0]||'�� ���� �������';
 
   // Metrics
   document.getElementById('macc').textContent=Math.round(finalAcc*100)+'%';
-  document.getElementById('maccs').textContent=finalAcc>=0.9?'?? �����':finalAcc>=0.8?'?? ����':finalAcc>=0.7?'?? ����':'? �����';
+  document.getElementById('maccs').textContent=finalAcc>=0.9🔗' �����':finalAcc>=0.8🔗' ����':finalAcc>=0.7🔗' ����':'🔗 �����';
   document.getElementById('ment').textContent=Math.max(buyCount,sellCount)+'/5';
-  document.getElementById('mconf').textContent=confRes.length>0?Math.round((confAgree||0)*confRes.length)+'/'+confRes.length:'�';
+  document.getElementById('mconf').textContent=confRes.length>0🔗Math.round((confAgree||0)*confRes.length)+'/'+confRes.length:'�';
   document.getElementById('mrsi').textContent=rsiVal.toFixed(1);
-  document.getElementById('mrsis').textContent=rsiVal>50?'?? ����':rsiVal<50?'?? ����':'?? �����';
-  document.getElementById('mmacd').textContent=(macdVal>0?'+':'')+macdVal.toFixed(5);
-  document.getElementById('mmacds').textContent=macdVal>0?'?? ������':macdVal<0?'?? ����':'?? �����';
+  document.getElementById('mrsis').textContent=rsiVal>50🔗' ����':rsiVal<50🔗' ����':' �����';
+  document.getElementById('mmacd').textContent=(macdVal>0🔗'+':'')+macdVal.toFixed(5);
+  document.getElementById('mmacds').textContent=macdVal>0🔗' ������':macdVal<0🔗' ����':' �����';
 
   // Noise
   const mv=ans[0].rng||1;
@@ -664,18 +664,18 @@ function calc(){
   document.getElementById('nv-body').textContent=f5(ans[0].body);
   document.getElementById('nv-noise').textContent=f5(nR);
   document.getElementById('nv-range').textContent=f5(ans[0].rng);
-  document.getElementById('ndirl').textContent=mainDir>0?'���� ? (����)':'���� ? (���)';
+  document.getElementById('ndirl').textContent=mainDir>0🔗'���� 🔗 (����)':'���� 🔗 (���)';
   const nvd=document.getElementById('nvd');nvd.className='nvd '+nCl;
-  nvd.textContent='?? '+nLv+' � '+nMsg;
+  nvd.textContent=' '+nLv+' � '+nMsg;
 
   // Tabs
   const labels=['M5','M15','M30','H1','H4'];
   document.getElementById('tabs').innerHTML=ans.map((a,i)=>
-    `<div class="tab${i===0?' active '+(a.dir>0?'buy':a.dir<0?'sell':'neu'):''}" onclick="showTab(${i})">
-      ${['??','??','??','??','??'][i]} ${labels[i]} ${a.dir>0?'?':a.dir<0?'?':'�'}
+    `<div class="tab${i===0🔗' active '+(a.dir>0🔗'buy':a.dir<0🔗'sell':'neu'):''}" onclick="showTab(${i})">
+      ${['','','','',''][i]} ${labels[i]} ${a.dir>0🔗'🔗':a.dir<0🔗'🔗':'�'}
     </div>`).join('');
   document.getElementById('tab-panes').innerHTML=ans.map((a,i)=>
-    `<div class="tab-pane${i===0?' active':''}" id="pane${i}">
+    `<div class="tab-pane${i===0🔗' active':''}" id="pane${i}">
       <div class="grps">${renderGroups(a.groups)}</div>
     </div>`).join('');
 
