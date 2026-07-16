@@ -155,6 +155,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 .loading-pulse{animation:pulse 1s infinite}
 @media(max-width:520px){.tf-fields{grid-template-columns:repeat(3,1fr)}.mets{grid-template-columns:1fr 1fr}.agree-grid{grid-template-columns:1fr 1fr 1fr}.conf-fields{grid-template-columns:repeat(3,1fr)}.risk-grid{grid-template-columns:1fr}.time-analysis{grid-template-columns:1fr}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 <div class="hdr">
@@ -318,100 +319,136 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh
 <div class="ftr">محرك اشارات OTC الاسطوري &middot; 5 فريمات &middot; 25 معادلة &middot; انماط شموع &middot; ادارة مخاطرة</div>
 
 <script>
-// ===== Screenshot Feature =====
-var _ssData = [];
-var TF_FIELDS = {
-  'M5': {o:'o1',h:'h1',l:'l1',c:'c1'},
-  'M15':{o:'o2',h:'h2',l:'l2',c:'c2'},
-  'M30':{o:'o3',h:'h3',l:'l3',c:'c3'},
-  'H1': {o:'o4',h:'h4',l:'l4',c:'c4'},
-  'H4': {o:'o5',h:'h5',l:'l5',c:'c5'}
-};
+// ===== Screenshot OCR Feature (Tesseract.js - no API needed) =====
+var _ssOCR = {};
 
 function ssHandle(file) {
   if (!file) return;
   var st = document.getElementById('ss-status');
   st.className = 'ss-status loading';
-  st.textContent = 'بيحمل الصورة...';
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    var b64 = e.target.result.split(',')[1];
-    var mime = file.type;
-    document.getElementById('ss-img').src = e.target.result;
-    document.getElementById('ss-preview').style.display = 'block';
-    st.textContent = 'Claude Vision بيحلل الشارت... ';
-    st.innerHTML += '<span class="loading-pulse">جار التحليل</span>';
-    fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 800,
-        messages: [{
-          role: 'user',
-          content: [
-            {type:'image', source:{type:'base64', media_type:mime, data:b64}},
-            {type:'text', text:'Look at this trading chart. Extract OHLC data for the most recent candle(s). Return ONLY a JSON array like: [{"tf":"M5","open":1.23450,"high":1.23510,"low":1.23420,"close":1.23480}]. tf must be M1, M5, M15, M30, H1, or H4. Numbers only. No markdown or explanation.'}
-          ]
-        }]
-      })
-    })
-    .then(function(r){ return r.json(); })
-    .then(function(d){
-      var txt = d.content.map(function(b){return b.text||'';}).join('').replace(/```json|```/g,'').trim();
-      var data = JSON.parse(txt);
-      if (!Array.isArray(data)) throw new Error('خطا');
-      _ssData = data;
-      // Show result cards
-      var cards = document.getElementById('ss-cards');
-      cards.style.display = 'grid';
-      cards.innerHTML = data.map(function(x){
-        return '<div class="ss-rc"><div class="ss-rc-tf">'+x.tf+'</div>'+
-          '<div class="ss-rc-row"><span>Open</span><span>'+x.open+'</span></div>'+
-          '<div class="ss-rc-row"><span>High</span><span>'+x.high+'</span></div>'+
-          '<div class="ss-rc-row"><span>Low</span><span>'+x.low+'</span></div>'+
-          '<div class="ss-rc-row"><span>Close</span><span>'+x.close+'</span></div>'+
-          '</div>';
-      }).join('');
-      document.getElementById('ss-fill-btn').style.display = 'block';
-      st.className = 'ss-status ok';
-      st.textContent = 'تم — اضغط الزرار الاخضر للملي';
-    })
-    .catch(function(err){
-      st.className = 'ss-status err';
-      st.textContent = 'خطا: ' + err.message;
-    });
+  st.innerHTML = 'بيقرأ الصورة... <span class="loading-pulse">OCR جاري</span>';
+  document.getElementById('ss-img').src = URL.createObjectURL(file);
+  document.getElementById('ss-preview').style.display = 'block';
+  document.getElementById('ss-cards').style.display = 'none';
+  document.getElementById('ss-fill-btn').style.display = 'none';
+
+  if (typeof Tesseract === 'undefined') {
+    st.className = 'ss-status err';
+    st.textContent = 'خطا: مكتبة OCR مش محملة - تاكد من الانترنت';
+    return;
+  }
+
+  Tesseract.recognize(file, 'eng', {
+    tessedit_char_whitelist: '0123456789.OpenHighLowClose:OHLC '
+  }).then(function(result) {
+    var text = result.data.text;
+    var found = parseOHLC(text);
+    if (!found.open && !found.close) {
+      // Try again with full OCR
+      return Tesseract.recognize(file, 'eng').then(function(r2) {
+        return parseOHLC(r2.data.text);
+      });
+    }
+    return found;
+  }).then(function(found) {
+    showOCRResult(found, st);
+  }).catch(function(err) {
+    st.className = 'ss-status err';
+    st.textContent = 'فشل القراءة: ' + err.message;
+  });
+}
+
+function parseOHLC(text) {
+  var found = {};
+  // Match patterns like "Open: 0.18570" or "Open 0.18570" or "O: 0.18570"
+  var patterns = {
+    open:  [/open[:\s]+([0-9]+\.?[0-9]*)/i, /O[:\s]+([0-9]+\.?[0-9]*)/i],
+    high:  [/high[:\s]+([0-9]+\.?[0-9]*)/i, /H[:\s]+([0-9]+\.?[0-9]*)/i],
+    low:   [/low[:\s]+([0-9]+\.?[0-9]*)/i,  /L[:\s]+([0-9]+\.?[0-9]*)/i],
+    close: [/close[:\s]+([0-9]+\.?[0-9]*)/i,/C[:\s]+([0-9]+\.?[0-9]*)/i],
   };
-  reader.readAsDataURL(file);
+  Object.keys(patterns).forEach(function(key) {
+    patterns[key].forEach(function(re) {
+      if (!found[key]) {
+        var m = text.match(re);
+        if (m) found[key] = parseFloat(m[1]);
+      }
+    });
+  });
+  // Fallback: extract all decimal numbers
+  if (!found.open || !found.close) {
+    var nums = text.match(/[0-9]+\.[0-9]{3,6}/g);
+    if (nums && nums.length >= 4) {
+      found.open  = found.open  || parseFloat(nums[0]);
+      found.high  = found.high  || parseFloat(nums[1]);
+      found.low   = found.low   || parseFloat(nums[2]);
+      found.close = found.close || parseFloat(nums[3]);
+    }
+  }
+  return found;
+}
+
+function showOCRResult(found, st) {
+  _ssOCR = found;
+  var cards = document.getElementById('ss-cards');
+  cards.style.display = 'grid';
+
+  var hasData = found.open || found.high || found.low || found.close;
+  if (!hasData) {
+    st.className = 'ss-status err';
+    st.textContent = 'ما عرفتش اقرأ الارقام - جرب صورة اوضح او ادخل يدوي';
+    cards.innerHTML = '<div style="color:var(--mt);font-size:11px;padding:.5rem">لم تُكتشف ارقام OHLC في الصورة</div>';
+    return;
+  }
+
+  cards.innerHTML =
+    '<div class="ss-rc">' +
+    '<div class="ss-rc-tf">البيانات المستخرجة</div>' +
+    '<div class="ss-rc-row"><span>Open</span><span>' + (found.open || '—') + '</span></div>' +
+    '<div class="ss-rc-row"><span>High</span><span style="color:var(--buy)">' + (found.high || '—') + '</span></div>' +
+    '<div class="ss-rc-row"><span>Low</span><span style="color:var(--sel)">' + (found.low || '—') + '</span></div>' +
+    '<div class="ss-rc-row"><span>Close</span><span>' + (found.close || '—') + '</span></div>' +
+    '</div>' +
+    '<div class="ss-rc" style="background:var(--sf);border-color:var(--ac)">' +
+    '<div class="ss-rc-tf" style="color:var(--wn)">اي فريم تملي؟</div>' +
+    '<select id="ss-tf-sel" style="width:100%;background:var(--sf2);border:.5px solid var(--bd);border-radius:6px;color:var(--tx);padding:4px;font-size:12px;margin-top:4px">' +
+    '<option value="1">① M5 - التنفيذ</option>' +
+    '<option value="2">② M15 - تاكيد</option>' +
+    '<option value="3">③ M30 - اتجاه</option>' +
+    '<option value="4">④ H1 - ترند</option>' +
+    '<option value="5">⑤ H4 - رئيسي</option>' +
+    '<option value="c1">تاكيد H1</option>' +
+    '<option value="c2">تاكيد H4</option>' +
+    '</select>' +
+    '</div>';
+
+  document.getElementById('ss-fill-btn').style.display = 'block';
+  st.className = 'ss-status ok';
+  st.textContent = 'تم القراءة — اختار الفريم واضغط ملي';
 }
 
 function ssFill() {
-  if (!_ssData.length) return;
-  var filled = 0;
-  _ssData.forEach(function(d){
-    var f = TF_FIELDS[d.tf];
-    if (f) {
-      document.getElementById(f.o).value = d.open;
-      document.getElementById(f.h).value = d.high;
-      document.getElementById(f.l).value = d.low;
-      document.getElementById(f.c).value = d.close;
-      [f.o,f.h,f.l,f.c].forEach(function(id){
-        var el = document.getElementById(id);
-        if(el){el.style.color='#4ade80';setTimeout(function(){el.style.color='';},2000);}
-      });
-      filled++;
-    }
-  });
+  var sel = document.getElementById('ss-tf-sel');
+  if (!sel) return;
+  var v = sel.value;
+  var prefix = v.startsWith('c') ? (v === 'c1' ? {o:'co1',h:'ch1',l:'cl1',c:'cc1'} : {o:'co2',h:'ch2',l:'cl2',c:'cc2'})
+                                 : {o:'o'+v, h:'h'+v, l:'l'+v, c:'c'+v};
+
+  if (_ssOCR.open)  { document.getElementById(prefix.o).value = _ssOCR.open;  flash(prefix.o); }
+  if (_ssOCR.high)  { document.getElementById(prefix.h).value = _ssOCR.high;  flash(prefix.h); }
+  if (_ssOCR.low)   { document.getElementById(prefix.l).value = _ssOCR.low;   flash(prefix.l); }
+  if (_ssOCR.close) { document.getElementById(prefix.c).value = _ssOCR.close; flash(prefix.c); }
+
   var st = document.getElementById('ss-status');
-  if (filled > 0) {
-    st.className = 'ss-status ok';
-    st.textContent = 'تم ملي ' + filled + ' فريم — راجع الارقام وبعدين احسب';
-  } else {
-    st.className = 'ss-status err';
-    st.textContent = 'الفريمات مش موجودة — المطلوب M5 M15 M30 H1 H4';
-  }
+  st.className = 'ss-status ok';
+  st.textContent = 'تم الملي — راجع الارقام وبعدين احسب';
 }
-// ===== End Screenshot =====
+
+function flash(id) {
+  var el = document.getElementById(id);
+  if (el) { el.style.color = '#4ade80'; setTimeout(function(){ el.style.color = ''; }, 2000); }
+}
+// ===== End Screenshot OCR =====
 
 function f5(n){return parseFloat(n).toFixed(5)}
 function pct(n){return(n*100).toFixed(1)+'%'}
