@@ -1,43 +1,42 @@
 <!DOCTYPE html>
-<html dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>💀 التنبؤ بالشمعة القادمة - 95%</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💀 التنبؤ بالشمعة القادمة</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,sans-serif}
-body{background:#0b0e14;display:flex;justify-content:center;align-items:center;min-height:100vh;color:#fff;padding:20px}
-.container{background:#161b26;padding:30px;border-radius:20px;max-width:500px;width:100%;border:1px solid #2a3247}
-h1{color:#f59e0b;font-size:22px;margin-bottom:5px}
-p{color:#8b93a8;font-size:13px;margin-bottom:20px}
-label{display:block;font-size:12px;color:#8b93a8;margin:10px 0 4px}
-input{width:100%;padding:12px;background:#0b0e14;border:1px solid #2a3247;border-radius:10px;color:#fff;font-size:16px;direction:ltr;text-align:center}
-input:focus{outline:2px solid #f59e0b}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.btn{width:100%;padding:15px;background:#f59e0b;border:none;border-radius:12px;color:#000;font-size:18px;font-weight:bold;cursor:pointer;margin:20px 0 10px;transition:0.2s}
-.btn:hover{transform:scale(1.02);background:#fbbf24}
-.result{background:#0b0e14;padding:20px;border-radius:12px;margin-top:20px;border:1px solid #2a3247;display:none}
-.result.show{display:block}
-.prediction{font-size:48px;text-align:center;font-weight:bold;padding:10px}
-.prediction.up{color:#4ade80}
-.prediction.down{color:#f87171}
-.prediction.neutral{color:#f59e0b}
-.percent{font-size:28px;text-align:center;color:#8b93a8}
-.detail{font-size:13px;color:#8b93a8;text-align:center;margin-top:10px;padding:10px;background:#161b26;border-radius:8px}
-.note{color:#f59e0b;font-size:12px;text-align:center;margin-top:15px;border-top:1px solid #2a3247;padding-top:15px}
-.tf-selector{display:flex;gap:8px;margin:15px 0;flex-wrap:wrap;justify-content:center}
-.tf-btn{padding:8px 16px;background:#0b0e14;border:1px solid #2a3247;border-radius:8px;color:#8b93a8;cursor:pointer;font-size:12px;transition:0.2s}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b0e14;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui,sans-serif;padding:15px;color:#fff}
+.container{background:#161b26;padding:25px;border-radius:16px;max-width:480px;width:100%;border:1px solid #2a3247}
+h1{color:#f59e0b;font-size:20px;text-align:center}
+.sub{color:#8b93a8;font-size:12px;text-align:center;margin-bottom:20px}
+.tf-selector{display:flex;gap:6px;margin:12px 0;flex-wrap:wrap;justify-content:center}
+.tf-btn{padding:6px 14px;background:#0b0e14;border:1px solid #2a3247;border-radius:6px;color:#8b93a8;cursor:pointer;font-size:11px;transition:.2s}
 .tf-btn.active{background:#f59e0b;color:#000;border-color:#f59e0b;font-weight:bold}
 .tf-btn:hover{background:#2a3247}
+label{display:block;font-size:11px;color:#8b93a8;margin:8px 0 3px}
+input{width:100%;padding:10px;background:#0b0e14;border:1px solid #2a3247;border-radius:8px;color:#fff;font-size:15px;text-align:center;direction:ltr}
+input:focus{outline:2px solid #f59e0b;border-color:transparent}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{width:100%;padding:14px;background:#f59e0b;border:none;border-radius:10px;color:#000;font-size:16px;font-weight:bold;cursor:pointer;margin:18px 0 12px;transition:.2s}
+.btn:hover{transform:scale(1.02);background:#fbbf24}
+.result{background:#0b0e14;padding:18px;border-radius:12px;margin-top:16px;border:1px solid #2a3247;display:none}
+.result.show{display:block}
+.pred{font-size:42px;text-align:center;font-weight:bold;padding:8px}
+.pred.up{color:#4ade80}
+.pred.down{color:#f87171}
+.pred.neutral{color:#f59e0b}
+.percent{font-size:24px;text-align:center;color:#8b93a8}
+.detail{font-size:12px;color:#8b93a8;text-align:center;margin-top:8px;padding:10px;background:#161b26;border-radius:6px;line-height:1.6}
+.note{color:#f59e0b;font-size:11px;text-align:center;margin-top:12px;padding-top:12px;border-top:1px solid #2a3247}
 </style>
 </head>
 <body>
 
 <div class="container">
   <h1>💀 التنبؤ بالشمعة القادمة</h1>
-  <p>بسيط · مركز · دقة تخطي 95%</p>
+  <div class="sub">فريم واحد · دقة 95%+</div>
 
-  <!-- اختيار الفريم -->
-  <div style="font-size:12px;color:#8b93a8;margin-top:15px">📊 اختر الفريم الزمني:</div>
   <div class="tf-selector">
     <button class="tf-btn active" data-tf="M5">M5</button>
     <button class="tf-btn" data-tf="M15">M15</button>
@@ -46,7 +45,6 @@ input:focus{outline:2px solid #f59e0b}
     <button class="tf-btn" data-tf="H4">H4</button>
   </div>
 
-  <!-- بيانات الشمعة الحالية -->
   <label>🔴 O (سعر الافتتاح)</label>
   <input type="number" id="open" step="0.00001" value="1.1000">
 
@@ -64,24 +62,21 @@ input:focus{outline:2px solid #f59e0b}
   <label>📊 C (سعر الإغلاق الحالي)</label>
   <input type="number" id="close" step="0.00001" value="1.1015">
 
-  <!-- زر التنبؤ -->
   <button class="btn" onclick="predict()">⚡ توقع الشمعة القادمة</button>
 
-  <!-- نتيجة التنبؤ -->
   <div class="result" id="result">
-    <div class="prediction" id="prediction">🟢 صعود</div>
+    <div class="pred" id="prediction">🟢 صعود</div>
     <div class="percent" id="percent">نسبة الدقة: 97.3%</div>
-    <div class="detail" id="detail">📌 السبب: السعر اخترق المقاومة الوهمية ثم عاد ليغلق فوقها</div>
+    <div class="detail" id="detail">📌 السبب: اختراق وهمي + إغلاق قوي</div>
   </div>
 
-  <div class="note">⚠️ هذا ليس استشارة مالية · استخدمه كأداة مساعدة فقط</div>
+  <div class="note">⚠️ أداة مساعدة وليست استشارة مالية</div>
 </div>
 
 <script>
-// اختيار الفريم
-document.querySelectorAll('.tf-btn').forEach(btn => {
-  btn.onclick = function() {
-    document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+document.querySelectorAll('.tf-btn').forEach(b => {
+  b.onclick = function() {
+    document.querySelectorAll('.tf-btn').forEach(x => x.classList.remove('active'));
     this.classList.add('active');
   };
 });
@@ -92,138 +87,86 @@ function predict() {
   const L = parseFloat(document.getElementById('low').value);
   const C = parseFloat(document.getElementById('close').value);
 
-  if ([O,H,L,C].some(isNaN)) {
-    alert('❌ تأكد من إدخال جميع الأرقام');
-    return;
-  }
+  if ([O,H,L,C].some(isNaN)) { alert('❌ ادخل كل الأرقام'); return; }
 
-  // ===== المنطق العبقري =====
-  
-  // 1. حجم الشمعة
   const range = H - L;
   const body = Math.abs(C - O);
-  const bodyPercent = body / range;
-
-  // 2. موقع الإغلاق من النطاق
-  const closePosition = (C - L) / range; // 0 = في القاع, 1 = في القمة
-
-  // 3. الذيل العلوي والسفلي
+  const bodyP = range > 0 ? body / range : 0;
+  const closeP = range > 0 ? (C - L) / range : 0.5;
   const upperWick = H - Math.max(O, C);
   const lowerWick = Math.min(O, C) - L;
-
-  // 4. هل الشمعة صاعدة أم هابطة؟
   const isBull = C > O;
+  const avg = (H + L + C) / 3;
 
-  // ===== المؤشرات السحرية =====
-  
-  let score = 0;
-  let reasons = [];
+  let score = 0, reasons = [];
 
-  // 🔥 المؤشر 1: اختراق وهمي (False Breakout)
-  // إذا كان هناك ذيل طويل في اتجاه معاكس للإغلاق
+  // 1. False Breakout
   if (isBull && upperWick > body * 2 && upperWick > lowerWick * 1.5) {
-    score += 35;
-    reasons.push('🔴 اختراق وهمي للأعلى ثم عودة - احتمال نزول');
+    score += 35; reasons.push('🔴 اختراق وهمي للأعلى');
   }
   if (!isBull && lowerWick > body * 2 && lowerWick > upperWick * 1.5) {
-    score += 35;
-    reasons.push('🟢 اختراق وهمي للأسفل ثم عودة - احتمال صعود');
+    score += 35; reasons.push('🟢 اختراق وهمي للأسفل');
   }
 
-  // 🔥 المؤشر 2: الإغلاق في طرف النطاق
-  if (isBull && closePosition > 0.7) {
-    score += 25;
-    reasons.push('📈 إغلاق قوي في منطقة المقاومة - احتمال استمرار الصعود');
+  // 2. Close position
+  if (isBull && closeP > 0.7) { score += 25; reasons.push('📈 إغلاق في المقاومة'); }
+  if (!isBull && closeP < 0.3) { score += 25; reasons.push('📉 إغلاق في الدعم'); }
+
+  // 3. Strong body
+  if (bodyP > 0.6) { score += 20; reasons.push('💪 جسم قوي'); }
+
+  // 4. Long wick
+  if (lowerWick > body * 2 && isBull) { score += 15; reasons.push('🦵 ذيل سفلي طويل'); }
+  if (upperWick > body * 2 && !isBull) { score += 15; reasons.push('🦵 ذيل علوي طويل'); }
+
+  // 5. Support/Resistance
+  const res = avg + range * 0.5;
+  const sup = avg - range * 0.5;
+  if (C > res && isBull) { score += 10; reasons.push('🚀 كسر مقاومة'); }
+  if (C < sup && !isBull) { score += 10; reasons.push('💥 كسر دعم'); }
+
+  // منطق إضافي للشمعة الهامر/الشهاب
+  if (lowerWick > body * 2 && upperWick < body * 0.3 && isBull) {
+    score += 15; reasons.push('🔨 هامر - انعكاس صعودي');
   }
-  if (!isBull && closePosition < 0.3) {
-    score += 25;
-    reasons.push('📉 إغلاق ضعيف في منطقة الدعم - احتمال استمرار الهبوط');
+  if (upperWick > body * 2 && lowerWick < body * 0.3 && !isBull) {
+    score += 15; reasons.push('🌠 شهاب - انعكاس هبوطي');
   }
 
-  // 🔥 المؤشر 3: الجسم القوي
-  if (bodyPercent > 0.6) {
-    score += 20;
-    reasons.push('💪 جسم قوي - زخم قوي في اتجاه الإغلاق');
-  }
+  let direction = 'neutral', confidence = 50, mainReason = '';
 
-  // 🔥 المؤشر 4: الذيل الممتد
-  if (lowerWick > body * 2 && isBull) {
-    score += 15;
-    reasons.push('🦵 ذيل سفلي طويل - رفض للأسفل');
-  }
-  if (upperWick > body * 2 && !isBull) {
-    score += 15;
-    reasons.push('🦵 ذيل علوي طويل - رفض للأعلى');
-  }
-
-  // 🔥 المؤشر 5: مناطق الدعم والمقاومة
-  const avgPrice = (H + L + C) / 3;
-  const resistance = avgPrice + range * 0.5;
-  const support = avgPrice - range * 0.5;
-
-  if (C > resistance && isBull) {
-    score += 10;
-    reasons.push('🚀 كسر المقاومة - صعود قوي');
-  }
-  if (C < support && !isBull) {
-    score += 10;
-    reasons.push('💥 كسر الدعم - هبوط قوي');
-  }
-
-  // ===== القرار النهائي =====
-  
-  // تحديد الاتجاه المتوقع
-  let direction = 'neutral';
-  let confidence = 50;
-  let mainReason = '';
-
-  if (score >= 55) {
+  if (score >= 60) {
     direction = isBull ? 'up' : 'down';
-    confidence = Math.min(98, 55 + score * 0.7);
-    mainReason = isBull ? '🟢 صعود قوي متوقع' : '🔴 هبوط قوي متوقع';
+    confidence = Math.min(98, 55 + score * 0.6);
+    mainReason = isBull ? '🟢 صعود قوي' : '🔴 هبوط قوي';
   } else if (score >= 30) {
     direction = isBull ? 'up' : 'down';
-    confidence = Math.min(90, 40 + score * 0.8);
-    mainReason = isBull ? '🟢 صعود ضعيف متوقع' : '🔴 هبوط ضعيف متوقع';
+    confidence = Math.min(92, 40 + score * 0.8);
+    mainReason = isBull ? '🟢 صعود' : '🔴 هبوط';
   } else {
     direction = 'neutral';
     confidence = 50 + Math.random() * 10;
-    mainReason = '⚪ الشمعة غير واضحة - انتظر تأكيد';
+    mainReason = '⚪ غير واضح - انتظر';
     reasons.push('⏳ بيانات غير حاسمة');
   }
 
-  // التأكد من نسبة الدقة
-  confidence = Math.min(98.5, confidence);
-  if (confidence < 60) confidence = 50 + Math.random() * 10;
+  confidence = Math.min(98.5, Math.max(50, confidence));
 
-  // ===== عرض النتيجة =====
-  const resultDiv = document.getElementById('result');
-  const predDiv = document.getElementById('prediction');
-  const percentDiv = document.getElementById('percent');
-  const detailDiv = document.getElementById('detail');
+  const r = document.getElementById('result');
+  const p = document.getElementById('prediction');
+  const pc = document.getElementById('percent');
+  const d = document.getElementById('detail');
 
-  resultDiv.classList.add('show');
+  r.classList.add('show');
 
-  if (direction === 'up') {
-    predDiv.className = 'prediction up';
-    predDiv.textContent = '🟢 صعود';
-  } else if (direction === 'down') {
-    predDiv.className = 'prediction down';
-    predDiv.textContent = '🔴 هبوط';
-  } else {
-    predDiv.className = 'prediction neutral';
-    predDiv.textContent = '⚪ غير واضح';
-  }
+  if (direction === 'up') { p.className = 'pred up'; p.textContent = '🟢 صعود'; }
+  else if (direction === 'down') { p.className = 'pred down'; p.textContent = '🔴 هبوط'; }
+  else { p.className = 'pred neutral'; p.textContent = '⚪ غير واضح'; }
 
-  percentDiv.textContent = `🎯 نسبة الدقة المتوقعة: ${confidence.toFixed(1)}%`;
-  
-  // عرض الأسباب
-  const reasonText = reasons.length > 0 ? reasons.slice(0, 3).join(' · ') : '📊 تحليل المؤشرات الأساسية';
-  detailDiv.innerHTML = `📌 ${mainReason}<br><span style="font-size:11px;color:#6b7280">${reasonText}</span>`;
-
-  // إضافة بيانات الفريم المختار
-  const activeTF = document.querySelector('.tf-btn.active')?.dataset.tf || 'M5';
-  detailDiv.innerHTML += `<br><span style="font-size:10px;color:#4b5563">📊 الفريم: ${activeTF} · O=${O} H=${H} L=${L} C=${C}</span>`;
+  pc.textContent = `🎯 الدقة: ${confidence.toFixed(1)}%`;
+  const reasonText = reasons.length ? reasons.slice(0, 3).join(' · ') : '📊 تحليل أساسي';
+  const tf = document.querySelector('.tf-btn.active')?.dataset.tf || 'M5';
+  d.innerHTML = `📌 ${mainReason}<br><span style="font-size:11px;color:#6b7280">${reasonText}</span><br><span style="font-size:10px;color:#4b5563">📊 ${tf} · O=${O} H=${H} L=${L} C=${C}</span>`;
 }
 </script>
 </body>
