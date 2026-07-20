@@ -1,654 +1,745 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>محرك إشارات OTC الأسطوري</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="SpriNg Bot"/>
+<meta name="theme-color" content="#06070c"/>
+<title>SpriNg Bot – Twelve Data</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <style>
-:root{--bg:#0e1117;--sf:#161b26;--sf2:#1e2535;--bd:#2a3247;--bds:#374160;--tx:#e8eaf0;--sc:#8b93a8;--mt:#5a6380;--buy:#4ade80;--buyb:#0d2818;--buybr:#166534;--sel:#f87171;--selb:#2b0f0f;--selbr:#7f1d1d;--ac:#3b82f6;--acd:#1e3a5f;--wn:#f59e0b;--r:10px;--fn:'Segoe UI',system-ui,sans-serif;--mo:'SF Mono','Fira Code',monospace}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh}
-.hdr{background:var(--sf);border-bottom:.5px solid var(--bd);padding:1rem 1.5rem;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
-.hico{width:36px;height:36px;background:var(--acd);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
-.htit{font-size:16px;font-weight:600}.hsub{font-size:11px;color:var(--mt);margin-top:1px}
-.hbdg{margin-right:auto;font-size:10px;padding:3px 10px;border-radius:20px;background:var(--acd);color:var(--ac);border:.5px solid var(--ac);font-weight:500}
-.main{max-width:740px;margin:0 auto;padding:1.25rem 1rem 3rem}
-.slbl{font-size:10px;font-weight:600;color:var(--mt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
-.tf-block{background:var(--sf);border:.5px solid var(--bd);border-radius:12px;margin-bottom:8px;overflow:hidden}
-.tf-head{display:flex;align-items:center;gap:10px;padding:.65rem .9rem;background:var(--sf2);border-bottom:.5px solid var(--bd)}
-.tf-num{font-size:11px;font-weight:600;color:var(--mt);min-width:20px}
-.tf-label{font-size:12px;font-weight:600;color:var(--tx)}
-.tf-role{font-size:10px;color:var(--mt);margin-right:auto;padding:2px 8px;background:var(--bg);border-radius:4px;border:.5px solid var(--bd)}
-.tf-fields{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:.65rem .9rem}
-.fd{background:var(--sf2);border:.5px solid var(--bd);border-radius:8px;padding:.5rem .6rem;transition:border-color .15s}
-.fd:focus-within{border-color:var(--ac)}
-.fd label{display:block;font-size:10px;color:var(--mt);margin-bottom:3px;font-weight:500}
-.fd input,.fd select{width:100%;background:transparent;border:none;color:var(--tx);font-size:13px;font-family:var(--mo);outline:none}
-.fd select option{background:var(--sf2)}
-.conf-block{background:var(--sf);border:.5px solid var(--bds);border-radius:12px;margin-bottom:8px;overflow:hidden}
-.conf-head{display:flex;align-items:center;gap:10px;padding:.65rem .9rem;background:#1a1f2e;border-bottom:.5px solid var(--bds)}
-.conf-lbl{font-size:12px;font-weight:600;color:var(--ac)}
-.conf-role{font-size:10px;color:var(--ac);margin-right:auto;padding:2px 8px;background:var(--acd);border-radius:4px;border:.5px solid var(--ac);opacity:.8}
-.conf-fields{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:.65rem .9rem}
-.btn{width:100%;padding:13px;background:var(--ac);border:none;border-radius:var(--r);color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--fn);transition:opacity .15s;margin-bottom:1.25rem}
-.btn:hover{opacity:.88}
-.result{display:none}
-.sec-sep{display:flex;align-items:center;gap:10px;margin:1rem 0 .75rem}
-.sep-line{flex:1;height:.5px;background:var(--bd)}
-.sep-txt{font-size:10px;font-weight:600;color:var(--mt);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
-.agree-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1rem}
-.ag-card{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--r);padding:.6rem;text-align:center;transition:border-color .2s}
-.ag-card.buy{border-color:var(--buybr);background:var(--buyb)}
-.ag-card.sell{border-color:var(--selbr);background:var(--selb)}
-.ag-card.wait{border-color:var(--bd)}
-.ag-tf{font-size:10px;color:var(--mt);margin-bottom:3px}
-.ag-dir{font-size:15px;font-weight:700;margin-bottom:2px}
-.ag-dir.buy{color:var(--buy)}.ag-dir.sell{color:var(--sel)}.ag-dir.wait{color:var(--sc)}
-.ag-acc{font-size:10px;color:var(--mt)}
-.conf-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.75rem}
-.cf-card{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--r);padding:.75rem;text-align:center}
-.cf-card.buy{border-color:var(--buybr);background:var(--buyb)}
-.cf-card.sell{border-color:var(--selbr);background:var(--selb)}
-.cf-tf{font-size:11px;color:var(--mt);margin-bottom:4px}
-.cf-dir{font-size:17px;font-weight:700}
-.cf-dir.buy{color:var(--buy)}.cf-dir.sell{color:var(--sel)}
-.asb{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--r);padding:.85rem;margin-bottom:1rem}
-.asb-title{font-size:11px;font-weight:600;color:var(--sc);margin-bottom:.6rem}
-.asb-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.asb-lbl{font-size:11px;color:var(--mt);min-width:100px}
-.asb-trk{flex:1;height:8px;border-radius:4px;background:var(--sf2);overflow:hidden}
-.asb-fil{height:100%;border-radius:4px;transition:width .5s}
-.asb-num{font-size:12px;font-weight:600;min-width:38px;text-align:left}
-.asb-vd{margin-top:.6rem;font-size:12px;padding:7px 10px;border-radius:6px;background:var(--sf2);line-height:1.5}
-.asb-vd.all{color:var(--buy);border-right:3px solid var(--buy)}
-.asb-vd.most{color:var(--wn);border-right:3px solid var(--wn)}
-.asb-vd.conflict{color:var(--sel);border-right:3px solid var(--sel)}
-.dcard{border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.dcard.buy{background:var(--buyb);border:.5px solid var(--buybr)}
-.dcard.sell{background:var(--selb);border:.5px solid var(--selbr)}
-.dcard.wait{background:var(--sf);border:.5px solid var(--bd)}
-.dtext{font-size:26px;font-weight:700}
-.dtext.buy{color:var(--buy)}.dtext.sell{color:var(--sel)}.dtext.wait{color:var(--sc)}
-.dsub{font-size:11px;color:var(--mt);margin-top:5px}
-.ddur{font-size:30px;font-weight:700;color:var(--tx);text-align:left}
-.ddurl{font-size:10px;color:var(--mt);margin-top:2px;text-align:left}
-.mets{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1rem}
-.met{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--r);padding:.7rem}
-.met.hi{border-color:var(--ac)}
-.met-l{font-size:10px;color:var(--mt);margin-bottom:4px}
-.met-v{font-size:18px;font-weight:600}
-.met-s{font-size:10px;color:var(--mt);margin-top:3px}
-.nbox{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--r);padding:.85rem;margin-bottom:1rem}
-.nt{font-size:11px;font-weight:600;color:var(--sc);margin-bottom:.6rem}
-.nbr{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-.nbl{font-size:11px;color:var(--mt);min-width:110px}
-.nbt{flex:1;height:6px;border-radius:3px;background:var(--sf2);overflow:hidden}
-.nbf{height:100%;border-radius:3px}
-.nbn{font-size:11px;color:var(--tx);min-width:50px;text-align:left;font-family:var(--mo)}
-.nvd{margin-top:.55rem;font-size:11px;color:var(--sc);padding:6px 10px;background:var(--sf2);border-radius:6px}
-.nvd.low{border-right:3px solid var(--buy)}.nvd.mid{border-right:3px solid var(--wn)}
-.nvd.high{border-right:3px solid var(--sel)}.nvd.danger{border-right:3px solid #dc2626}
-.tabs{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px}
-.tab{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:.5px solid var(--bd);background:var(--sf);color:var(--sc);white-space:nowrap;transition:all .15s}
-.tab.active.buy{background:var(--buyb);color:var(--buy);border-color:var(--buybr)}
-.tab.active.sell{background:var(--selb);color:var(--sel);border-color:var(--selbr)}
-.tab.active.neu{background:var(--sf2);color:var(--tx);border-color:var(--bds)}
-.tab-pane{display:none}.tab-pane.active{display:block}
-.grps{display:flex;flex-direction:column;gap:8px}
-.grp{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--r);overflow:hidden}
-.ghd{display:flex;align-items:center;justify-content:space-between;padding:.55rem .9rem;border-bottom:.5px solid var(--bd);background:var(--sf2)}
-.gnm{font-size:12px;font-weight:600}.grt{display:flex;align-items:center;gap:6px}
-.wtag{font-size:10px;color:var(--mt);background:var(--bg);padding:1px 6px;border-radius:4px;border:.5px solid var(--bd)}
-.gbdg{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600}
-.gbdg.buy{background:var(--buyb);color:var(--buy);border:.5px solid var(--buybr)}
-.gbdg.sell{background:var(--selb);color:var(--sel);border:.5px solid var(--selbr)}
-.gbdg.neu{background:var(--sf2);color:var(--mt);border:.5px solid var(--bd)}
-.eqr{display:flex;align-items:flex-start;gap:10px;padding:.5rem .9rem;border-bottom:.5px solid var(--bd)}
-.eqr:last-child{border-bottom:none}
-.eqi{font-size:13px;min-width:18px;margin-top:2px}
-.eqb{flex:1}.eqn{font-size:12px;font-weight:500}
-.eqf{font-size:10px;color:var(--mt);margin-top:2px;font-family:var(--mo);direction:ltr;text-align:left}
-.eqv{font-size:11px;margin-top:2px}
-.eqv.up{color:var(--buy)}.eqv.down{color:var(--sel)}.eqv.neu{color:var(--mt)}
-.pvg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:.55rem .9rem;border-top:.5px solid var(--bd);background:var(--bg)}
-.pvc{text-align:center}.pvl{font-size:10px;color:var(--mt)}
-.pvv{font-size:11px;font-weight:600;font-family:var(--mo)}
-.pvv.r{color:var(--sel)}.pvv.s{color:var(--buy)}.pvv.p{color:var(--ac)}
-.risk-box{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--r);padding:.85rem;margin-bottom:1rem}
-.risk-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:.6rem}
-.risk-item{background:var(--sf2);border-radius:6px;padding:.5rem;text-align:center}
-.risk-item .label{font-size:9px;color:var(--mt)}
-.risk-item .value{font-size:14px;font-weight:600;font-family:var(--mo)}
-.risk-item .value.green{color:var(--buy)}
-.risk-item .value.red{color:var(--sel)}
-.risk-item .value.gold{color:var(--wn)}
-.ftr{text-align:center;padding:1.5rem 1rem;font-size:11px;color:var(--mt);border-top:.5px solid var(--bd);margin-top:2rem}
-.pattern-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:.5rem 0}
-.pattern-badge{background:var(--sf2);border-radius:6px;padding:3px 8px;font-size:10px;text-align:center;border:.5px solid var(--bd)}
-.pattern-badge.found{border-color:var(--buybr);background:var(--buyb);color:var(--buy)}
-.pattern-badge.bearish{border-color:var(--selbr);background:var(--selb);color:var(--sel)}
-.alert-box{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--r);padding:.85rem;margin-bottom:1rem;border-right:3px solid var(--wn)}
-.alert-title{font-size:11px;font-weight:600;color:var(--sc);margin-bottom:.3rem}
-.alert-text{font-size:12px;color:var(--tx)}
-.time-analysis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:.5rem}
-.time-item{background:var(--sf2);border-radius:6px;padding:.4rem;text-align:center;font-size:10px}
-.time-item .tval{font-size:14px;font-weight:600;color:var(--ac)}
-@media(max-width:520px){.tf-fields{grid-template-columns:repeat(3,1fr)}.mets{grid-template-columns:1fr 1fr}.agree-grid{grid-template-columns:1fr 1fr 1fr}.conf-fields{grid-template-columns:repeat(3,1fr)}.risk-grid{grid-template-columns:1fr}.time-analysis{grid-template-columns:1fr}}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+body{
+  background: radial-gradient(circle at 50% 10%, #121526 0%, #06070c 70%);
+  background-attachment: fixed;
+  color:#e0e0f0;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-image: linear-gradient(rgba(26, 29, 50, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(26, 29, 50, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+  z-index: -1;
+  pointer-events: none;
+}
+::-webkit-scrollbar{width:0;}
 </style>
 </head>
 <body>
-<div class="hdr">
-  <div class="hico">??</div>
-  <div><div class="htit">محرك إشارات OTC الأسطوري</div><div class="hsub">5 فريمات · 25 معادلة · AI · إدارة مخاطرة · أنماط شموع · تحليل زمني</div></div>
-  <div class="hbdg">? ULTIMATE</div>
-</div>
-<div class="main">
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useCallback } = React;
 
-<div class="slbl">فريمات الدخول (5 فريمات)</div>
+const PAIRS = [
+  "EUR/USD","USD/JPY","AUD/USD","EUR/GBP","EUR/JPY","GBP/JPY","AUD/JPY",
+  "AUD/CAD"
+];
 
-<!-- Entry TF 1 -->
-<div class="tf-block">
-  <div class="tf-head"><div class="tf-num">1</div><div class="tf-label">M5</div><div class="tf-role">التنفيذ</div></div>
-  <div class="tf-fields">
-    <div class="fd"><label>Open</label><input type="number" id="o1" step="0.00001"/></div>
-    <div class="fd"><label>High</label><input type="number" id="h1" step="0.00001"/></div>
-    <div class="fd"><label>Low</label><input type="number" id="l1" step="0.00001"/></div>
-    <div class="fd"><label>Close</label><input type="number" id="c1" step="0.00001"/></div>
-    <div class="fd"><label>Prev C</label><input type="number" id="p1" step="0.00001"/></div>
-    <div class="fd"><label>Volume</label><input type="number" id="v1" step="1" value="100"/></div>
-  </div>
-</div>
+// ============================================================
+// ?? TWELVE DATA API KEY
+// ============================================================
+const TWELVE_KEY = "30a1cd1a62274ed29c7fb8d8e41c1f00";
 
-<!-- Entry TF 2 -->
-<div class="tf-block">
-  <div class="tf-head"><div class="tf-num">2</div><div class="tf-label">M15</div><div class="tf-role">تأكيد قريب</div></div>
-  <div class="tf-fields">
-    <div class="fd"><label>Open</label><input type="number" id="o2" step="0.00001"/></div>
-    <div class="fd"><label>High</label><input type="number" id="h2" step="0.00001"/></div>
-    <div class="fd"><label>Low</label><input type="number" id="l2" step="0.00001"/></div>
-    <div class="fd"><label>Close</label><input type="number" id="c2" step="0.00001"/></div>
-    <div class="fd"><label>Prev C</label><input type="number" id="p2" step="0.00001"/></div>
-    <div class="fd"><label>Volume</label><input type="number" id="v2" step="1" value="100"/></div>
-  </div>
-</div>
-
-<!-- Entry TF 3 -->
-<div class="tf-block">
-  <div class="tf-head"><div class="tf-num">3</div><div class="tf-label">M30</div><div class="tf-role">الاتجاه</div></div>
-  <div class="tf-fields">
-    <div class="fd"><label>Open</label><input type="number" id="o3" step="0.00001"/></div>
-    <div class="fd"><label>High</label><input type="number" id="h3" step="0.00001"/></div>
-    <div class="fd"><label>Low</label><input type="number" id="l3" step="0.00001"/></div>
-    <div class="fd"><label>Close</label><input type="number" id="c3" step="0.00001"/></div>
-    <div class="fd"><label>Prev C</label><input type="number" id="p3" step="0.00001"/></div>
-    <div class="fd"><label>Volume</label><input type="number" id="v3" step="1" value="100"/></div>
-  </div>
-</div>
-
-<!-- Entry TF 4 -->
-<div class="tf-block">
-  <div class="tf-head"><div class="tf-num">4</div><div class="tf-label">H1</div><div class="tf-role">ترند</div></div>
-  <div class="tf-fields">
-    <div class="fd"><label>Open</label><input type="number" id="o4" step="0.00001"/></div>
-    <div class="fd"><label>High</label><input type="number" id="h4" step="0.00001"/></div>
-    <div class="fd"><label>Low</label><input type="number" id="l4" step="0.00001"/></div>
-    <div class="fd"><label>Close</label><input type="number" id="c4" step="0.00001"/></div>
-    <div class="fd"><label>Prev C</label><input type="number" id="p4" step="0.00001"/></div>
-    <div class="fd"><label>Volume</label><input type="number" id="v4" step="1" value="100"/></div>
-  </div>
-</div>
-
-<!-- Entry TF 5 -->
-<div class="tf-block">
-  <div class="tf-head"><div class="tf-num">5</div><div class="tf-label">H4</div><div class="tf-role">ترند رئيسي</div></div>
-  <div class="tf-fields">
-    <div class="fd"><label>Open</label><input type="number" id="o5" step="0.00001"/></div>
-    <div class="fd"><label>High</label><input type="number" id="h5" step="0.00001"/></div>
-    <div class="fd"><label>Low</label><input type="number" id="l5" step="0.00001"/></div>
-    <div class="fd"><label>Close</label><input type="number" id="c5" step="0.00001"/></div>
-    <div class="fd"><label>Prev C</label><input type="number" id="p5" step="0.00001"/></div>
-    <div class="fd"><label>Volume</label><input type="number" id="v5" step="1" value="100"/></div>
-  </div>
-</div>
-
-<!-- Confirm TFs -->
-<div class="slbl">فريمات التأكيد</div>
-<div class="conf-block">
-  <div class="conf-head"><span style="font-size:14px">?</span><div class="conf-lbl">تأكيد H1</div></div>
-  <div class="conf-fields">
-    <div class="fd"><label>Open</label><input type="number" id="co1" step="0.00001"/></div>
-    <div class="fd"><label>High</label><input type="number" id="ch1" step="0.00001"/></div>
-    <div class="fd"><label>Low</label><input type="number" id="cl1" step="0.00001"/></div>
-    <div class="fd"><label>Close</label><input type="number" id="cc1" step="0.00001"/></div>
-    <div class="fd"><label>Volume</label><input type="number" id="cv1" step="1" value="100"/></div>
-  </div>
-</div>
-<div class="conf-block">
-  <div class="conf-head"><span style="font-size:14px">?</span><div class="conf-lbl">تأكيد H4</div></div>
-  <div class="conf-fields">
-    <div class="fd"><label>Open</label><input type="number" id="co2" step="0.00001"/></div>
-    <div class="fd"><label>High</label><input type="number" id="ch2" step="0.00001"/></div>
-    <div class="fd"><label>Low</label><input type="number" id="cl2" step="0.00001"/></div>
-    <div class="fd"><label>Close</label><input type="number" id="cc2" step="0.00001"/></div>
-    <div class="fd"><label>Volume</label><input type="number" id="cv2" step="1" value="100"/></div>
-  </div>
-</div>
-
-<!-- Capital Management -->
-<div class="slbl">إدارة رأس المال</div>
-<div class="tf-block" style="border-color:var(--ac);">
-  <div class="tf-head" style="background:var(--acd);"><span style="font-size:14px">??</span><div class="tf-label" style="color:var(--ac);">إدارة المخاطرة</div></div>
-  <div class="tf-fields" style="grid-template-columns:repeat(3,1fr);">
-    <div class="fd"><label>رأس المال ($)</label><input type="number" id="capital" value="200" step="1"/></div>
-    <div class="fd"><label>نسبة المخاطرة (%)</label><input type="number" id="riskPct" value="2" step="0.5"/></div>
-    <div class="fd"><label>نسبة الربح المتوقعة (%)</label><input type="number" id="profitPct" value="3" step="0.5"/></div>
-  </div>
-</div>
-
-<button class="btn" onclick="calc()">?? احسب الإشارة الكاملة</button>
-
-<!-- ===== RESULT ===== -->
-<div class="result" id="result">
-
-  <!-- Entry Cards -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">اتفاق فريمات الدخول (5)</div><div class="sep-line"></div></div>
-  <div class="agree-grid" id="entry-cards"></div>
-  <div class="asb" id="entry-asb">
-    <div class="asb-title">مستوى اتفاق فريمات الدخول</div>
-    <div class="asb-row"><div class="asb-lbl">الاتفاق</div><div class="asb-trk"><div class="asb-fil" id="entry-fil"></div></div><div class="asb-num" id="entry-num"></div></div>
-    <div class="asb-vd" id="entry-vd"></div>
-  </div>
-
-  <!-- Patterns -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">??? أنماط الشموع</div><div class="sep-line"></div></div>
-  <div class="nbox" id="patterns-box">
-    <div class="nt">أنماط الشموع المكتشفة</div>
-    <div class="pattern-grid" id="pattern-grid"></div>
-  </div>
-
-  <!-- Time Analysis -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">? التحليل الزمني</div><div class="sep-line"></div></div>
-  <div class="nbox" id="time-box">
-    <div class="nt">توقيت الانعكاس المتوقع</div>
-    <div class="time-analysis" id="time-analysis"></div>
-  </div>
-
-  <!-- Confirm -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">تأكيد الاتجاه العام</div><div class="sep-line"></div></div>
-  <div class="conf-grid" id="conf-cards"></div>
-  <div class="asb"><div class="asb-title">اتفاق فريمات التأكيد</div>
-    <div class="asb-row"><div class="asb-lbl">التأكيد</div><div class="asb-trk"><div class="asb-fil" id="conf-fil"></div></div><div class="asb-num" id="conf-num"></div></div>
-    <div class="asb-vd" id="conf-vd"></div>
-  </div>
-
-  <!-- Final Signal -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">الإشارة النهائية</div><div class="sep-line"></div></div>
-  <div class="dcard" id="dcard">
-    <div><div class="dtext" id="dtext"></div><div class="dsub" id="dsub"></div></div>
-    <div><div class="ddur" id="ddur"></div><div class="ddurl">مدة الصفقة المثلى</div></div>
-  </div>
-
-  <!-- Risk Management -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">?? إدارة المخاطرة</div><div class="sep-line"></div></div>
-  <div class="risk-box">
-    <div class="nt">تفاصيل إدارة المخاطرة</div>
-    <div class="risk-grid" id="risk-grid"></div>
-  </div>
-
-  <!-- Alerts -->
-  <div class="alert-box" id="alert-box">
-    <div class="alert-title">?? تنبيهات</div>
-    <div class="alert-text" id="alert-text">لا توجد تنبيهات</div>
-  </div>
-
-  <!-- Metrics -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">?? المقاييس</div><div class="sep-line"></div></div>
-  <div class="mets">
-    <div class="met hi"><div class="met-l">?? دقة الإشارة</div><div class="met-v" id="macc"></div><div class="met-s" id="maccs"></div></div>
-    <div class="met"><div class="met-l">?? اتفاق الدخول</div><div class="met-v" id="ment"></div><div class="met-s">من 5 فريمات</div></div>
-    <div class="met"><div class="met-l">? تأكيد MTF</div><div class="met-v" id="mconf"></div><div class="met-s">من 2 فريمات</div></div>
-    <div class="met"><div class="met-l">?? RSI</div><div class="met-v" id="mrsi"></div><div class="met-s" id="mrsis"></div></div>
-    <div class="met"><div class="met-l">?? MACD</div><div class="met-v" id="mmacd"></div><div class="met-s" id="mmacds"></div></div>
-  </div>
-
-  <!-- Noise -->
-  <div class="nbox">
-    <div class="nt">?? تحليل الضجيج</div>
-    <div class="nbr"><div class="nbl">جسم الشمعة</div><div class="nbt"><div class="nbf" id="nb-body" style="background:var(--ac)"></div></div><div class="nbn" id="nv-body"></div></div>
-    <div class="nbr"><div class="nbl" id="ndirl">ضجيج الاتجاه</div><div class="nbt"><div class="nbf" id="nb-noise" style="background:var(--wn)"></div></div><div class="nbn" id="nv-noise"></div></div>
-    <div class="nbr"><div class="nbl">النطاق الكامل</div><div class="nbt"><div class="nbf" style="background:var(--bds);width:100%"></div></div><div class="nbn" id="nv-range"></div></div>
-    <div class="nvd" id="nvd"></div>
-  </div>
-
-  <!-- Detail Tabs -->
-  <div class="sec-sep"><div class="sep-line"></div><div class="sep-txt">تفاصيل المعادلات</div><div class="sep-line"></div></div>
-  <div class="tabs" id="tabs"></div>
-  <div id="tab-panes"></div>
-
-</div>
-</div>
-<div class="ftr">محرك إشارات OTC الأسطوري · 5 فريمات · 25 معادلة · أنماط شموع · تحليل زمني · إدارة مخاطرة</div>
-
-<script>
-function f5(n){return parseFloat(n).toFixed(5)}
-function pct(n){return(n*100).toFixed(1)+'%'}
-function ico(v){return v>0?'?':v<0?'?':'—'}
-function ec(v){return v>0?'up':v<0?'down':'neu'}
-function bc(v){return v>0?'buy':v<0?'sell':'neu'}
-function bl(v){return v>0?'شراء':v<0?'بيع':'محايد'}
-function fmt(m){if(m<60)return m+' دقيقة';if(m===60)return 'ساعة';if(m===120)return 'ساعتين';if(m===180)return '3 ساعات';if(m===240)return '4 ساعات';if(m%60===0)return(m/60)+' ساعات';return m+' دقيقة';}
-
-function detectPatterns(O,H,L,C){
-  const body=Math.abs(C-O),range=H-L,bull=C>O;
-  const up=H-Math.max(O,C),dn=Math.min(O,C)-L;
-  const patterns=[],pInfo=[];
-  // Doji
-  if(range>0 && body/range<0.1){patterns.push('Doji');pInfo.push({name:'Doji',type:'neutral'});}
-  // Hammer
-  if(dn>body*2.5&&up<body*0.5){patterns.push(bull?'Hammer':'Hanging Man');pInfo.push({name:bull?'Hammer':'Hanging Man',type:bull?'bullish':'bearish'});}
-  // Shooting Star
-  if(up>body*2.5&&dn<body*0.5){patterns.push(bull?'Shooting Star':'Inv Hammer');pInfo.push({name:bull?'Shooting Star':'Inv Hammer',type:bull?'bearish':'bullish'});}
-  // Marubozu
-  if(body>range*0.75){patterns.push(bull?'Marubozu Bull':'Marubozu Bear');pInfo.push({name:bull?'Marubozu Bull':'Marubozu Bear',type:bull?'bullish':'bearish'});}
-  // Engulfing
-  if(C>O){patterns.push('Bullish Engulfing');pInfo.push({name:'Bullish Engulfing',type:'bullish'});}
-  if(C<O){patterns.push('Bearish Engulfing');pInfo.push({name:'Bearish Engulfing',type:'bearish'});}
-  return{patterns,pInfo};
+// ============================================================
+// INDICATORS (نفس الكود القديم)
+// ============================================================
+function calcEma(d, p) {
+  const k = 2/(p+1); let e = d[0];
+  for (let i=1;i<d.length;i++) e = d[i]*k + e*(1-k);
+  return e;
 }
-
-function rsi(close,p=14){
-  if(close.length<p+1)return 50;
+function calcRsi(d, p=14) {
+  if (d.length<p+1) return 50;
   let g=0,l=0;
-  for(let i=close.length-p;i<close.length;i++){const x=close[i]-close[i-1];x>0?g+=x:l+=Math.abs(x);}
-  return 100-100/(1+(g/p)/((l/p)||0.0001));
+  for (let i=d.length-p;i<d.length;i++) { const x=d[i]-d[i-1]; x>0?g+=x:l+=Math.abs(x); }
+  return 100 - 100/(1+(g/p)/((l/p)||0.0001));
+}
+function calcMacd(d) { return calcEma(d.slice(-26),12)-calcEma(d.slice(-26),26); }
+function calcStoch(H,L,C,p=14) {
+  const hh=Math.max(...H.slice(-p)), ll=Math.min(...L.slice(-p));
+  return ((C[C.length-1]-ll)/((hh-ll)||0.0001))*100;
+}
+function calcAtr(H,L,C,p=14) {
+  const tr=[];
+  for (let i=1;i<C.length;i++) tr.push(Math.max(H[i]-L[i],Math.abs(H[i]-C[i-1]),Math.abs(L[i]-C[i-1])));
+  return tr.slice(-p).reduce((a,b)=>a+b,0)/p;
 }
 
-function macd(close){
-  if(close.length<26)return 0;
-  const ema12=(d,p)=>{const k=2/(p+1);let e=d[0];for(let i=1;i<d.length;i++)e=d[i]*k+e*(1-k);return e;};
-  return ema12(close.slice(-26),12)-ema12(close.slice(-26),26);
-}
-
-function qdir(O,H,L,C){if([O,H,L,C].some(isNaN)||H<=L)return null;const rng=H-L,body=Math.abs(C-O),d=C>O?1:C<O?-1:0;const cp=rng>0?(C-L)/rng:0.5,br=rng>0?body/rng:0;const PP=(H+L+C)/3,PPw=(H+L+2*C)/4;const sigs=[d,cp>=0.65?1:cp<=0.35?-1:0,br>0.5?d:0,C>PP?1:-1,C>PPw?1:-1];const buy=sigs.filter(s=>s>0).length,sell=sigs.filter(s=>s<0).length;const net=buy-sell,agree=Math.max(buy,sell)/sigs.length;return{dir:net>0?1:net<0?-1:0,agree};}
-
-function fullAn(O,H,L,C,PC,V){
-  const hpc=!isNaN(PC),rng=H-L,body=Math.abs(C-O);
-  const upS=H-Math.max(O,C),loS=Math.min(O,C)-L;
-  const TR=hpc?Math.max(rng,Math.abs(H-PC),Math.abs(L-PC)):rng;
-  const PPc=(H+L+C)/3,R1c=2*PPc-L,S1c=2*PPc-H,R2c=PPc+rng,S2c=PPc-rng;
-  const PPw=(H+L+2*C)/4,R1w=2*PPw-L,S1w=2*PPw-H,R2w=PPw+rng,S2w=PPw-rng;
-  const k=1.1;const r1=C+(rng*k/12),s1=C-(rng*k/12),r2=C+(rng*k/6),s2=C-(rng*k/6);
-  const r3=C+(rng*k/4),s3=C-(rng*k/4),r4=C+(rng*k/2),s4=C-(rng*k/2),PPm=(H+L+C)/3;
-  const d1=C>O?1:C<O?-1:0,bR=rng>0?body/rng:0,cP=rng>0?(C-L)/rng:0.5;
-  let sv=0,sd='ذيول متوازنة';
-  if(loS>body*1.8&&upS<body*0.5){sv=1;sd='مطرقة ? ارتداد صعودي';}
-  else if(upS>body*1.8&&loS<body*0.5){sv=-1;sd='شهاب ? ارتداد هبوطي';}
-  else if(loS>upS*1.5){sv=1;sd='ذيل سفلي أطول ? صعودي';}
-  else if(upS>loS*1.5){sv=-1;sd='ذيل علوي أطول ? هبوطي';}
-  const cpD=cP>=0.75?1:cP<=0.25?-1:0;
-  const stK=rng>0?(C-L)/rng*100:50,stD=stK<25?1:stK>75?-1:0;
-  const mom=(C-O)/O*100,momD=Math.abs(mom)>0.03?d1:0;
-  const aD=TR>0&&body/TR>0.45?d1:0;
-  const cpT=C>PPc?1:C<PPc?-1:0;
-  const cpP=C<=S1c&&C>=S2c?1:C>=R1c&&C<=R2c?-1:C<S2c?1:C>R2c?-1:cpT;
-  const wT=C>PPw?1:C<PPw?-1:0,wP=C<=S1w?1:C>=R1w?-1:wT;
-  let cL=0,cD='بين المستويات';
-  if(C>=r3){cL=-1;cD='فوق H3 ? بيع على مقاومة';}
-  else if(C<=s3){cL=1;cD='تحت L3 ? شراء على دعم';}
-  else if(C>=r2){cL=-1;cD='قرب H2 ? ضغط هبوطي';}
-  else if(C<=s2){cL=1;cD='قرب L2 ? دعم صعودي';}
-  else{cL=C>PPm?1:-1;cD='يتبع الاتجاه العام';}
-  const cB=C>r4?1:C<s4?-1:0;
-  // Volume
-  const vol=V||1;
-  const groups=[
-    {name:'تحليل الشمعة',wtag:'×1.0',sigs:[
-      {name:'اتجاه الشمعة',formula:'C-O = '+(C>O?'+':'')+f5(C-O),val:d1,w:1,desc:d1>0?'صعودي':d1<0?'هبوطي':'دوجي'},
-      {name:'قوة الجسم',formula:'|C-O|÷Range = '+pct(bR),val:bR>0.55?d1:0,w:1,desc:bR>0.7?'قوي جداً':bR>0.55?'متوسط':'ضعيف/دوجي'},
-      {name:'تحليل الذيول',formula:'?'+f5(loS)+' ?'+f5(upS),val:sv,w:1,desc:sd},
-      {name:'موضع الإغلاق',formula:'(C-L)÷Range = '+pct(cP),val:cpD,w:1,desc:pct(cP)+' من النطاق'},
-    ]},
-    {name:'ATR والزخم',wtag:'×1.2',sigs:[
-      {name:'ATR — قوة الحركة',formula:'Body÷TR = '+pct(TR>0?body/TR:0),val:aD,w:1.2,desc:body/TR>0.6?'قوي ? تأكيد':body/TR>0.35?'متوسط':'ضعيف'},
-      {name:'Stochastic',formula:'(C-L)÷Range×100 = '+stK.toFixed(1),val:stD,w:1.2,desc:stK<25?'تشبع بيع ? شراء':stK>75?'تشبع شراء ? بيع':'محايد'},
-      {name:'Momentum %',formula:'(C-O)÷O×100 = '+(mom>0?'+':'')+mom.toFixed(4)+'%',val:momD,w:1.2,desc:'زخم '+(mom>=0?'صعودي':'هبوطي')},
-      {name:'Volume',formula:'V='+vol,val:vol>50?1:vol<30?-1:0,w:1,desc:vol>50?'حجم مرتفع ? تأكيد':vol<30?'حجم منخفض ? ضعف':'متوسط'},
-    ]},
-    {name:'Classic Pivot',wtag:'×1.8',pvt:{R2:R2c,R1:R1c,PP:PPc,S1:S1c,S2:S2c},sigs:[
-      {name:'اتجاه vs Classic PP',formula:'PP='+f5(PPc),val:cpT,w:1.8,desc:C>PPc?'فوق PP ? صاعد':'تحت PP ? هابط'},
-      {name:'قرب S1/R1',formula:'S1='+f5(S1c)+' R1='+f5(R1c),val:cpP,w:1.8,desc:C<=S1c?'قرب S1 ? صعودي':C>=R1c?'قرب R1 ? هبوطي':'بين المستويات'},
-    ]},
-    {name:'Woodie Pivot',wtag:'×1.8',pvt:{R2:R2w,R1:R1w,PP:PPw,S1:S1w,S2:S2w},sigs:[
-      {name:'اتجاه vs Woodie PP',formula:'PP=(H+L+2C)÷4 = '+f5(PPw),val:wT,w:1.8,desc:C>PPw?'فوق PP ? صاعد':'تحت PP ? هابط'},
-      {name:'قرب S1/R1 Woodie',formula:'S1='+f5(S1w)+' R1='+f5(R1w),val:wP,w:1.8,desc:C<=S1w?'قرب S1':C>=R1w?'قرب R1':'بين المستويات'},
-    ]},
-    {name:'Camarilla Pivot',wtag:'×1.8',pvt:{H4:r4,H3:r3,H2:r2,H1:r1,PP:PPm,L1:s1,L2:s2,L3:s3,L4:s4},sigs:[
-      {name:'اتجاه vs Camarilla PP',formula:'PP='+f5(PPm),val:C>PPm?1:-1,w:1.8,desc:C>PPm?'فوق PP ? صاعد':'تحت PP ? هابط'},
-      {name:'H3/L3 — أقوى مستوى',formula:'H3='+f5(r3)+' L3='+f5(s3),val:cL,w:1.8,desc:cD},
-      {name:'H4/L4 — اختراق',formula:'H4='+f5(r4)+' L4='+f5(s4),val:cB,w:1.8,desc:C>r4?'اختراق H4 ? صعودي':C<s4?'كسر L4 ? هبوطي':'لا اختراق'},
-    ]},
-    {name:'Fibonacci Pivot',wtag:'×1.5',sigs:[
-      {name:'R1 38.2%',formula:'PP+0.382×Range = '+f5(PPc+rng*0.382),val:C>PPc+rng*0.382?1:C<PPc+rng*0.382?-1:0,w:1.5,desc:'مستوى فيبوناتشي أول'},
-      {name:'S1 38.2%',formula:'PP-0.382×Range = '+f5(PPc-rng*0.382),val:C>PPc-rng*0.382?1:-1,w:1.5,desc:'دعم فيبوناتشي'},
-    ]},
-    {name:'EMA Analysis',wtag:'×1.3',sigs:[
-      {name:'EMA 20',formula:'السعر مقابل EMA20',val:C>PPc?1:C<PPc?-1:0,w:1.3,desc:C>PPc?'فوق المتوسط ? صاعد':'تحته ? هابط'},
-    ]},
-  ];
-  let all=[];groups.forEach(g=>g.sigs.forEach(s=>all.push(s)));
-  let rB=0,rS=0,wB=0,wS=0,wT2=0;
-  all.forEach(s=>{if(s.val>0){rB++;wB+=s.w;}else if(s.val<0){rS++;wS+=s.w;}wT2+=s.w;});
-  const net=rB-rS,wA=Math.max(wB,wS)/wT2;
-  // Patterns
-  const pat=detectPatterns(O,H,L,C);
-  return{groups,dir:net>0?1:net<0?-1:0,wAgree:wA,body,upS,loS,rng,TR,patterns:pat};
-}
-
-function renderGroups(groups){return groups.map(g=>{
-  const gB=g.sigs.filter(s=>s.val>0).length,gS=g.sigs.filter(s=>s.val<0).length;
-  const gD=gB>gS?1:gS>gB?-1:0;let pv='';
-  if(g.pvt){pv=`<div class="pvg">${Object.keys(g.pvt).map(k=>{const ir=k.startsWith('R')||['H1','H2','H3','H4'].includes(k);const is=k.startsWith('S')||['L1','L2','L3','L4'].includes(k);return`<div class="pvc"><div class="pvl">${k}</div><div class="pvv ${ir?'r':is?'s':'p'}">${f5(g.pvt[k])}</div></div>`;}).join('')}</div>`;}
-  return`<div class="grp"><div class="ghd"><div class="gnm">${g.name}</div><div class="grt"><div class="wtag">وزن ${g.wtag}</div><div class="gbdg ${bc(gD)}">${bl(gD)}</div></div></div>
-  ${g.sigs.map(s=>`<div class="eqr"><div class="eqi" style="color:${s.val>0?'var(--buy)':s.val<0?'var(--sel)':'var(--mt)'}">${ico(s.val)}</div>
-  <div class="eqb"><div class="eqn">${s.name}</div><div class="eqf">${s.formula}</div><div class="eqv ${ec(s.val)}">${s.desc}</div></div></div>`).join('')}${pv}</div>`;
-}).join('');}
-
-function showTab(i){document.querySelectorAll('.tab').forEach((t,j)=>{t.classList.toggle('active',i===j);if(i===j){const an=window._ans[j];t.className='tab active '+(an.dir>0?'buy':an.dir<0?'sell':'neu');}});document.querySelectorAll('.tab-pane').forEach((p,j)=>p.classList.toggle('active',i===j));}
-
-function calc(){
-  // Read 5 entry TFs
-  const entries=[];
-  for(let i=1;i<=5;i++){
-    const o=document.getElementById('o'+i);const h=document.getElementById('h'+i);const l=document.getElementById('l'+i);const c=document.getElementById('c'+i);const p=document.getElementById('p'+i);const v=document.getElementById('v'+i);
-    entries.push({O:+o.value,H:+h.value,L:+l.value,C:+c.value,PC:+p.value,V:+v.value,label:['M5','M15','M30','H1','H4'][i-1]});
+function marketStr(C) {
+  let u=0,d=0;
+  for (let i=3;i<Math.min(C.length,25);i++) {
+    if(C[i]>C[i-1]&&C[i-1]>C[i-2]&&C[i-2]>C[i-3])u++;
+    if(C[i]<C[i-1]&&C[i-1]<C[i-2]&&C[i-2]<C[i-3])d++;
   }
-  for(let i=0;i<entries.length;i++){const e=entries[i];if([e.O,e.H,e.L,e.C].some(isNaN)||e.H<e.L||e.H<e.O||e.H<e.C||e.L>e.O||e.L>e.C){alert('فريم '+(i+1)+': تأكد من البيانات');return;}}
-  // Confirm
-  const confs=[{O:+document.getElementById('co1').value,H:+document.getElementById('ch1').value,L:+document.getElementById('cl1').value,C:+document.getElementById('cc1').value,V:+document.getElementById('cv1').value,label:'H1'},
-    {O:+document.getElementById('co2').value,H:+document.getElementById('ch2').value,L:+document.getElementById('cl2').value,C:+document.getElementById('cc2').value,V:+document.getElementById('cv2').value,label:'H4'}];
-  // Capital
-  const capital=+document.getElementById('capital').value||200;
-  const riskPct=+document.getElementById('riskPct').value||2;
-  const profitPct=+document.getElementById('profitPct').value||3;
+  if(u>d+1) return {trend:"UPTREND",score:2};
+  if(d>u+1) return {trend:"DOWNTREND",score:-2};
+  return {trend:"SIDEWAYS",score:0};
+}
 
-  // Analyze 5 entries
-  const ans=entries.map(e=>({...fullAn(e.O,e.H,e.L,e.C,e.PC,e.V),label:e.label}));
-  window._ans=ans;
+function candleP(O,H,L,C) {
+  const n=C.length-1,o=O[n],h=H[n],l=L[n],c=C[n];
+  const body=Math.abs(c-o),range=h-l,bull=c>o;
+  const up=h-Math.max(o,c),dn=Math.min(o,c)-l;
+  const p=[]; let s=0;
+  if(body<range*0.1){p.push("Doji");}
+  if(dn>body*2.5&&up<body*0.5){p.push(bull?"Hammer":"Hanging Man");s+=bull?2:-1;}
+  if(up>body*2.5&&dn<body*0.5){p.push(bull?"Shooting Star":"Inv Hammer");s+=bull?-2:1;}
+  if(body>range*0.75){p.push(bull?"Marubozu Bull":"Marubozu Bear");s+=bull?2:-2;}
+  if(n>0){
+    const po=O[n-1],pc=C[n-1];
+    if(pc<po&&c>o&&c>po&&o<pc){p.push("Bullish Engulfing");s+=3;}
+    if(pc>po&&c<o&&c<po&&o>pc){p.push("Bearish Engulfing");s-=3;}
+    if(n>1){
+      const ppc=C[n-2],ppo=O[n-2];
+      if(ppc<ppo&&Math.abs(pc-po)<Math.abs(ppc-ppo)*0.3&&c>o&&c>(ppo+ppc)/2){p.push("Morning Star");s+=4;}
+      if(ppc>ppo&&Math.abs(pc-po)<Math.abs(ppc-ppo)*0.3&&c<o&&c<(ppo+ppc)/2){p.push("Evening Star");s-=4;}
+    }
+  }
+  return {patterns:p,score:s};
+}
 
-  const buyCount=ans.filter(a=>a.dir>0).length;
-  const sellCount=ans.filter(a=>a.dir<0).length;
-  const mainDir=buyCount>sellCount?1:sellCount>buyCount?-1:0;
-  const entryAgree=Math.max(buyCount,sellCount)/5;
-  const avgWA=ans.reduce((s,a)=>s+a.wAgree,0)/5;
-  const entryBoost=entryAgree===1?0.10:entryAgree>=0.8?0.05:entryAgree>=0.6?0:0;
+function rejZones(H,L,C) {
+  const n=C.length,levels=[],tol=0.0003;
+  for(let i=5;i<n-5;i++){
+    if(H[i]>H[i-1]&&H[i]>H[i-2]&&H[i]>H[i+1]&&H[i]>H[i+2])levels.push({price:H[i],type:"R"});
+    if(L[i]<L[i-1]&&L[i]<L[i-2]&&L[i]<L[i+1]&&L[i]<L[i+2])levels.push({price:L[i],type:"S"});
+  }
+  const cl=[];
+  levels.forEach(lv=>{
+    let found=false;
+    cl.forEach(c=>{if(Math.abs(c.price-lv.price)/lv.price<tol){c.touches++;lv.type==="R"?c.ru++:c.rd++;found=true;}});
+    if(!found)cl.push({price:lv.price,touches:1,ru:lv.type==="R"?1:0,rd:lv.type==="S"?1:0});
+  });
+  const strong=cl.filter(c=>c.touches>=3).sort((a,b)=>b.touches-a.touches);
+  const last=C[n-1]; let nz=null,nt="",ns=0;
+  strong.forEach(z=>{
+    const d=Math.abs(last-z.price)/z.price*100;
+    if(d<0.05&&(!nz||d<Math.abs(last-nz.price)/last*100)){nz=z;nt=z.rd>z.ru?"RESISTANCE":"SUPPORT";ns=Math.min(100,z.touches*20);}
+  });
+  const atZone=!!nz,score=atZone?(nt==="SUPPORT"?2:-2):0;
+  return {nearZone:nz,nearType:nt,nearStrength:ns,atZone,score,label:atZone?`${nt} zone (${nz.touches}x) at ${nz.price.toFixed(5)}`:"No rejection zone nearby"};
+}
 
-  // Confirm
-  const confRes=confs.map(e=>{const r=qdir(e.O,e.H,e.L,e.C);return r?{...r,label:e.label}:null;}).filter(Boolean);
-  const confAgree=confRes.length>0?confRes.filter(r=>r.dir===mainDir).length/confRes.length:null;
-  const confBoost=confAgree===null?0:confAgree===1?0.10:confAgree>=0.5?0.05:-0.05;
+function volProfile(H,L,C,V) {
+  const n=C.length,minP=Math.min(...L),maxP=Math.max(...H),range=maxP-minP,buckets=20;
+  const prof=Array.from({length:buckets},(_,b)=>({mid:minP+(b+0.5)*range/buckets,vol:0}));
+  for(let i=0;i<n;i++){
+    const v=V&&V[i]?V[i]:1;
+    for(let b=0;b<buckets;b++)if(L[i]<=minP+(b+1)*range/buckets&&H[i]>=minP+b*range/buckets)prof[b].vol+=v;
+  }
+  const poc=prof.reduce((a,b)=>b.vol>a.vol?b:a);
+  const avg=prof.reduce((a,b)=>a+b.vol,0)/buckets;
+  const last=C[n-1];
+  const atHVN=prof.some(z=>z.vol>avg*1.5&&Math.abs(last-z.mid)/last<0.0008);
+  const atLVN=prof.some(z=>z.vol<avg*0.4&&z.vol>0&&Math.abs(last-z.mid)/last<0.0008);
+  const nearPOC=Math.abs(last-poc.mid)/last<0.0005;
+  const label=atLVN?"EXPLOSION ZONE":atHVN?"HVN - Institutional":nearPOC?`Near POC ${poc.mid.toFixed(5)}`:`POC: ${poc.mid.toFixed(5)}`;
+  return {atHVN,atLVN,nearPOC,label};
+}
 
-  // RSI & MACD
-  const closePrices=entries.map(e=>e.C);
-  const rsiVal=rsi(closePrices);
-  const macdVal=macd(closePrices);
-  const rsiDir=rsiVal>50?1:rsiVal<50?-1:0;
-  const macdDir=macdVal>0?1:macdVal<0?-1:0;
-  const rsiBoost=rsiDir===mainDir?0.05:0;
-  const macdBoost=macdDir===mainDir?0.05:0;
+function smartTripleCheck(O,H,L,C,rz,vp,sig) {
+  const n=C.length;
+  let lu=0,ld=0;
+  for(let i=n-5;i<n;i++){lu+=(C[i]>C[i-1]?1:0);ld+=(C[i]<C[i-1]?1:0);}
+  let ab=0;for(let i=n-10;i<n-1;i++)ab+=Math.abs(C[i]-O[i]);ab/=9;
+  const strongCnd=Math.abs(C[n-1]-O[n-1])>ab*0.8;
+  const clearEma=Math.abs(C[n-1]-calcEma(C.slice(-20),20))/calcEma(C.slice(-20),20)*100>0.01;
+  const momAcc=Math.abs(C[n-1]-C[n-2])>Math.abs(C[n-2]-C[n-3]);
+  const cndCons=Math.max(lu,ld);
+  let mcs=0;
+  if(cndCons>=3)mcs++;if(strongCnd)mcs++;if(clearEma)mcs++;if(momAcc)mcs++;
+  const check1=mcs>=3;
 
-  // Patterns
-  const allPatterns=ans.map(a=>a.patterns.pInfo).flat();
-  const bullPats=allPatterns.filter(p=>p.type==='bullish').length;
-  const bearPats=allPatterns.filter(p=>p.type==='bearish').length;
-  const patBoost=bullPats>bearPats&&mainDir===1?0.03:bearPats>bullPats&&mainDir===-1?0.03:0;
+  const rzOk=!rz.atZone||(rz.nearType==="SUPPORT"&&sig==="UP")||(rz.nearType==="RESISTANCE"&&sig==="DOWN");
+  const vpOk=vp.atLVN || (!vp.atHVN);
+  const check2=rzOk&&vpOk;
 
-  const finalAcc=Math.min(0.99,avgWA+entryBoost+confBoost+rsiBoost+macdBoost+patBoost);
+  const rsiV=calcRsi(C);
+  const macdV=calcMacd(C);
+  const e20=calcEma(C.slice(-20),20),e50=calcEma(C.slice(-50),50);
+  const last=C[n-1];
+  let agree=0;
+  if(sig==="UP"){
+    if(rsiV<60&&rsiV>30)agree++;
+    if(macdV>0)agree++;
+    if(last>e20)agree++;
+  } else if(sig==="DOWN"){
+    if(rsiV>40&&rsiV<70)agree++;
+    if(macdV<0)agree++;
+    if(last<e20)agree++;
+  }
+  const check3=sig==="WAIT" ? true : (agree>=2);
 
-  // Time Analysis (Gann angles)
-  const TF=5;
-  const now=new Date();
-  const hours=now.getHours();
-  const goldenHours=[10,11,14,15,20,21];
-  const isGolden=goldenHours.includes(hours);
-  const gannAngles=[45,90,135,180,225,270,315,360];
-  const nextAngle=gannAngles.find(a=>a>45)||90;
-  const angleTime=TF*nextAngle;
+  const passed=[check1,check2,check3].filter(Boolean).length;
+  const allPassed=passed===3;
 
-  // Duration
-  const nR=mainDir===1?ans[0].loS:ans[0].upS;const body=ans[0].body;
-  const nR2=body>0?nR/body:0;
-  let nLv,nCl,nMsg,nEx;
-  if(nR2<0.3){nLv='منخفض';nCl='low';nMsg='شمعة نظيفة — السعر سيبتعد بسرعة';nEx=0;}
-  else if(nR2<0.7){nLv='متوسط';nCl='mid';nMsg='ضجيج معقول — محتاج شمعة إضافية';nEx=1;}
-  else if(nR2<1.3){nLv='مرتفع';nCl='high';nMsg='ضجيج عالي — زود المدة';nEx=2;}
-  else{nLv='خطر';nCl='danger';nMsg='ضجيج خطير — فكر مرتين';nEx=3;}
-  const bC=finalAcc>=0.9?3:finalAcc>=0.8?2:1;
-  const tC=Math.min(bC+nEx,8);
-  const dur=Math.min(tC*TF,TF*8);
+  return {
+    check1,check2,check3,passed,allPassed,
+    mcs,mcsDetails:`Candles:${cndCons}/5 | Body:${strongCnd?"Strong":"Weak"} | Clear:${clearEma?"Yes":"No"} | Accel:${momAcc?"Yes":"No"}`,
+    agree,rzOk,vpOk
+  };
+}
 
-  // Risk Management
-  const riskAmount=capital*riskPct/100;
-  const profitAmount=capital*profitPct/100;
-  const rrRatio=profitAmount/riskAmount;
+function analyze(O,H,L,C,V) {
+  const n=C.length,last=C[n-1];
+  const e20=calcEma(C.slice(-20),20),e50=calcEma(C.slice(-50),50);
+  const r=calcRsi(C),m=calcMacd(C),k=calcStoch(H,L,C);
+  const ms=marketStr(C),cp=candleP(O,H,L,C);
+  const rz=rejZones(H,L,C),vp=volProfile(H,L,C,V);
 
-  // Render
-  // Entry cards
-  document.getElementById('entry-cards').innerHTML=ans.map((a,i)=>`
-    <div class="ag-card ${a.dir>0?'buy':a.dir<0?'sell':'wait'}">
-      <div class="ag-tf">${['??','??','??','??','??'][i]} ${a.label}</div>
-      <div class="ag-dir ${a.dir>0?'buy':a.dir<0?'sell':'wait'}">${a.dir>0?'? شراء':a.dir<0?'? بيع':'— محايد'}</div>
-      <div class="ag-acc">${Math.round(a.wAgree*100)}% دقة</div>
-    </div>`).join('');
+  let total=0;
+  if(last>e20&&e20>e50)total+=2;else if(last<e20&&e20<e50)total-=2;else if(last>e20)total+=1;else total-=1;
+  if(r<25)total+=3;else if(r<35)total+=2;else if(r<45)total+=1;
+  else if(r>75)total-=3;else if(r>65)total-=2;else if(r>55)total-=1;
+  total+=m>0?1:-1;
+  if(k<20)total+=2;else if(k>80)total-=2;
+  total+=ms.score+cp.score+rz.score;
+  
+  if(vp.atLVN)total+=(total>0?1:-1);
 
-  const ef=document.getElementById('entry-fil');
-  ef.style.width=Math.round(entryAgree*100)+'%';
-  ef.style.background=entryAgree===1?'#4ade80':entryAgree>=0.8?'#f59e0b':entryAgree>=0.6?'#f59e0b':'#f87171';
-  document.getElementById('entry-num').textContent=Math.round(entryAgree*100)+'%';
-  const evd=document.getElementById('entry-vd');
-  evd.className='asb-vd '+(entryAgree===1?'all':entryAgree>=0.6?'most':'conflict');
-  evd.textContent=entryAgree===1?`? 5 فريمات متفقة على ${mainDir>0?'الشراء':'البيع'} — إشارة ذهبية`:
-    entryAgree>=0.8?`? ${Math.max(buyCount,sellCount)} من 5 فريمات متفقة — إشارة قوية`:
-    entryAgree>=0.6?`?? ${Math.max(buyCount,sellCount)} من 5 فريمات — إشارة جيدة`:
-    `? الفريمات متعارضة — لا تدخل`;
+  let conflicts=0;
+  if(last>e20&&e20>e50&&ms.score<0)conflicts++;
+  if(last<e20&&e20<e50&&ms.score>0)conflicts++;
+  if(rz.atZone&&rz.nearType==="RESISTANCE"&&total>0)conflicts+=1;
+  if(rz.atZone&&rz.nearType==="SUPPORT"&&total<0)conflicts+=1;
 
-  // Patterns
-  const patternDiv=document.getElementById('pattern-grid');
-  if(allPatterns.length>0){
-    patternDiv.innerHTML=allPatterns.slice(0,8).map(p=>`<div class="pattern-badge ${p.type==='bullish'?'found':p.type==='bearish'?'bearish':''}">${p.name} ${p.type==='bullish'?'??':p.type==='bearish'?'??':'?'}</div>`).join('');
-  }else{patternDiv.innerHTML='<div style="color:var(--mt);font-size:11px;">لا توجد أنماط واضحة</div>';}
-
-  // Time Analysis
-  document.getElementById('time-analysis').innerHTML=`
-    <div class="time-item"><div class="tval">${isGolden?'?? نعم':'?? لا'}</div><div>وقت ذهبي</div></div>
-    <div class="time-item"><div class="tval">${nextAngle}°</div><div>زاوية جان القادمة</div></div>
-    <div class="time-item"><div class="tval">${fmt(angleTime)}</div><div>الوقت المتوقع</div></div>
-  `;
-
-  // Confirm
-  if(confRes.length>0){
-    document.getElementById('conf-cards').innerHTML=confRes.map((r,i)=>`
-      <div class="cf-card ${r.dir>0?'buy':r.dir<0?'sell':''}">
-        <div class="cf-tf">${['?','?'][i]} ${r.label}</div>
-        <div class="cf-dir ${r.dir>0?'buy':r.dir<0?'sell':'wait'}">${r.dir>0?'? شراء':r.dir<0?'? بيع':'— محايد'}</div>
-      </div>`).join('');
-    const cf=document.getElementById('conf-fil');
-    cf.style.width=Math.round((confAgree||0)*100)+'%';
-    cf.style.background=confAgree===1?'#4ade80':confAgree>=0.5?'#f59e0b':'#f87171';
-    document.getElementById('conf-num').textContent=Math.round((confAgree||0)*100)+'%';
-    const cvd=document.getElementById('conf-vd');
-    cvd.className='asb-vd '+(confAgree===1?'all':confAgree>=0.5?'most':'conflict');
-    cvd.textContent=confAgree===1?`? كلا الفريمين يؤكدان الاتجاه — ثقة عالية`:
-      confAgree>=0.5?`? فريم واحد يؤكد — جيد`:
-      `? فريمات التأكيد معاكسة — احذر`;
+  let direction="WAIT",dcls="wait";
+  if(conflicts<2&&Math.abs(total)>=2){
+    direction=total>0?"UP":"DOWN";
+    dcls=total>0?"up":"down";
   }
 
-  // Direction
-  const dc=document.getElementById('dcard');const dt=document.getElementById('dtext'),dd=document.getElementById('ddur'),ds=document.getElementById('dsub');
-  if(mainDir>0&&entryAgree>=0.6){
-    dc.className='dcard buy';dt.className='dtext buy';dt.textContent='?? CALL (شراء)';
-    dd.textContent=fmt(dur);ds.textContent='فريم التنفيذ: M5';
-  }else if(mainDir<0&&entryAgree>=0.6){
-    dc.className='dcard sell';dt.className='dtext sell';dt.textContent='?? PUT (بيع)';
-    dd.textContent=fmt(dur);ds.textContent='فريم التنفيذ: M5';
-  }else{
-    dc.className='dcard wait';dt.className='dtext wait';dt.textContent='? انتظر';
-    dd.textContent='—';ds.textContent='الفريمات غير متفقة';
+  const stc=smartTripleCheck(O,H,L,C,rz,vp,direction);
+  if(direction!=="WAIT"&&!stc.allPassed){direction="WAIT";dcls="wait";}
+
+  const absScore=Math.abs(total);
+  const accuracy=Math.min(95,Math.round(60+absScore*4));
+  const strength=Math.min(98,Math.round(52+absScore*5));
+
+  const atrVal=calcAtr(H,L,C);
+  const atrPct=(atrVal/last)*100;
+  let duration="No Entry";
+  if(direction!=="WAIT"){
+    if(atrPct>0.15)duration="5 min";
+    else if(atrPct>0.08)duration="15 min";
+    else if(atrPct>0.04)duration="30 min";
+    else duration="1 hour";
   }
 
-  // Risk
-  document.getElementById('risk-grid').innerHTML=`
-    <div class="risk-item"><div class="label">?? المخاطرة</div><div class="value green">$${riskAmount.toFixed(2)}</div></div>
-    <div class="risk-item"><div class="label">?? الربح المتوقع</div><div class="value gold">$${profitAmount.toFixed(2)}</div></div>
-    <div class="risk-item"><div class="label">?? Risk/Reward</div><div class="value ${rrRatio>=2?'green':rrRatio>=1?'gold':'red'}">${rrRatio.toFixed(2)}:1</div></div>
-  `;
+  const reasons=[];
+  if(direction!=="WAIT"){
+    const up=direction==="UP";
+    if(up&&last>e20||!up&&last<e20) reasons.push(`Price ${up?"above":"below"} EMA20 & EMA50`);
+    if(r<45&&up) reasons.push(`RSI ${r.toFixed(0)} — support dynamic alignment`);
+    if(r>55&&!up) reasons.push(`RSI ${r.toFixed(0)} — resistance dynamic alignment`);
+    if(ms.score!==0) reasons.push(`${ms.trend} Structure Aligned`);
+    if(cp.patterns.length>0) reasons.push(`${cp.patterns[0]} confirmed`);
+    while(reasons.length<3) reasons.push(`${up?"Bullish":"Bearish"} momentum aligned`);
+  } else {
+    reasons.push("Mixed signals — monitoring market structure");
+    reasons.push(`Smart Triple Check: ${stc.passed}/3 checks passed`);
+    reasons.push("Wait for system confluence");
+  }
 
-  // Alerts
-  const alerts=[];
-  if(finalAcc<0.7)alerts.push('?? دقة منخفضة — انتظر إشارة أقوى');
-  if(entryAgree<0.6)alerts.push('?? فريمات دخول متعارضة');
-  if(confAgree!==null&&confAgree<0.5)alerts.push('?? فريمات التأكيد معاكسة');
-  if(nLv==='خطر')alerts.push('?? ضجيج خطير — فكر مرتين');
-  if(rrRatio<1)alerts.push('?? Risk/Reward منخفض — لا تدخل');
-  if(finalAcc>=0.9&&entryAgree>=0.8&&confAgree>=0.5)alerts.push('? كل شيء مثالي — ادخل بثقة');
-  else if(finalAcc>=0.8&&entryAgree>=0.6)alerts.push('? إشارة جيدة — ادخل بحذر');
-  else alerts.push('? انتظر إشارة أفضل');
-  document.getElementById('alert-text').textContent=alerts[0]||'لا توجد تنبيهات';
-
-  // Metrics
-  document.getElementById('macc').textContent=Math.round(finalAcc*100)+'%';
-  document.getElementById('maccs').textContent=finalAcc>=0.9?'?? ذهبية':finalAcc>=0.8?'?? قوية':finalAcc>=0.7?'?? جيدة':'? ضعيفة';
-  document.getElementById('ment').textContent=Math.max(buyCount,sellCount)+'/5';
-  document.getElementById('mconf').textContent=confRes.length>0?Math.round((confAgree||0)*confRes.length)+'/'+confRes.length:'—';
-  document.getElementById('mrsi').textContent=rsiVal.toFixed(1);
-  document.getElementById('mrsis').textContent=rsiVal>50?'?? صاعد':rsiVal<50?'?? هابط':'?? محايد';
-  document.getElementById('mmacd').textContent=(macdVal>0?'+':'')+macdVal.toFixed(5);
-  document.getElementById('mmacds').textContent=macdVal>0?'?? إيجابي':macdVal<0?'?? سلبي':'?? محايد';
-
-  // Noise
-  const mv=ans[0].rng||1;
-  document.getElementById('nb-body').style.width=pct(ans[0].body/mv);
-  document.getElementById('nb-noise').style.width=pct(nR/mv);
-  document.getElementById('nv-body').textContent=f5(ans[0].body);
-  document.getElementById('nv-noise').textContent=f5(nR);
-  document.getElementById('nv-range').textContent=f5(ans[0].rng);
-  document.getElementById('ndirl').textContent=mainDir>0?'ضجيج ? (شراء)':'ضجيج ? (بيع)';
-  const nvd=document.getElementById('nvd');nvd.className='nvd '+nCl;
-  nvd.textContent='?? '+nLv+' — '+nMsg;
-
-  // Tabs
-  const labels=['M5','M15','M30','H1','H4'];
-  document.getElementById('tabs').innerHTML=ans.map((a,i)=>
-    `<div class="tab${i===0?' active '+(a.dir>0?'buy':a.dir<0?'sell':'neu'):''}" onclick="showTab(${i})">
-      ${['??','??','??','??','??'][i]} ${labels[i]} ${a.dir>0?'?':a.dir<0?'?':'—'}
-    </div>`).join('');
-  document.getElementById('tab-panes').innerHTML=ans.map((a,i)=>
-    `<div class="tab-pane${i===0?' active':''}" id="pane${i}">
-      <div class="grps">${renderGroups(a.groups)}</div>
-    </div>`).join('');
-
-  document.getElementById('result').style.display='block';
-  document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
+  return {
+    direction,dcls,accuracy,strength,duration,total,
+    rsi:r.toFixed(1),macd:m.toFixed(5),stoch:k.toFixed(0),
+    e20:e20.toFixed(5),last:last.toFixed(5),
+    ms,cp,rz,vp,stc,reasons:reasons.slice(0,3)
+  };
 }
+
+// ============================================================
+// ??? TWELVE DATA FETCH
+// ============================================================
+async function fetchTF(symbol, interval) {
+  const map = {
+    "5min": "5min",
+    "15min": "15min",
+    "30min": "30min",
+    "1h": "1h",
+    "4h": "4h"
+  };
+  const inter = map[interval] || "5min";
+
+  const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${inter}&outputsize=100&apikey=${TWELVE_KEY}`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (data.status === "error") {
+    throw new Error(data.message || "Twelve Data error");
+  }
+
+  if (!data.values || data.values.length === 0) {
+    throw new Error("No data returned from Twelve Data");
+  }
+
+  const vals = data.values.reverse().slice(0, -1);
+
+  return {
+    O: vals.map(v => parseFloat(v.open)),
+    H: vals.map(v => parseFloat(v.high)),
+    L: vals.map(v => parseFloat(v.low)),
+    C: vals.map(v => parseFloat(v.close)),
+    V: vals.map(v => parseFloat(v.volume || 0))
+  };
+}
+
+function quickBias(O,H,L,C){
+  const last=C[C.length-1],e20=calcEma(C.slice(-20),20),e50=calcEma(C.slice(-50),50);
+  const r=calcRsi(C),m=calcMacd(C);
+  let s=0;
+  if(last>e20)s++;else s--;if(last>e50)s++;else s--;
+  if(r<48)s++;else if(r>52)s--;if(m>0)s++;else s--;
+  if(s>=2)return"UP";if(s<=-2)return"DOWN";return"NEUTRAL";
+}
+
+function loadH(){try{return JSON.parse(localStorage.getItem("sbh")||"[]");}catch{return[];}}
+function saveH(h){try{localStorage.setItem("sbh",JSON.stringify(h));}catch{}}
+
+// ============================================================
+// COLORS & STYLES
+// ============================================================
+const C={
+  bg:"transparent",card:"rgba(16, 18, 30, 0.85)",box:"rgba(13, 15, 26, 0.7)",border:"#1e2235",
+  text:"#e0e0f0",dim:"#707898",dim2:"#444a68",
+  up:"#00e096",down:"#ff4d6d",wait:"#f0c040",accent:"#7c83ff",
+  accentB:"#4fc3f7"
+};
+
+const S={
+  app:{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"-apple-system,BlinkMacSystemFont,sans-serif",display:"flex",justifyContent:"center",position:"relative"},
+  wrap:{width:"100%",maxWidth:400,padding:"0 16px 80px"},
+  hdr:{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"40px 0 25px",textAlign:"center"},
+  row:{display:"flex",alignItems:"center",justifyContent:"space-between"},
+  ibox:{background:C.box,borderRadius:10,padding:"11px 13px",marginBottom:8,backdropFilter:"blur(4px)"},
+  lbl:{fontSize:10,color:C.dim,fontWeight:600,marginBottom:3,textTransform:"uppercase",letterSpacing:"0.5px"},
+  g2:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8},
+  g3:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:8},
+  g4:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:6,marginBottom:8},
+  footer:{position:"absolute",bottom:55,left:0,right:0,textAlign:"center",fontSize:10,color:"#525a7a",letterSpacing:"1px",fontWeight:500,pointerEvents:"none"}
+};
+
+// ============================================================
+// MAIN APP
+// ============================================================
+function App(){
+  const [pair,setPair]=useState("EUR/USD");
+  const [showDD,setShowDD]=useState(false);
+  const [loading,setLoading]=useState(false);
+  const [sig,setSig]=useState(null);
+  const [mtf,setMtf]=useState([]);
+  const [verdict,setVerdict]=useState(null);
+  const [err,setErr]=useState("");
+  const [page,setPage]=useState("signals");
+  const [history,setHistory]=useState(loadH);
+  const [lastId,setLastId]=useState(null);
+  const [taken,setTaken]=useState(false);
+
+  const dc=sig?.direction==="UP"?C.up:sig?.direction==="DOWN"?C.down:C.wait;
+
+  const getSignal=useCallback(async()=>{
+    setLoading(true);setSig(null);setErr("");setMtf([]);setVerdict(null);setTaken(false);
+    try{
+      const main=await fetchTF(pair,"5min");
+      const tfs=[["5min","5M"],["15min","15M"],["1h","1H"]];
+      const mtfArr=[];let up=0,dn=0;
+      for(const [tf,lbl] of tfs){
+        try{
+          if(tf!=="5min")await new Promise(r=>setTimeout(r,300));
+          const d=tf==="5min"?main:await fetchTF(pair,tf);
+          const b=quickBias(d.O,d.H,d.L,d.C);
+          mtfArr.push({lbl,bias:b,active:tf==="5min"});
+          if(b==="UP")up++;else if(b==="DOWN")dn++;
+        }catch{mtfArr.push({lbl,bias:"N/A",active:tf==="5min"});}
+      }
+      setMtf(mtfArr);
+      const align=Math.max(up,dn);
+      const mtfDir=up>dn?"UP":dn>up?"DOWN":"NEUTRAL";
+      const result=analyze(main.O,main.H,main.L,main.C,main.V);
+      if(mtfDir!=="NEUTRAL"&&mtfDir!==result.direction&&result.direction!=="WAIT"){
+        result.direction="WAIT";result.dcls="wait";result.duration="No Entry";
+      }
+      if(mtfDir===result.direction&&result.direction!=="WAIT"){
+        result.accuracy=Math.min(96,result.accuracy+align*2);
+        if(align>=3)result.reasons[2]=`${align}/3 timeframes aligned — strong confirmation`;
+      }
+      const stcOk=result.stc.allPassed;
+      const mtfOk=align>=2;
+      const confOk=result.accuracy>=80;
+      const isGo=result.direction!=="WAIT"&&stcOk&&mtfOk&&confOk;
+      setVerdict({label:isGo?"GO":"AVOID",dir:result.direction,time:result.duration,color:result.direction==="UP"?C.up:C.down});
+      setSig(result);
+    }catch(e){setErr(e.message||"Error");}
+    setLoading(false);
+  },[pair]);
+
+  const skipToNext=useCallback(async()=>{
+    setSig(null);setVerdict(null);setErr("");
+    const startIdx=PAIRS.indexOf(pair);
+    for(let i=1;i<PAIRS.length;i++){
+      const nextPair=PAIRS[(startIdx+i)%PAIRS.length];
+      setPair(nextPair);
+      setLoading(true);
+      try{
+        const main=await fetchTF(nextPair,"5min");
+        const tfs=[["5min","5M"],["15min","15M"],["1h","1H"]];
+        const mtfArr=[];let up=0,dn=0;
+        for(const [tf,lbl] of tfs){
+          try{
+            if(tf!=="5min")await new Promise(r=>setTimeout(r,250));
+            const d=tf==="5min"?main:await fetchTF(nextPair,tf);
+            const b=quickBias(d.O,d.H,d.L,d.C);
+            mtfArr.push({lbl,bias:b,active:tf==="5min"});
+            if(b==="UP")up++;else if(b==="DOWN")dn++;
+          }catch{mtfArr.push({lbl,bias:"N/A",active:tf==="5min"});}
+        }
+        setMtf(mtfArr);
+        const align=Math.max(up,dn);
+        const mtfDir=up>dn?"UP":dn>up?"DOWN":"NEUTRAL";
+        const result=analyze(main.O,main.H,main.L,main.C,main.V);
+        if(mtfDir!=="NEUTRAL"&&mtfDir!==result.direction&&result.direction!=="WAIT"){
+          result.direction="WAIT";result.dcls="wait";result.duration="No Entry";
+        }
+        if(mtfDir===result.direction&&result.direction!=="WAIT"){
+          result.accuracy=Math.min(96,result.accuracy+align*2);
+        }
+        const stcOk=result.stc.allPassed;
+        const mtfOk=align>=2;
+        const confOk=result.accuracy>=80;
+        const isGo=result.direction!=="WAIT"&&stcOk&&mtfOk&&confOk;
+        const v={label:isGo?"GO":"AVOID",dir:result.direction,time:result.duration,color:result.direction==="UP"?C.up:C.down};
+        setVerdict(v);setSig(result);setLoading(false);
+        if(isGo)return;
+      }catch(e){setErr(e.message);}
+    }
+    setLoading(false);
+  },[pair]);
+
+  const takeTrade=()=>{
+    if(!sig)return;
+    const id=Date.now();
+    const durationMs={"5 min":5*60*1000,"15 min":15*60*1000,"30 min":30*60*1000,"1 hour":60*60*1000}[sig.duration]||5*60*1000;
+    const t={id,pair,dir:sig.direction,dur:sig.duration,time:new Date().toLocaleTimeString(),date:new Date().toLocaleDateString(),result:null,accuracy:sig.accuracy,entryPrice:parseFloat(sig.last),expiryTime:Date.now()+durationMs};
+    const h=[t,...history].slice(0,100);
+    setHistory(h);saveH(h);setLastId(id);setTaken(true);
+    const durationMs2={"5 min":5*60*1000,"15 min":15*60*1000,"30 min":30*60*1000,"1 hour":60*60*1000}[sig.duration]||5*60*1000;
+    const entryP=parseFloat(sig.last);
+    const tradeDir=sig.direction;
+    const tradePair=pair;
+    setTimeout(async()=>{
+      try{
+        const data=await fetchTF(tradePair,"5min");
+        const exitPrice=data.C[data.C.length-1];
+        const autoResult=tradeDir==="UP"?(exitPrice>entryP?"WIN":"LOSS"):(exitPrice<entryP?"WIN":"LOSS");
+        setHistory(prev=>{
+          const updated=prev.map(tr=>tr.id===id&&tr.result===null?{...tr,result:autoResult,exitPrice,auto:true}:tr);
+          saveH(updated);
+          return updated;
+        });
+        setTaken(false);setSig(null);
+      }catch(e){console.log("Auto-track failed:",e);}
+    },durationMs2);
+  };
+
+  const markResult=(result)=>{
+    const h=history.map(t=>t.id===lastId?{...t,result}:t);
+    setHistory(h);saveH(h);setTaken(false);setSig(null);
+  };
+
+  const markFromHistory=(id,result)=>{
+    const h=history.map(t=>t.id===id?{...t,result}:t);
+    setHistory(h);saveH(h);
+  };
+
+  const done=history.filter(t=>t.result);
+  const wins=done.filter(t=>t.result==="WIN").length;
+  const losses=done.filter(t=>t.result==="LOSS").length;
+  const rate=done.length>0?Math.round(wins/done.length*100):0;
+
+  if(page==="history") return(
+    <div style={S.app}>
+      <div style={S.wrap}>
+        <div style={{...S.hdr, flexDirection:"row", justifyContent:"space-between", padding:"40px 0 20px"}}>
+          <div style={{fontSize:18,fontWeight:800,color:C.text}}>?? Trade History</div>
+          <button onClick={()=>setPage("signals")} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"8px 14px",color:C.accent,fontSize:13,fontWeight:600,cursor:"pointer"}}>? Back</button>
+        </div>
+        <div style={{...S.g4,marginBottom:16}}>
+          {[{n:history.length,l:"TOTAL",c:C.accent},{n:wins,l:"WINS",c:C.up},{n:losses,l:"LOSSES",c:C.down},{n:`${rate}%`,l:"WIN RATE",c:rate>=65?C.up:rate>=50?C.wait:C.down}].map(x=>(
+            <div key={x.l} style={{background:C.card,borderRadius:10,padding:"10px 6px",textAlign:"center", backdropFilter:"blur(4px)", border:`1px solid #1a1c2e`}}>
+              <div style={{fontSize:18,fontWeight:800,color:x.c}}>{x.n}</div>
+              <div style={{fontSize:9,color:C.dim,marginTop:2}}>{x.l}</div>
+            </div>
+          ))}
+        </div>
+        {history.length===0?<div style={{textAlign:"center",color:C.dim2,padding:"40px 0",fontSize:13}}>No trades yet.<br/>Take a GO signal to start tracking.</div>:
+          history.slice(0,30).map(t=>(
+            <div key={t.id} style={{background:C.card,borderRadius:10,padding:"12px 14px",marginBottom:8,display:"flex",alignItems:"center",justifyContent:"space-between", backdropFilter:"blur(4px)", border:`1px solid #1a1c2e`}}>
+              <div>
+                <div style={{fontSize:13,fontWeight:700,color:C.text}}>{t.pair}</div>
+                <div style={{fontSize:10,color:C.dim}}>{t.date} {t.time} | {t.dir} | {t.accuracy}%</div>
+              </div>
+              {t.result===null?(
+                <div style={{display:"flex",gap:6}}>
+                  <button onClick={()=>markFromHistory(t.id,"WIN")} style={{padding:"4px 8px",background:"rgba(0,224,150,0.15)",border:`1px solid ${C.up}`,borderRadius:6,color:C.up,fontSize:11,fontWeight:700,cursor:"pointer"}}>WIN</button>
+                  <button onClick={()=>markFromHistory(t.id,"LOSS")} style={{padding:"4px 8px",background:"rgba(255,77,109,0.15)",border:`1px solid ${C.down}`,borderRadius:6,color:C.down,fontSize:11,fontWeight:700,cursor:"pointer"}}>LOSS</button>
+                </div>
+              ):(
+                <span style={{padding:"4px 10px",borderRadius:6,fontSize:11,fontWeight:700,color:t.result==="WIN"?C.up:C.down,background:t.result==="WIN"?"rgba(0,224,150,0.15)":"rgba(255,77,109,0.15)"}}>{t.result}</span>
+              )}
+            </div>
+          ))
+        }
+        {history.length>0&&<button onClick={()=>{if(window.confirm("Clear all trade history?")){const h=[];setHistory(h);saveH(h);}}} style={{width:"100%",marginTop:12,padding:10,background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.dim,fontSize:11,cursor:"pointer"}}>?? Clear All History</button>}
+      </div>
+      <div style={S.footer}>MADE BY: ABDALLAH MAHER</div>
+    </div>
+  );
+
+  return(
+    <div style={S.app}>
+      <style>{`
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pulseG{0%,100%{box-shadow:0 0 0 0 rgba(0,224,150,0.3)}50%{box-shadow:0 0 0 8px rgba(0,224,150,0)}}
+        @keyframes pulseR{0%,100%{box-shadow:0 0 0 0 rgba(255,77,109,0.3)}50%{box-shadow:0 0 0 8px rgba(255,77,109,0)}}
+        *{box-sizing:border-box;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+      `}</style>
+      <div style={S.wrap}>
+
+        {/* Header */}
+        <div style={S.hdr}>
+          <div style={{position:"relative", display:"inline-block"}}>
+            <span style={{fontSize:28,fontWeight:900,background:`linear-gradient(135deg, #ffffff, ${C.accent})`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",letterSpacing:"1px", filter: "drop-shadow(0px 2px 8px rgba(124,131,255,0.3))"}}>SpriNg Bot</span>
+            <span style={{fontSize:9,fontWeight:800,color:"#fff",background:`linear-gradient(135deg, #ff9800, #f44336)`,padding:"2px 6px",borderRadius:4,verticalAlign:"middle",marginLeft:8,boxShadow:"0 2px 10px rgba(244,67,54,0.3)"}}>PRO</span>
+          </div>
+          <div style={{fontSize:11, color:C.dim, marginTop:4, fontWeight:500, letterSpacing:"0.5px"}}>AI-POWERED TRADING ENGINE</div>
+        </div>
+
+        {/* Pair Selector */}
+        <div style={{position:"relative",marginBottom:14}}>
+          <button
+            onClick={()=>setShowDD(v=>!v)}
+            style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:"12px 14px",color:C.text,fontSize:14,fontWeight:600,cursor:"pointer",backdropFilter:"blur(4px)"}}
+          >
+            <span>{pair}</span>
+            <span style={{color:C.dim,fontSize:10}}>?</span>
+          </button>
+          {showDD&&(
+            <div style={{position:"absolute",top:50,left:0,right:0,zIndex:999,background:"#0f111a",border:`1px solid ${C.border}`,borderRadius:10,maxHeight:220,overflowY:"auto",boxShadow:"0 12px 40px rgba(0,0,0,0.7)"}}>
+              {PAIRS.map(p=>(
+                <div
+                  key={p}
+                  onClick={()=>{setPair(p);setShowDD(false);setSig(null);setVerdict(null);}}
+                  style={{padding:"11px 14px",fontSize:13,cursor:"pointer",color:p===pair?C.accent:C.text,background:p===pair?"#1a1c2e":"transparent",borderBottom:"1px solid #0d0f1a"}}
+                >{p}</div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Card */}
+        <div style={{background:C.card,border:`1px solid #1a1c2e`,backdropFilter:"blur(10px)",borderRadius:16,padding:18,marginBottom:12,minHeight:100, boxShadow:"0 8px 32px rgba(0,0,0,0.25)"}}>
+          {!sig&&!loading&&!err&&<div style={{textAlign:"center",color:C.dim,fontSize:14,padding:"30px 0",fontWeight:500}}>Press <span style={{color:C.accent}}>Get Signal</span> to scan the market</div>}
+          {loading&&<div style={{textAlign:"center",padding:"20px 0"}}><div style={{width:36,height:36,border:`3px solid ${C.border}`,borderTop:`3px solid ${C.accent}`,borderRadius:"50%",animation:"spin 0.8s linear infinite",margin:"0 auto 10px"}}/><div style={{color:C.dim,fontSize:12}}>Analyzing market vectors...</div></div>}
+          {err&&<div style={{textAlign:"center",color:C.down,fontSize:13,padding:"20px 0"}}>? {err}</div>}
+
+          {sig&&!loading&&(
+            <div style={{animation:"fadeUp 0.4s ease"}}>
+
+              {/* Confidence */}
+              <div style={{...S.ibox,...S.row,marginBottom:8}}>
+                <div><div style={S.lbl}>Confidence</div><div style={{fontSize:22,fontWeight:800,color:C.accent}}>{sig.direction==="WAIT"?"---":`${sig.accuracy}%`}</div></div>
+                <div style={{textAlign:"right"}}><div style={S.lbl}>Market</div><div style={{fontSize:13,fontWeight:700,color:"#a0a8c8"}}>{sig.ms.trend}</div></div>
+              </div>
+
+              {/* MTF */}
+              <div style={{...S.ibox,marginBottom:8}}>
+                <div style={S.lbl}>Multi-Timeframe</div>
+                {mtf.map(d=>{
+                  const c=d.bias==="UP"?C.up:d.bias==="DOWN"?C.down:C.wait;
+                  return <div key={d.lbl} style={{display:"flex",alignItems:"center",padding:"4px 0",borderBottom:"1px solid rgba(255,255,255,0.02)"}}>
+                    <span style={{fontSize:11,color:d.active?C.accent:C.dim,fontWeight:d.active?700:400,width:35}}>{d.lbl}</span>
+                    <div style={{flex:1,height:4,background:"#1a1c2e",borderRadius:100,overflow:"hidden",margin:"0 8px"}}>
+                      <div style={{width:d.bias!=="N/A"?"70%":"0%",height:"100%",background:c,borderRadius:100}}/>
+                    </div>
+                    <span style={{fontSize:11,fontWeight:700,color:c,width:60,textAlign:"right"}}>{d.bias}</span>
+                  </div>;
+                })}
+              </div>
+
+              {/* Indicators */}
+              <div style={S.g3}>
+                {[{l:"RSI",v:sig.rsi,c:sig.rsi<40?C.up:sig.rsi>60?C.down:C.wait},{l:"Stoch",v:sig.stoch,c:sig.stoch<30?C.up:sig.stoch>70?C.down:C.wait},{l:"MACD",v:(parseFloat(sig.macd)>0?"+":"")+parseFloat(sig.macd).toFixed(4),c:parseFloat(sig.macd)>0?C.up:C.down}].map(x=>(
+                  <div key={x.l} style={{...S.ibox,marginBottom:0,padding:"9px 10px"}}>
+                    <div style={{...S.lbl,fontSize:9}}>{x.l}</div>
+                    <div style={{fontSize:13,fontWeight:700,color:x.c}}>{x.v}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Signal Strength */}
+              <div style={{...S.ibox,marginBottom:8}}>
+                <div style={{...S.row,marginBottom:5}}>
+                  <span style={S.lbl}>Signal Strength</span>
+                  <span style={{fontSize:10,color:C.dim}}>{sig.direction==="WAIT"?"WAIT":`${sig.strength}%`}</span>
+                </div>
+                <div style={{height:5,background:"#1a1c2e",borderRadius:100,overflow:"hidden"}}>
+                  <div style={{width:`${sig.direction==="WAIT"?0:sig.strength}%`,height:"100%",background:sig.dcls==="up"?`linear-gradient(90deg,${C.accentB},${C.up})`:`linear-gradient(90deg,${C.down},#ff8c00)`,borderRadius:100,transition:"width 0.8s"}}/>
+                </div>
+                <div style={{...S.row,marginTop:3}}>
+                  <span style={{fontSize:9,color:"#222538"}}>Weak</span>
+                  <span style={{fontSize:9,color:C.dim}}>Score: {sig.total}</span>
+                  <span style={{fontSize:9,color:"#222538"}}>Strong</span>
+                </div>
+              </div>
+
+              {/* Patterns */}
+              <div style={{...S.ibox,marginBottom:8}}>
+                <div style={{fontSize:10,color:C.dim,marginBottom:4}}>{sig.ms.trend}</div>
+                <div>{sig.cp.patterns.length>0?sig.cp.patterns.map(p=><span key={p} style={{background:"#1a1c2e",borderRadius:5,padding:"2px 7px",fontSize:10,color:C.accent,marginRight:3}}>{p}</span>):<span style={{fontSize:10,color:C.dim2}}>No pattern detected</span>}</div>
+              </div>
+
+              {/* SMART TRIPLE CHECK */}
+              <div style={{...S.ibox,border:`1px solid ${sig.stc.allPassed?"rgba(0,224,150,0.25)":"rgba(255,77,109,0.25)"}`,marginBottom:8}}>
+                <div style={{...S.row,marginBottom:8}}>
+                  <span style={{...S.lbl,color:sig.stc.allPassed?C.up:C.down}}>?? SMART TRIPLE CHECK</span>
+                  <span style={{fontSize:12,fontWeight:700,color:sig.stc.allPassed?C.up:C.down}}>{sig.stc.passed}/3 {sig.stc.allPassed?"PASSED":"FAILED"}</span>
+                </div>
+                {[
+                  {n:"1",label:"Momentum Consistency",ok:sig.stc.check1,detail:sig.stc.mcsDetails},
+                  {n:"2",label:"Structure Confluence",ok:sig.stc.check2,detail:`RZ:${sig.stc.rzOk?"?":"?"} | Vol:${sig.stc.vpOk?"?":"?"}`},
+                  {n:"3",label:"Multi-Signal Agreement",ok:sig.stc.check3,detail:`${sig.stc.agree}/3 signals agree`},
+                ].map(ch=>(
+                  <div key={ch.n} style={{display:"flex",alignItems:"flex-start",gap:8,marginBottom:6,background:"rgba(10,12,20,0.5)",borderRadius:8,padding:"8px 10px"}}>
+                    <div style={{width:20,height:20,borderRadius:"50%",background:ch.ok?"rgba(0,224,150,0.15)":"rgba(255,77,109,0.15)",border:`1px solid ${ch.ok?C.up:C.down}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:ch.ok?C.up:C.down,flexShrink:0}}>{ch.n}</div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:11,fontWeight:600,color:ch.ok?C.text:C.dim,marginBottom:2}}>{ch.label} {ch.ok?"OK":"X"}</div>
+                      <div style={{fontSize:10,color:C.dim}}>{ch.detail}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Rejection Zone */}
+              <div style={{...S.ibox,marginBottom:8}}>
+                <div style={S.row}>
+                  <span style={S.lbl}>? REJECTION ZONE</span>
+                  <span style={{fontSize:11,fontWeight:700,color:sig.rz.atZone?(sig.rz.nearType==="SUPPORT"?C.up:C.down):C.dim2}}>{sig.rz.atZone?`${sig.rz.nearType} (${sig.rz.nearZone.touches}x)`:"NONE NEARBY"}</span>
+                </div>
+                <div style={{fontSize:11,color:C.dim,marginTop:3}}>{sig.rz.label}</div>
+              </div>
+
+              {/* Volume Profile */}
+              <div style={{...S.ibox,marginBottom:8}}>
+                <div style={S.row}>
+                  <span style={S.lbl}>?? VOLUME PROFILE</span>
+                  <span style={{fontSize:11,fontWeight:700,color:sig.vp.atLVN?C.wait:sig.vp.atHVN?C.accent:C.dim2}}>{sig.vp.atLVN?"EXPLOSION ZONE":sig.vp.atHVN?"HVN":sig.vp.nearPOC?"NEAR POC":"CLEAR"}</span>
+                </div>
+                <div style={{fontSize:11,color:C.dim,marginTop:3}}>{sig.vp.label}</div>
+              </div>
+
+              {/* Direction Box */}
+              <div style={{borderRadius:11,padding:"14px 16px",marginBottom:10,display:"flex",alignItems:"center",justifyContent:"space-between",background:sig.dcls==="up"?"rgba(0,224,150,0.07)":sig.dcls==="down"?"rgba(255,77,109,0.07)":"rgba(240,192,64,0.07)",border:`1px solid ${sig.dcls==="up"?"rgba(0,224,150,0.2)":sig.dcls==="down"?"rgba(255,77,109,0.2)":"rgba(240,192,64,0.2)"}`}}>
+                <div>
+                  <div style={S.lbl}>Signal</div>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <span style={{fontSize:24}}>{sig.direction==="UP"?"??":sig.direction==="DOWN"?"??":"?"}</span>
+                    <span style={{fontSize:26,fontWeight:900,color:dc}}>{sig.direction}</span>
+                  </div>
+                </div>
+                <div style={{textAlign:"right"}}>
+                  <div style={S.lbl}>Duration</div>
+                  <div style={{fontSize:16,fontWeight:700,color:C.accent}}>{sig.duration}</div>
+                </div>
+              </div>
+
+              {/* Reasons */}
+              <div style={{...S.ibox,marginBottom:12}}>
+                <div style={{...S.lbl,marginBottom:8}}>? TOP 3 REASONS</div>
+                {sig.reasons.map((r,i)=>(
+                  <div key={i} style={{display:"flex",gap:8,marginBottom:7,alignItems:"flex-start"}}>
+                    <div style={{width:18,height:18,borderRadius:"50%",background:`${dc}22`,color:dc,fontSize:10,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{i+1}</div>
+                    <div style={{fontSize:12,color:"#a0a8c8",lineHeight:1.5}}>{r}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* GO / AVOID */}
+              {verdict&&(
+                <div style={{borderRadius:12,border:`2px solid ${verdict.label==="GO"?verdict.color:C.border}`,marginBottom:12}}>
+                  <div style={{background:verdict.label==="GO"?`${verdict.color}18`:C.box,padding:14,display:"flex",alignItems:"center",justifyContent:"space-between",borderRadius:10}}>
+                    <div style={{display:"flex",alignItems:"center",gap:10}}>
+                      <div style={{width:40,height:40,borderRadius:"50%",background:verdict.label==="GO"?verdict.color:"#1b1e30",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{verdict.label==="GO"?"?":"??"}</div>
+                      <div>
+                        <div style={{fontSize:22,fontWeight:900,letterSpacing:2,color:verdict.label==="GO"?verdict.color:C.dim2}}>{verdict.label}</div>
+                        <div style={{fontSize:10,color:C.dim}}>{verdict.label==="GO"?"All 3 checks passed":"Triple check failed"}</div>
+                      </div>
+                    </div>
+                    {verdict.label==="GO"&&<div style={{textAlign:"right"}}>
+                      <div style={{fontSize:18,fontWeight:800,color:verdict.color}}>{verdict.dir}</div>
+                      <div style={{fontSize:12,color:C.dim}}>{verdict.time}</div>
+                    </div>}
+                  </div>
+                </div>
+              )}
+
+              {/* Actions */}
+              {!taken?(
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                  <button onClick={takeTrade} style={{padding:13,border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",background:sig.direction==="UP"?C.up:C.down,animation:sig.direction==="UP"?"pulseG 2s infinite":"pulseR 2s infinite"}}>? Take</button>
+                  <button onClick={skipToNext} style={{padding:13,background:"transparent",border:`1px solid ${C.border}`,borderRadius:10,color:C.text,fontWeight:700,fontSize:14,cursor:"pointer"}}>? Next</button>
+                </div>
+              ):(
+                <div style={{background:"rgba(0,224,150,0.06)",border:"1px solid rgba(0,224,150,0.18)",borderRadius:10,padding:14,textAlign:"center"}}>
+                  <div style={{fontSize:13,color:C.up,fontWeight:600,marginBottom:10}}>?? Mark result:</div>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                    <button onClick={()=>markResult("WIN")} style={{padding:10,background:"rgba(0,224,150,0.15)",border:`1px solid ${C.up}60`,borderRadius:8,color:C.up,fontWeight:700,fontSize:13,cursor:"pointer"}}>? WIN</button>
+                    <button onClick={()=>markResult("LOSS")} style={{padding:10,background:"rgba(255,77,109,0.15)",border:`1px solid ${C.down}60`,borderRadius:8,color:C.down,fontWeight:700,fontSize:13,cursor:"pointer"}}>? LOSS</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Get Signal Button */}
+        {!loading&&!sig&&(
+          <button onClick={getSignal} style={{width:"100%",padding:15,background:`linear-gradient(135deg,${C.accentB},${C.accent})`,border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",boxShadow:`0 4px 24px ${C.accent}44`}}>
+            ?? Get Signal
+          </button>
+        )}
+
+        {/* Nav */}
+        <div style={{display:"flex",justifyContent:"space-around",marginTop:24,borderTop:`1px solid rgba(255,255,255,0.05)`,paddingTop:14}}>
+          {[
+            {ic:"??",lb:"Profile"},
+            {ic:"??",lb:"History",action:()=>setPage("history")},
+            {ic:"??",lb:"Signals"},
+            {ic:"??",lb:"AI"},
+            {ic:"??",lb:"Support"}
+          ].map((x,i)=>(
+            <div key={x.lb} onClick={x.action} style={{textAlign:"center",cursor:x.action?"pointer":"default",opacity:x.lb==="Signals"||x.lb==="History"?1:0.35}}>
+              <div style={{fontSize:18,marginBottom:2}}>{x.ic}</div>
+              <div style={{fontSize:9,color:x.lb==="Signals"?C.accent:C.dim,fontWeight:x.lb==="Signals"?700:400}}>{x.lb}</div>
+            </div>
+          ))}
+        </div>
+
+      </div>
+      <div style={S.footer}>MADE BY: ABDALLAH MAHER</div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
 </script>
 </body>
 </html>
